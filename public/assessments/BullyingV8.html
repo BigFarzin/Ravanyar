@@ -1,0 +1,1693 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سامانه هوشمند ضد قلدری – V8</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Vazirmatn",Tahoma,sans-serif}
+body{background:#eef2f7;padding:16px;direction:rtl}
+.app{max-width:1440px;margin:0 auto;background:#fff;border-radius:32px;box-shadow:0 20px 60px rgba(0,0,0,.06);overflow:hidden}
+header{background:linear-gradient(135deg,#0b2a4a,#1b4a7a);color:#fff;padding:18px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+header h1{font-weight:400;font-size:1.4rem}
+header h1 small{display:block;font-size:.7rem;opacity:.7;font-weight:300}
+.role-badge{background:rgba(255,255,255,.12);padding:6px 20px;border-radius:40px;font-size:.85rem;border:1px solid rgba(255,255,255,.08)}
+.role-selector{display:flex;gap:8px;flex-wrap:wrap}
+.role-selector button{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);color:#c8d8ee;padding:4px 14px;border-radius:30px;font-size:.75rem;cursor:pointer;transition:.2s}
+.role-selector button.active-role{background:rgba(255,255,255,.2);color:#fff;border-color:rgba(255,255,255,.4)}
+.icon-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;padding:6px 12px;border-radius:30px;font-size:.8rem;cursor:pointer}
+.icon-btn:hover{background:rgba(255,255,255,.25)}
+.tabs{display:flex;flex-wrap:wrap;background:#e9eef5;padding:0 16px;border-bottom:1px solid #cdd8e6}
+.tabs button{background:transparent;border:none;padding:12px 18px;font-size:.85rem;font-weight:600;color:#2a4058;cursor:pointer;border-bottom:3px solid transparent;transition:.2s;white-space:nowrap}
+.tabs button:hover{background:#dce4ef}
+.tabs button.active{border-bottom-color:#1b4a7a;color:#0b2a4a;background:#fff}
+.tabs button.hidden-tab{display:none}
+.panel{display:none;padding:24px 28px 36px;animation:fade .25s}
+.panel.active{display:block}
+@keyframes fade{from{opacity:.2}to{opacity:1}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin:16px 0}
+.card{background:#f8fafe;border-radius:18px;padding:18px 20px;border:1px solid #e5ecf5;margin-bottom:14px}
+.card h3{font-size:1rem;color:#0b2a4a;margin-bottom:12px;border-right:4px solid #1b4a7a;padding-right:12px}
+.stat{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #dfe7f0}
+.stat:last-child{border:none}
+.stat .label{color:#3d5670;font-size:.9rem}
+.stat .value{font-weight:700;color:#0b2a4a;font-size:.95rem}
+.badge{display:inline-block;padding:2px 12px;border-radius:40px;font-size:.7rem;font-weight:700}
+.badge.green{background:#d4edda;color:#155724}
+.badge.yellow{background:#fff3cd;color:#856404}
+.badge.orange{background:#ffe5cc;color:#a45a1c}
+.badge.red{background:#f8d7da;color:#721c24}
+.badge.gray{background:#e2e6ea;color:#383d41}
+.badge.blue{background:#cce5ff;color:#004085}
+.btn{background:#1b4a7a;border:none;color:#fff;padding:8px 22px;border-radius:40px;font-weight:600;font-size:.85rem;cursor:pointer;transition:.2s}
+.btn:hover{background:#0b2a4a;transform:scale(.97)}
+.btn-outline{background:transparent;border:2px solid #1b4a7a;color:#1b4a7a}
+.btn-outline:hover{background:#e6edf8}
+.btn-sm{padding:4px 14px;font-size:.75rem}
+.btn-danger{background:#b02a37}.btn-danger:hover{background:#7a1a24}
+.btn-success{background:#1e7e34}.btn-success:hover{background:#135c25}
+.btn-warning{background:#c98b1a}.btn-warning:hover{background:#8a5f11}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-weight:600;color:#0b2a4a;font-size:.85rem;margin-bottom:3px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:8px 14px;border:1px solid #d0dae8;border-radius:12px;font-size:.9rem;background:#fff}
+.form-group textarea{min-height:60px}
+.form-row{display:flex;gap:14px;flex-wrap:wrap}
+.form-row .form-group{flex:1;min-width:160px}
+.module-list{list-style:none;padding:0}
+.module-list li{background:#eef3fb;padding:8px 14px;margin:4px 0;border-radius:10px;border-right:3px solid #1b4a7a;font-size:.85rem}
+.risk-map-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:12px 0}
+.risk-map-item{background:#f8fafe;border-radius:14px;padding:14px 12px;border:1px solid #e5ecf5;text-align:center}
+.risk-map-item .location-name{font-weight:600;color:#0b2a4a;font-size:.95rem}
+.risk-map-item .location-risk{font-size:.78rem;color:#3d5670;margin-top:6px}
+.risk-map-item .risk-indicator{width:100%;height:6px;border-radius:10px;margin-top:8px}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+table th{background:#e9eff6;text-align:right;padding:8px 12px;font-weight:600;color:#0b2a4a}
+table td{padding:8px 12px;border-bottom:1px solid #e5ecf5}
+table tr:hover td{background:#f5f8fd}
+.footer-note{background:#e9eff6;padding:10px 20px;border-radius:40px;font-size:.75rem;color:#2a4058;text-align:center;margin-top:24px}
+.flex{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.mt-8{margin-top:8px}.mt-16{margin-top:16px}.mb-8{margin-bottom:8px}
+.text-muted{color:#5a6f88;font-size:.8rem}
+.text-center{text-align:center}
+.help-text{font-size:.72rem;color:#6a7f98;margin-top:2px;background:#f0f4fa;padding:4px 8px;border-radius:6px}
+.school-badge{display:inline-block;background:#e9eff6;padding:2px 14px;border-radius:30px;font-size:.7rem;color:#0b2a4a}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:20px}
+.modal-overlay.active{display:flex}
+.modal{background:#fff;border-radius:24px;padding:28px;max-width:640px;width:100%;max-height:90vh;overflow:auto}
+.modal h2{color:#0b2a4a;margin-bottom:16px;font-size:1.1rem}
+.license-lock{position:fixed;inset:0;background:#0b2a4a;display:none;align-items:center;justify-content:center;z-index:2000;color:#fff;padding:20px}
+.license-lock.active{display:flex}
+.license-lock .box{background:#1b4a7a;padding:40px;border-radius:24px;max-width:520px;width:100%;text-align:center}
+.license-lock h1{font-size:1.3rem;margin-bottom:14px}
+.license-lock input{width:100%;padding:12px;border-radius:12px;border:none;font-size:1rem;text-align:center;margin:14px 0}
+.license-status{display:inline-block;padding:4px 14px;border-radius:30px;font-weight:700;font-size:.8rem}
+.license-status.valid{background:#d4edda;color:#155724}
+.license-status.expired{background:#f8d7da;color:#721c24}
+.license-status.warning{background:#fff3cd;color:#856404}
+.suggestion-list{list-style:none;padding:0;margin:0}
+.suggestion-list li{padding:8px 12px;margin:6px 0;background:#fff;border-radius:10px;border-right:3px solid #1b4a7a;font-size:.88rem}
+.activity-item{background:#fff;border-radius:12px;padding:12px;margin:8px 0;border:1px solid #dde6f0;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.activity-item.selected{border-color:#1b4a7a;background:#e6edf8}
+.guide-block{background:#f0f5fd;border:1px solid #d5e2f2;border-radius:14px;padding:14px 18px;margin-bottom:12px}
+.guide-block h4{color:#0b2a4a;margin-bottom:8px;font-size:.95rem;border-right:3px solid #1b4a7a;padding-right:10px}
+.guide-block .formula{background:#fff;border:1px dashed #b0c4dd;border-radius:10px;padding:8px 12px;font-family:'Courier New',monospace;font-size:.78rem;color:#1b3a5a;direction:ltr;text-align:left;margin:6px 0;white-space:pre-wrap}
+.guide-block p{font-size:.82rem;color:#2a4058;margin:4px 0}
+.guide-block ul{padding-right:20px;font-size:.82rem;color:#2a4058}
+.guide-block ul li{margin:3px 0}
+.case-action-item{background:#fff;border:1px solid #dde6f0;border-radius:12px;padding:12px 14px;margin:8px 0;border-right:4px solid #1b4a7a}
+.case-action-item .ca-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px}
+.case-action-item .ca-case-id{font-family:monospace;font-weight:700;color:#0b2a4a;font-size:.85rem}
+.case-action-item .ca-desc{font-size:.85rem;color:#3d5670}
+.case-action-item .ca-meta{font-size:.72rem;color:#7a8fa8;margin-top:4px}
+.about-modal .designer-box{background:linear-gradient(135deg,#0b2a4a,#1b4a7a);color:#fff;border-radius:18px;padding:24px 20px;text-align:center;margin:14px 0}
+.about-modal .designer-box .label{font-size:.78rem;opacity:.75;letter-spacing:1px;margin-bottom:8px}
+.about-modal .designer-box .name{font-size:1.15rem;font-weight:700;letter-spacing:.5px;line-height:1.7}
+.about-modal .designer-box .divider{width:50px;height:3px;background:rgba(255,255,255,.35);margin:12px auto;border-radius:3px}
+.about-modal .designer-box .role{font-size:.88rem;opacity:.9}
+.about-modal .version-badge{display:inline-block;background:#e9eff6;color:#1b4a7a;padding:4px 14px;border-radius:30px;font-size:.75rem;font-weight:700;margin-top:8px}
+@media(max-width:700px){header{flex-direction:column;align-items:stretch;gap:8px}.tabs button{padding:8px 12px;font-size:.75rem}.panel{padding:16px}.grid{grid-template-columns:1fr}.form-row{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<!-- License Lock Screen -->
+<div class="license-lock" id="licenseLock">
+    <div class="box">
+        <h1>🔒 اعتبار نرم‌افزار به پایان رسیده است</h1>
+        <p style="opacity:.8;font-size:.9rem;">برای ادامه استفاده، کد تمدید اعتبار را وارد کنید.</p>
+        <input type="text" id="renewalCodeInput" placeholder="کد تمدید اعتبار...">
+        <button class="btn" onclick="submitRenewal()">تمدید اعتبار</button>
+        <div id="renewalMsg" style="margin-top:12px;font-size:.85rem;"></div>
+    </div>
+</div>
+
+<!-- License Modal -->
+<div class="modal-overlay" id="licenseModal">
+    <div class="modal">
+        <h2>🔐 وضعیت اعتبار نرم‌افزار</h2>
+        <div class="stat"><span class="label">تاریخ شروع لایسنس</span><span class="value" id="licStart">—</span></div>
+        <div class="stat"><span class="label">تاریخ انقضا</span><span class="value" id="licEnd">—</span></div>
+        <div class="stat"><span class="label">مدت اعتبار</span><span class="value">۱۲ ماه</span></div>
+        <div class="stat"><span class="label">روزهای گذشته</span><span class="value" id="licPassed">—</span></div>
+        <div class="stat"><span class="label">روزهای باقی‌مانده</span><span class="value" id="licRemaining">—</span></div>
+        <div class="stat"><span class="label">وضعیت</span><span class="value" id="licStatus">—</span></div>
+        <div class="mt-16" style="border-top:1px solid #e5ecf5;padding-top:14px;">
+            <label style="font-weight:600;font-size:.85rem;color:#0b2a4a;">کد تمدید اعتبار</label>
+            <div class="flex mt-8">
+                <input type="text" id="modalRenewalCode" placeholder="کد تمدید..." style="flex:1;padding:8px 14px;border:1px solid #d0dae8;border-radius:12px;">
+                <button class="btn" onclick="submitModalRenewal()">تمدید</button>
+            </div>
+            <div id="modalRenewalMsg" class="mt-8 text-muted"></div>
+        </div>
+        <div class="flex mt-16" style="justify-content:flex-end;">
+            <button class="btn btn-outline" onclick="document.getElementById('licenseModal').classList.remove('active')">بستن</button>
+        </div>
+    </div>
+</div>
+
+<!-- Risk Guide Modal -->
+<div class="modal-overlay" id="riskGuideModal">
+    <div class="modal">
+        <h2>📖 راهنمای محاسبه نمرات خطر</h2>
+        <p class="text-muted" style="margin-bottom:14px;">این نمرات به‌صورت خودکار و فقط بر اساس داده‌های واقعی ثبت‌شده محاسبه می‌شوند (حوادث + غربالگری + مشاهدات).</p>
+
+        <div class="guide-block">
+            <h4>🛡️ نمره قربانی‌شدن (Victimization) — بازه ۰ تا ۱۰۰</h4>
+            <p>از حوادثی که دانش‌آموز در آن قربانی است:</p>
+            <div class="formula">میانگین‌شدت × ۸  +  min(۱۰, تعداد‌حوادث × ۲) × ۴</div>
+            <p>سپس از غربالگری اضافه می‌شود:</p>
+            <div class="formula">+ (امتیاز قربانی‌شدن در غربالگری × ۲)</div>
+            <p>حداکثر نمره: ۱۰۰</p>
+        </div>
+
+        <div class="guide-block">
+            <h4>⚠️ نمره قلدری (Perpetration) — بازه ۰ تا ۱۰۰</h4>
+            <p>از حوادثی که دانش‌آموز در آن متهم است:</p>
+            <div class="formula">میانگین‌شدت × ۸  +  min(۱۰, تعداد‌حوادث × ۲) × ۴</div>
+            <p>سپس از غربالگری اضافه می‌شود:</p>
+            <div class="formula">+ (امتیاز رفتار قلدرانه × ۲)</div>
+        </div>
+
+        <div class="guide-block">
+            <h4>👀 نمره تماشاگر (Bystander) — بازه ۰ تا ۱۰۰</h4>
+            <p>از غربالگری:</p>
+            <div class="formula">(۱۰ − امتیاز تماشاگر) × ۸</div>
+            <p>به‌علاوه به‌ازای هر مشاهده معلم با تایپ «تماشاگر»:</p>
+            <div class="formula">+ (تعداد مشاهدات تماشاگر × ۵)</div>
+        </div>
+
+        <div class="guide-block">
+            <h4>🤝 نیاز حمایت (Support Need) — بازه ۰ تا ۱۰۰</h4>
+            <p>از غربالگری:</p>
+            <div class="formula">(قربانی‌شدن×۰.۴ + انزوا×۰.۲۵ + فشار‌همسالان×۰.۲ + (۱۰−کمک‌خواهی)×۰.۱۵) × ۵</div>
+            <p>سپس:</p>
+            <div class="formula">+ (نمره‌قربانی × ۰.۲)  +  (نمره‌قلدری × ۰.۱)</div>
+        </div>
+
+        <div class="guide-block">
+            <h4>📊 نمره خطر کلی (Overall)</h4>
+            <div class="formula">overall = max(قربانی، قلدری، تماشاگر، نیاز‌حمایت)</div>
+            <ul>
+                <li><span class="badge green">سبز</span> : کمتر از ۲۰</li>
+                <li><span class="badge yellow">زرد</span> : ۲۰ تا ۴۴</li>
+                <li><span class="badge orange">نارنجی</span> : ۴۵ تا ۶۹</li>
+                <li><span class="badge red">قرمز</span> : ۷۰ و بیشتر</li>
+            </ul>
+        </div>
+
+        <div class="flex mt-16" style="justify-content:flex-end;">
+            <button class="btn btn-outline" onclick="document.getElementById('riskGuideModal').classList.remove('active')">بستن</button>
+        </div>
+    </div>
+</div>
+
+<!-- Location Modal -->
+<div class="modal-overlay" id="locationModal">
+    <div class="modal" style="max-width:420px;">
+        <h2>➕ افزودن مکان جدید</h2>
+        <div class="form-group">
+            <label>نام مکان</label>
+            <input type="text" id="newLocationName" placeholder="مثلاً راهروی طبقه سوم">
+        </div>
+        <div class="flex" style="justify-content:flex-end;">
+            <button class="btn btn-outline" onclick="document.getElementById('locationModal').classList.remove('active')">انصراف</button>
+            <button class="btn" onclick="saveNewLocation()">ذخیره</button>
+        </div>
+        <div id="locationModalMsg" class="mt-8 text-muted"></div>
+    </div>
+</div>
+
+<!-- About Modal -->
+<div class="modal-overlay about-modal" id="aboutModal">
+    <div class="modal" style="max-width:480px;">
+        <h2>ℹ️ درباره سامانه</h2>
+        <p class="text-muted" style="margin-bottom:8px;">
+            سامانه هوشمند ضد قلدری – نسخه داده‌محور
+        </p>
+        <div class="designer-box">
+            <div class="label">طراحی و توسعه تخصصی</div>
+            <div class="name">دکتر سیاوش طالع‌پسند</div>
+            <div class="divider"></div>
+            <div class="role">استاد دانشگاه سمنان</div>
+        </div>
+        <div class="text-center">
+            <span class="version-badge">نسخه V8</span>
+        </div>
+        <div class="flex mt-16" style="justify-content:flex-end;">
+            <button class="btn btn-outline" onclick="document.getElementById('aboutModal').classList.remove('active')">بستن</button>
+        </div>
+    </div>
+</div>
+
+<div class="app" id="app">
+    <header>
+        <div><h1>🛡️ سامانه هوشمند ضد قلدری <small>V8 – داده‌محور + لایسنس</small></h1></div>
+        <div class="flex" style="align-items:center;">
+            <div class="role-selector" id="roleSelector">
+                <button class="active-role" data-role="admin">مدیر</button>
+                <button data-role="counselor">مشاور</button>
+                <button data-role="teacher">معلم</button>
+                <button data-role="parent">والدین</button>
+            </div>
+            <span class="role-badge" id="roleBadge">👤 نقش: <strong>مدیر</strong></span>
+            <button class="icon-btn" onclick="openLicenseModal()" title="اعتبار نرم‌افزار">🔐</button>
+            <button class="icon-btn" onclick="resetAll()" title="ریست کامل" style="background:rgba(176,42,55,.4)">🔄</button>
+            <button class="icon-btn" onclick="openAboutModal()" title="درباره سامانه">ℹ️</button>
+        </div>
+    </header>
+
+    <div class="tabs" id="tabsContainer">
+        <button class="active" data-panel="dashboard" data-role="admin,counselor,teacher,parent">📊 داشبورد</button>
+        <button data-panel="students" data-role="admin,counselor">👥 دانش‌آموزان</button>
+        <button data-panel="incidents" data-role="admin,counselor,teacher">⚠️ حوادث</button>
+        <button data-panel="screening" data-role="counselor">📋 غربالگری</button>
+        <button data-panel="interventions" data-role="counselor">🎯 مداخلات</button>
+        <button data-panel="cases" data-role="admin,counselor">📁 پرونده‌ها</button>
+        <button data-panel="teacher-panel" data-role="teacher">🧑‍🏫 کلاس من</button>
+        <button data-panel="parent-panel" data-role="parent">👪 فرزند من</button>
+        <button data-panel="riskmap" data-role="admin,counselor">🗺️ نقشه خطر</button>
+        <button data-panel="outcomes" data-role="admin,counselor">📈 پیامدها</button>
+        <button data-panel="audit" data-role="admin">📜 گزارش تغییرات</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="panel-dashboard" class="panel active">
+        <h2 id="dashboardTitle">📊 داشبورد مدیریت</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>📌 توزیع سطوح خطر</h3>
+                <div class="stat"><span class="label">🟢 سبز</span><span class="value" id="greenCount">0</span></div>
+                <div class="stat"><span class="label">🟡 زرد</span><span class="value" id="yellowCount">0</span></div>
+                <div class="stat"><span class="label">🟠 نارنجی</span><span class="value" id="orangeCount">0</span></div>
+                <div class="stat"><span class="label">🔴 قرمز</span><span class="value" id="redCount">0</span></div>
+                <div class="stat"><span class="label"><strong>جمع</strong></span><span class="value" id="totalStudents">0</span></div>
+            </div>
+            <div class="card">
+                <h3>📈 شاخص‌های عملیاتی</h3>
+                <div class="stat"><span class="label">گزارش‌های ماه جاری</span><span class="value" id="monthlyReports">0</span></div>
+                <div class="stat"><span class="label">حوادث تأییدشده</span><span class="value" id="confirmedIncidents">0</span></div>
+                <div class="stat"><span class="label">پرونده‌های فعال</span><span class="value" id="activeCases">0</span></div>
+                <div class="stat"><span class="label">میانگین زمان رسیدگی</span><span class="value" id="avgResponseTime">—</span></div>
+                <div class="stat"><span class="label">مشارکت معلمان</span><span class="value" id="teacherParticipation">۰٪</span></div>
+                <div class="stat"><span class="label">مشارکت والدین</span><span class="value" id="parentParticipation">۰٪</span></div>
+                <div class="help-text">مشارکت = نسبت مشاهدات ثبت‌شده توسط این نقش به کل مشاهدات</div>
+            </div>
+            <div class="card">
+                <h3>🏫 سطح خطر مدرسه</h3>
+                <div class="stat"><span class="label">خطر کلی مدرسه</span><span class="value" id="schoolRiskLevel">—</span></div>
+                <div class="stat"><span class="label">کلاس‌های پرخطر</span><span class="value" id="highRiskClasses">0</span></div>
+                <div class="stat"><span class="label">مکان‌های پرخطر</span><span class="value" id="highRiskLocations">0</span></div>
+                <div class="stat"><span class="label">پایه‌های پرخطر</span><span class="value" id="highRiskGrades">0</span></div>
+            </div>
+            <div class="card">
+                <h3>⚡ توصیه‌های هوشمند</h3>
+                <ul id="smartSuggestions" class="suggestion-list"></ul>
+            </div>
+        </div>
+        <div class="footer-note">تمامی اعداد مستقیماً از داده‌های ثبت‌شده محاسبه می‌شوند.</div>
+    </div>
+
+    <!-- STUDENTS -->
+    <div id="panel-students" class="panel">
+        <h2>👥 مدیریت دانش‌آموزان</h2>
+        <div class="card">
+            <h3>افزودن دانش‌آموز</h3>
+            <div class="form-row">
+                <div class="form-group"><label>نام</label><input type="text" id="studentFirstName"></div>
+                <div class="form-group"><label>نام خانوادگی</label><input type="text" id="studentLastName"></div>
+                <div class="form-group"><label>نوع مدرسه</label>
+                    <select id="studentSchoolType"><option>دولتی</option><option>غیر انتفاعی</option><option>سایر</option></select></div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>مقطع</label>
+                    <select id="studentGradeLevel"><option>ابتدایی</option><option>متوسطه اول</option><option>متوسطه دوم</option><option>هنرستان</option><option>کاردانش</option></select></div>
+                <div class="form-group"><label>پایه</label><select id="studentGrade"></select></div>
+                <div class="form-group"><label>کلاس</label><input type="text" id="studentClass" placeholder="مثلاً الف"></div>
+            </div>
+            <button class="btn" id="addStudentBtn">➕ افزودن</button>
+            <div id="studentFeedback" class="mt-8 text-muted"></div>
+        </div>
+        <div class="card" style="overflow-x:auto;">
+            <table><thead><tr>
+                <th>کد</th><th>نام</th><th>نام‌خانوادگی</th><th>نوع</th><th>مقطع</th><th>پایه</th><th>کلاس</th><th>خطر</th><th>قربانی</th><th>قلدری</th><th>تماشاگر</th><th>حمایت</th><th>عملیات</th>
+            </tr></thead><tbody id="studentsTableBody"></tbody></table>
+        </div>
+    </div>
+
+    <!-- INCIDENTS -->
+    <div id="panel-incidents" class="panel">
+        <h2>⚠️ ثبت حوادث</h2>
+        <div class="card">
+            <h3>ثبت حادثه جدید</h3>
+            <div class="form-row">
+                <div class="form-group"><label>نوع حادثه</label>
+                    <select id="incidentType">
+                        <option value="خشونت فیزیکی">خشونت فیزیکی</option>
+                        <option value="پرخاشگری کلامی">پرخاشگری کلامی</option>
+                        <option value="طرد اجتماعی">طرد اجتماعی</option>
+                        <option value="آزار سایبری">آزار سایبری</option>
+                        <option value="تهدید">تهدید</option>
+                        <option value="شایعه پراکنی">شایعه پراکنی</option>
+                        <option value="گرفتن وسایل">گرفتن وسایل</option>
+                        <option value="سایر">سایر (ثبت دستی)</option>
+                    </select>
+                </div>
+                <div class="form-group" id="customTypeContainer" style="display:none;"><label>نوع دلخواه</label><input type="text" id="customIncidentType"></div>
+                <div class="form-group">
+                    <label>مکان</label>
+                    <select id="incidentLocation"></select>
+                    <div class="help-text">مکان‌ها در نقشه خطر یک‌بار نمایش داده می‌شوند و حوادث هر مکان با هم جمع می‌شوند.</div>
+                    <button type="button" class="btn btn-outline btn-sm mt-8" onclick="openLocationModal()">➕ افزودن مکان</button>
+                </div>
+                <div class="form-group"><label>شدت (۱–۵)</label>
+                    <select id="incidentSeverity"><option value="1">۱ خیلی کم</option><option value="2">۲ کم</option><option value="3" selected>۳ متوسط</option><option value="4">۴ زیاد</option><option value="5">۵ خیلی زیاد</option></select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group"><label>قربانی *</label><select id="incidentVictim"></select></div>
+                <div class="form-group"><label>متهم (اختیاری)</label><select id="incidentPerpetrator"></select></div>
+                <div class="form-group"><label>منبع گزارش</label>
+                    <select id="incidentSource">
+                        <option value="دانش‌آموز">دانش‌آموز</option>
+                        <option value="معلم">معلم</option>
+                        <option value="والدین">والدین</option>
+                        <option value="کادر مدرسه">کادر مدرسه</option>
+                        <option value="ناشناس">ناشناس</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group"><label>توضیحات</label><textarea id="incidentDescription"></textarea></div>
+            <div class="flex">
+                <button class="btn" id="submitIncidentBtn">ثبت حادثه</button>
+                <button class="btn btn-outline" id="submitAnonymousIncidentBtn">ثبت ناشناس</button>
+            </div>
+            <div id="incidentFeedback" class="mt-8 text-muted"></div>
+        </div>
+        <div class="card">
+            <h3>📋 لیست حوادث</h3>
+            <div class="help-text mb-8">برای محاسبه «میانگین زمان رسیدگی»، حادثه را تأیید و سپس حل کنید.</div>
+            <div style="overflow-x:auto;">
+                <table><thead><tr><th>شناسه</th><th>نوع</th><th>مکان</th><th>شدت</th><th>قربانی</th><th>منبع</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+                <tbody id="incidentsTableBody"></tbody></table>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCREENING -->
+    <div id="panel-screening" class="panel">
+        <h2>📋 غربالگری (فقط مشاور)</h2>
+        <div class="card">
+            <div class="flex" style="justify-content:space-between;">
+                <p class="text-muted">مقیاس هر گزینه از ۱ تا ۱۰. هر نمره را بر اساس مشاهده/مصاحبه با دانش‌آموز وارد کنید.</p>
+                <button class="btn btn-outline btn-sm" onclick="openRiskGuide()">📖 راهنمای محاسبه نمرات خطر</button>
+            </div>
+            <div class="flex mt-8">
+                <select id="screeningStudentSelect" style="padding:8px 16px;border:1px solid #d0dae8;border-radius:30px;flex:1;"></select>
+                <button class="btn" id="startScreeningBtn">شروع غربالگری</button>
+            </div>
+            <div id="screeningForm" style="display:none;margin-top:16px;border-top:1px solid #e5ecf5;padding-top:16px;">
+                <div class="form-row">
+                    <div class="form-group"><label>قربانی‌شدن (۱–۱۰)</label><input type="number" id="scrVictimization" min="1" max="10"><div class="help-text">۱=هرگز قربانی نشده، ۱۰=همیشه قربانی می‌شود</div></div>
+                    <div class="form-group"><label>رفتار قلدرانه (۱–۱۰)</label><input type="number" id="scrPerpetration" min="1" max="10"><div class="help-text">۱=هرگز قلدری نکرده، ۱۰=همیشه قلدری می‌کند</div></div>
+                    <div class="form-group"><label>انزوای اجتماعی (۱–۱۰)</label><input type="number" id="scrIsolation" min="1" max="10"><div class="help-text">۱=بسیار اجتماعی، ۱۰=کاملاً منزوی</div></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>جرأت‌ورزی (۱–۱۰)</label><input type="number" id="scrAssertiveness" min="1" max="10"><div class="help-text">۱=بسیار کم‌جرأت، ۱۰=بسیار جرأت‌ورز</div></div>
+                    <div class="form-group"><label>فشار همسالان (۱–۱۰)</label><input type="number" id="scrPeerPressure" min="1" max="10"><div class="help-text">۱=هیچ فشاری، ۱۰=فشار بسیار شدید</div></div>
+                    <div class="form-group"><label>تعلق به مدرسه (۱–۱۰)</label><input type="number" id="scrBelonging" min="1" max="10"><div class="help-text">۱=هیچ تعلقی، ۱۰=تعلق بسیار بالا</div></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label>کمک‌خواهی (۱–۱۰)</label><input type="number" id="scrHelpSeeking" min="1" max="10"><div class="help-text">۱=هرگز کمک نمی‌خواهد، ۱۰=همیشه کمک می‌خواهد</div></div>
+                    <div class="form-group"><label>رفتار تماشاگر (۱–۱۰)</label><input type="number" id="scrBystander" min="1" max="10"><div class="help-text">۱=بی‌تفاوت، ۱۰=واکنش فعالانه</div></div>
+                </div>
+                <div class="flex">
+                    <button class="btn" id="saveScreeningBtn">ذخیره</button>
+                    <button class="btn btn-outline" id="cancelScreeningBtn">انصراف</button>
+                </div>
+                <div id="screeningFeedback" class="mt-8 text-muted"></div>
+            </div>
+        </div>
+        <div class="card">
+            <h3>نتایج غربالگری</h3>
+            <div style="overflow-x:auto;">
+                <table><thead><tr><th>دانش‌آموز</th><th>قربانی</th><th>قلدری</th><th>انزوا</th><th>جرأت</th><th>فشار</th><th>تعلق</th><th>کمک</th><th>تماشاگر</th><th>تاریخ</th></tr></thead>
+                <tbody id="screeningResultsBody"></tbody></table>
+            </div>
+        </div>
+    </div>
+
+    <!-- INTERVENTIONS -->
+    <div id="panel-interventions" class="panel">
+        <h2>🎯 مداخلات</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>📚 کتابخانه ماژول‌ها</h3>
+                <ul class="module-list">
+                    <li>M01 – آگاهی از قلدری</li><li>M02 – تشخیص رفتار</li><li>M03 – جرأت‌ورزی</li>
+                    <li>M04 – مواجهه قاطعانه</li><li>M05 – مقابله با فشار همسالان</li><li>M06 – نه گفتن</li>
+                    <li>M07 – تنظیم هیجان</li><li>M08 – خودپنداره</li><li>M09 – حقوق فردی</li>
+                    <li>M10 – نقش تماشاگر</li><li>T01 – نظارت معلم</li><li>P01 – آموزش والدین</li><li>S01 – فعالیت مدرسه</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>تخصیص مداخله</h3>
+                <div class="form-group"><label>دانش‌آموز</label><select id="interventionStudentSelect"></select></div>
+                <div class="form-group"><label>ماژول</label>
+                    <select id="interventionModuleSelect">
+                        <option>M01</option><option>M02</option><option>M03</option><option>M04</option><option>M05</option>
+                        <option>M06</option><option>M07</option><option>M08</option><option>M09</option><option>M10</option>
+                        <option>T01</option><option>P01</option><option>S01</option>
+                    </select>
+                </div>
+                <button class="btn" id="assignInterventionBtn">تخصیص</button>
+                <div id="interventionFeedback" class="mt-8 text-muted"></div>
+            </div>
+        </div>
+        <div class="card">
+            <h3>تاریخچه مداخلات</h3>
+            <div id="activeInterventionsList" style="font-size:.9rem;"></div>
+        </div>
+    </div>
+
+    <!-- CASES -->
+    <div id="panel-cases" class="panel">
+        <h2>📁 مدیریت پرونده‌ها</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>پرونده‌های فعال</h3>
+                <ul id="activeCasesList" style="list-style:none;padding:0;"></ul>
+            </div>
+            <div class="card">
+                <h3>ایجاد پرونده جدید</h3>
+                <div class="form-group"><label>دانش‌آموز</label><select id="caseStudentSelect"></select></div>
+                <div class="form-group"><label>سطح خطر</label>
+                    <select id="caseRiskLevel"><option value="yellow">زرد</option><option value="orange" selected>نارنجی</option><option value="red">قرمز</option></select>
+                </div>
+                <button class="btn" id="createCaseBtn">ایجاد پرونده</button>
+                <div id="caseCreateFeedback" class="mt-8 text-muted"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>ثبت اقدام و پیگیری</h3>
+            <div class="help-text mb-8">شناسه پرونده را از لیست زیر انتخاب کنید.</div>
+            <div class="form-row">
+                <div class="form-group"><label>پرونده</label><select id="caseActionSelect"></select></div>
+                <div class="form-group"><label>نوع اقدام</label>
+                    <select id="caseActionType">
+                        <option value="note">یادداشت</option>
+                        <option value="followup">پیگیری</option>
+                        <option value="reassessment">بازارزیابی</option>
+                        <option value="close">بستن پرونده</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group"><label>توضیحات</label><textarea id="caseActionDesc"></textarea></div>
+            <button class="btn" id="addCaseActionBtn">ثبت اقدام</button>
+            <div id="caseActionFeedback" class="mt-8 text-muted"></div>
+        </div>
+
+        <div class="card">
+            <h3>📝 سابقه اقدامات ثبت‌شده</h3>
+            <div class="help-text mb-8">در این بخش، هر اقدام ثبت‌شده روی پرونده‌ها به‌صورت یک کارت نمایش داده می‌شود: شناسه پرونده + نوع اقدام + توضیحات.</div>
+            <div id="caseActionsHistory"></div>
+        </div>
+    </div>
+
+    <!-- TEACHER PANEL -->
+    <div id="panel-teacher-panel" class="panel">
+        <h2>🧑‍🏫 پنل معلم</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>وضعیت کلاس (بر اساس داده‌ها)</h3>
+                <div class="stat"><span class="label">تعداد دانش‌آموزان</span><span class="value" id="teacherClassSize">0</span></div>
+                <div class="stat"><span class="label">گزارش‌های هفته</span><span class="value" id="teacherWeeklyReports">0</span></div>
+                <div class="stat"><span class="label">دانش‌آموزان در معرض خطر</span><span class="value" id="teacherAttentionNeeded">0</span></div>
+                <div class="stat"><span class="label">قربانیان احتمالی</span><span class="value" id="teacherVictimsCount">0</span></div>
+                <div class="stat"><span class="label">قلدرهای احتمالی</span><span class="value" id="teacherBulliesCount">0</span></div>
+            </div>
+            <div class="card">
+                <h3>⚡ توصیه‌های هوشمند برای کلاس شما</h3>
+                <ul id="teacherSmartSuggestions" class="suggestion-list"></ul>
+            </div>
+        </div>
+        <div class="card">
+            <h3>🎯 فعالیت‌های پیشنهادی (خودکار بر اساس وضعیت کلاس)</h3>
+            <div id="teacherActivitiesBox"></div>
+            <div class="flex mt-8">
+                <button class="btn" id="registerActivityBtn">✅ ثبت و اجرای فعالیت انتخابی</button>
+            </div>
+            <div id="teacherActivityFeedback" class="mt-8 text-muted"></div>
+        </div>
+        <div class="card">
+            <h3>ثبت مشاهده</h3>
+            <div class="form-row">
+                <div class="form-group"><label>دانش‌آموز</label><select id="teacherObsStudent"></select></div>
+                <div class="form-group"><label>نوع مشاهده</label>
+                    <select id="teacherObsType">
+                        <option>طرد اجتماعی</option><option>پرخاشگری کلامی</option><option>انزوا</option>
+                        <option>قلدری فیزیکی</option><option>کمک‌خواهی</option><option>رفتار مثبت</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group"><label>توضیحات</label><textarea id="teacherObsDesc"></textarea></div>
+            <button class="btn" id="submitTeacherObsBtn">ثبت مشاهده</button>
+            <div id="teacherObsFeedback" class="mt-8 text-muted"></div>
+        </div>
+    </div>
+
+    <!-- PARENT PANEL -->
+    <div id="panel-parent-panel" class="panel">
+        <h2>👪 پنل والدین – فرزند: <span id="parentChildName">(انتخاب نشده)</span></h2>
+        <div class="form-group" style="max-width:300px;">
+            <label>انتخاب فرزند</label>
+            <select id="parentStudentSelect"></select>
+        </div>
+        <div class="grid">
+            <div class="card">
+                <h3>وضعیت فرزند</h3>
+                <div class="stat"><span class="label">غربالگری</span><span class="value" id="parentScreeningStatus">—</span></div>
+                <div class="stat"><span class="label">خطر کلی</span><span class="value" id="parentRiskLevel">—</span></div>
+                <div class="stat"><span class="label">قربانی</span><span class="value" id="parentVictimScore">—</span></div>
+                <div class="stat"><span class="label">قلدری</span><span class="value" id="parentPerpScore">—</span></div>
+                <div class="stat"><span class="label">مداخله فعال</span><span class="value" id="parentActiveModule">—</span></div>
+            </div>
+            <div class="card">
+                <h3>⚡ توصیه‌های هوشمند برای شما</h3>
+                <ul id="parentSuggestions" class="suggestion-list"></ul>
+            </div>
+        </div>
+        <div class="card">
+            <h3>ثبت مشاهده در خانه</h3>
+            <div class="form-group"><label>توضیحات</label><textarea id="parentObservationDesc"></textarea></div>
+            <button class="btn btn-sm" id="submitParentObsBtn">ثبت</button>
+            <div id="parentObsFeedback" class="mt-8 text-muted"></div>
+        </div>
+    </div>
+
+    <!-- RISK MAP -->
+    <div id="panel-riskmap" class="panel">
+        <h2>🗺️ نقشه خطر مدرسه</h2>
+        <div class="card">
+            <div class="help-text mb-8">
+                نقشه بر اساس <strong>مکان‌های از پیش‌تعریف‌شده</strong> ساخته می‌شود. هر مکان <strong>یک بار</strong> نمایش داده می‌شود و مجموع حوادث آن مکان گزارش می‌گردد.<br>
+                قاعده رنگ: کمتر از ۷ حادثه = <span style="color:#28a745;">سبز</span> | ۷ تا ۱۴ = <span style="color:#ffc107;">زرد</span> | ۱۵ و بیشتر = <span style="color:#dc3545;">قرمز</span>
+            </div>
+            <div class="risk-map-grid" id="riskMapContainer"></div>
+            <div class="mt-16"><p id="riskMapInsight" class="text-muted">نقشه بر اساس مکان‌های ثبت‌شده در حوادث ساخته می‌شود.</p></div>
+            <button class="btn btn-sm mt-8" id="refreshRiskMap">🔄 به‌روزرسانی</button>
+        </div>
+    </div>
+
+    <!-- OUTCOMES -->
+    <div id="panel-outcomes" class="panel">
+        <h2>📈 ارزیابی پیامدها</h2>
+        <div class="card">
+            <div class="help-text mb-8">این اعداد از میانگین نمرات آخرین غربالگری همه دانش‌آموزان محاسبه می‌شود.</div>
+            <div class="grid">
+                <div class="card">
+                    <h3>تغییرات کلی</h3>
+                    <div class="stat"><span class="label">میانگین قربانی‌شدن</span><span class="value" id="outcomeVictimization">—</span></div>
+                    <div class="stat"><span class="label">میانگین جرأت‌ورزی</span><span class="value" id="outcomeAssertiveness">—</span></div>
+                    <div class="stat"><span class="label">میانگین تعلق</span><span class="value" id="outcomeBelonging">—</span></div>
+                    <div class="stat"><span class="label">پرونده‌های بسته</span><span class="value" id="outcomeClosedCases">0</span></div>
+                </div>
+                <div class="card">
+                    <h3>گزارش فردی</h3>
+                    <select id="outcomeStudentSelect"></select>
+                    <div id="outcomeIndividualReport" class="mt-8 text-muted">انتخاب کنید.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AUDIT -->
+    <div id="panel-audit" class="panel">
+        <h2>📜 گزارش تغییرات (Audit Log)</h2>
+        <div class="card">
+            <div class="help-text mb-8">این بخش تمام عملیات انجام‌شده در سامانه را به‌صورت خودکار با زمان و کاربر ثبت می‌کند.</div>
+            <div style="max-height:400px;overflow-y:auto;">
+                <table><thead><tr><th>زمان</th><th>کاربر</th><th>عمل</th><th>جزئیات</th></tr></thead>
+                <tbody id="auditLogBody"></tbody></table>
+            </div>
+            <button class="btn btn-sm mt-8" id="clearAuditBtn">پاک کردن لاگ</button>
+        </div>
+    </div>
+
+    <div style="padding:12px 28px;background:#f5f8fd;border-top:1px solid #dde6f0;font-size:.75rem;color:#3d5670;text-align:center;">
+        ⚡ V8 – داده‌محور + لایسنس + راهنمای نمرات + نقشه بر مبنای مکان
+    </div>
+</div>
+
+<script>
+// ================================================================
+// LICENSE
+// ================================================================
+const RENEWAL_CODE = 'St_6040690';
+const LICENSE_MONTHS = 12;
+const DB_KEY = 'antiBullyingDB_V8';
+
+const DEFAULT_LOCATIONS = [
+    'حیاط جنوبی','حیاط شمالی','راهروی طبقه اول','راهروی طبقه دوم','راهروی طبقه سوم',
+    'کلاس درس','آبخوری','سلف','سرویس بهداشتی','کتابخانه','سالن ورزشی','پله‌ها','ورودی مدرسه'
+];
+
+function getLicenseInfo() {
+    const db = getDB();
+    if (!db.licenseStartDate) { db.licenseStartDate = Date.now(); saveDB(db); }
+    const start = new Date(db.licenseStartDate);
+    const end = new Date(start); end.setMonth(end.getMonth() + LICENSE_MONTHS);
+    const now = new Date();
+    const passed = Math.floor((now - start) / 86400000);
+    const remaining = Math.max(0, Math.ceil((end - now) / 86400000));
+    return { start, end, passed, remaining, expired: now >= end };
+}
+function checkLicenseAndRender() {
+    const lic = getLicenseInfo();
+    if (lic.expired) {
+        document.getElementById('app').style.display = 'none';
+        document.getElementById('licenseLock').classList.add('active');
+        return false;
+    }
+    document.getElementById('app').style.display = '';
+    document.getElementById('licenseLock').classList.remove('active');
+    return true;
+}
+function submitRenewal() {
+    const code = document.getElementById('renewalCodeInput').value.trim();
+    const msg = document.getElementById('renewalMsg');
+    if (code === RENEWAL_CODE) {
+        const db = getDB(); db.licenseStartDate = Date.now(); saveDB(db);
+        msg.style.color = '#7cd47c'; msg.textContent = '✅ اعتبار تمدید شد.';
+        setTimeout(() => location.reload(), 800);
+    } else { msg.style.color = '#ff8a8a'; msg.textContent = '❌ کد نامعتبر است.'; }
+}
+function submitModalRenewal() {
+    const code = document.getElementById('modalRenewalCode').value.trim();
+    const msg = document.getElementById('modalRenewalMsg');
+    if (code === RENEWAL_CODE) {
+        const db = getDB(); db.licenseStartDate = Date.now(); saveDB(db);
+        msg.style.color = '#1e7e34'; msg.textContent = '✅ اعتبار تمدید شد.';
+        updateLicenseModal(); setTimeout(() => location.reload(), 800);
+    } else { msg.style.color = '#b02a37'; msg.textContent = '❌ کد نامعتبر.'; }
+}
+function openLicenseModal() { updateLicenseModal(); document.getElementById('licenseModal').classList.add('active'); }
+function updateLicenseModal() {
+    const lic = getLicenseInfo();
+    const fmt = d => d.toLocaleDateString('fa-IR');
+    document.getElementById('licStart').textContent = fmt(lic.start);
+    document.getElementById('licEnd').textContent = fmt(lic.end);
+    document.getElementById('licPassed').textContent = lic.passed + ' روز';
+    document.getElementById('licRemaining').textContent = lic.remaining + ' روز';
+    const status = document.getElementById('licStatus');
+    if (lic.expired) status.innerHTML = '<span class="license-status expired">منقضی</span>';
+    else if (lic.remaining <= 30) status.innerHTML = '<span class="license-status warning">نزدیک انقضا</span>';
+    else status.innerHTML = '<span class="license-status valid">فعال</span>';
+}
+
+window.openAboutModal = function() {
+    document.getElementById('aboutModal').classList.add('active');
+};
+
+// ================================================================
+// DATA LAYER
+// ================================================================
+function getDB() {
+    const raw = localStorage.getItem(DB_KEY);
+    if (raw) {
+        const db = JSON.parse(raw);
+        if (!db.locations) db.locations = [...DEFAULT_LOCATIONS];
+        return db;
+    }
+    return { students: [], incidents: [], observations: [], screenings: [], cases: [], interventions: [], auditLogs: [], activities: [], locations: [...DEFAULT_LOCATIONS], nextStudentId: 1, nextIncidentId: 1, nextCaseId: 1, licenseStartDate: null };
+}
+function saveDB(db) { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+function addAuditLog(user, action, entity, entityId, note = '') {
+    const db = getDB();
+    db.auditLogs.push({ timestamp: Date.now(), user: user || 'سیستم', action, entity, entityId, note });
+    saveDB(db);
+}
+function getStudentById(id) { return getDB().students.find(s => s.id === id); }
+function getStudentName(s) { return s ? `${s.firstName} ${s.lastName}` : 'نامشخص'; }
+function getStudentDisplay(s) { return s ? `${s.firstName} ${s.lastName} (کد ${s.id})` : 'نامشخص'; }
+
+// ================================================================
+// RISK ENGINE
+// ================================================================
+function calculateRisks(studentId) {
+    const db = getDB();
+    const student = db.students.find(s => s.id === studentId);
+    if (!student) return { victimization: 0, perpetration: 0, bystander: 0, supportNeed: 0, overall: 0, level: 'green' };
+    const asVictim = db.incidents.filter(i => i.victimId === studentId);
+    const asPerp = db.incidents.filter(i => i.perpetratorId === studentId);
+    const screening = db.screenings.find(s => s.studentId === studentId);
+
+    let victimScore = 0;
+    if (asVictim.length > 0) {
+        const avgSev = asVictim.reduce((s, i) => s + (i.severity || 1), 0) / asVictim.length;
+        const freq = Math.min(10, asVictim.length * 2);
+        victimScore = Math.min(100, (avgSev * 8 + freq * 4));
+    }
+    if (screening && screening.victimization) victimScore = Math.min(100, victimScore + screening.victimization * 2);
+
+    let perpScore = 0;
+    if (asPerp.length > 0) {
+        const avgSev = asPerp.reduce((s, i) => s + (i.severity || 1), 0) / asPerp.length;
+        const freq = Math.min(10, asPerp.length * 2);
+        perpScore = Math.min(100, (avgSev * 8 + freq * 4));
+    }
+    if (screening && screening.perpetration) perpScore = Math.min(100, perpScore + screening.perpetration * 2);
+
+    let bystanderScore = 0;
+    if (screening && screening.bystander) bystanderScore = Math.min(100, (10 - screening.bystander) * 8);
+    const obsBystander = db.observations.filter(o => o.studentId === studentId && o.type && o.type.includes('تماشاگر'));
+    if (obsBystander.length > 0) bystanderScore = Math.min(100, bystanderScore + obsBystander.length * 5);
+
+    let supportScore = 0;
+    if (screening) {
+        const v = screening.victimization || 0, iso = screening.isolation || 0;
+        const peer = screening.peerPressure || 0, help = screening.helpSeeking || 0;
+        supportScore = (v * 0.4 + iso * 0.25 + peer * 0.2 + (10 - help) * 0.15) * 5;
+    }
+    supportScore = Math.min(100, supportScore + victimScore * 0.2 + perpScore * 0.1);
+
+    const overall = Math.max(victimScore, perpScore, supportScore, bystanderScore);
+    let level = 'green';
+    if (overall >= 70) level = 'red';
+    else if (overall >= 45) level = 'orange';
+    else if (overall >= 20) level = 'yellow';
+    return { victimization: Math.round(victimScore), perpetration: Math.round(perpScore), bystander: Math.round(bystanderScore), supportNeed: Math.round(supportScore), overall: Math.round(overall), level };
+}
+
+function updateAllStudentRisks() {
+    const db = getDB();
+    db.students.forEach(s => {
+        const r = calculateRisks(s.id);
+        s.victimizationRisk = r.victimization; s.perpetrationRisk = r.perpetration;
+        s.bystanderRisk = r.bystander; s.supportNeedRisk = r.supportNeed;
+        s.riskLevel = r.level; s.riskScore = r.overall;
+    });
+    saveDB(db); return db;
+}
+
+function calculateSchoolRisk() {
+    const db = getDB();
+    const students = db.students;
+    if (students.length === 0) return { level: 'green', highRiskClasses: 0, highRiskLocations: 0, highRiskGrades: 0 };
+    const classRisk = {}, gradeRisk = {}, locCount = {};
+    students.forEach(s => {
+        const r = calculateRisks(s.id);
+        const cls = s.class || 'نامشخص';
+        (classRisk[cls] = classRisk[cls] || []).push(r.overall);
+        const g = s.grade || 'نامشخص';
+        (gradeRisk[g] = gradeRisk[g] || []).push(r.overall);
+    });
+    db.incidents.forEach(i => {
+        const loc = i.location || 'سایر';
+        locCount[loc] = (locCount[loc] || 0) + 1;
+    });
+    const avg = arr => arr.reduce((a, b) => a + b, 0) / arr.length || 0;
+    const getLevel = s => s >= 70 ? 'red' : s >= 45 ? 'orange' : s >= 20 ? 'yellow' : 'green';
+    let hc = 0, hl = 0, hg = 0;
+    for (let c in classRisk) if (['red','orange'].includes(getLevel(avg(classRisk[c])))) hc++;
+    for (let l in locCount) if (locCount[l] >= 7) hl++;
+    for (let g in gradeRisk) if (['red','orange'].includes(getLevel(avg(gradeRisk[g])))) hg++;
+    const total = students.length;
+    const overallScore = students.reduce((s, st) => s + calculateRisks(st.id).overall, 0) / total;
+    return { level: getLevel(overallScore), highRiskClasses: hc, highRiskLocations: hl, highRiskGrades: hg };
+}
+
+function recommendModules(studentId) {
+    const db = getDB();
+    const scr = db.screenings.find(s => s.studentId === studentId);
+    const risks = calculateRisks(studentId);
+    const history = db.interventions.filter(iv => iv.studentId === studentId);
+    const done = history.filter(iv => iv.status === 'completed').map(iv => iv.moduleId);
+    const active = history.filter(iv => iv.status === 'active').map(iv => iv.moduleId);
+    let rec = [];
+    if (!scr) return ['M01'];
+    if (risks.victimization > 50) rec.push('M03', 'M04');
+    if (risks.perpetration > 50) rec.push('M07');
+    if ((scr.peerPressure||0) >= 6) rec.push('M05', 'M06');
+    if ((scr.assertiveness||10) <= 4) rec.push('M02');
+    if ((scr.belonging||10) <= 4) rec.push('M08');
+    if ((scr.bystander||10) <= 4) rec.push('M10');
+    if ((scr.helpSeeking||10) <= 4) rec.push('M09');
+    if (risks.supportNeed > 60) rec.push('T01', 'P01');
+    rec = rec.filter(m => !done.includes(m) && !active.includes(m));
+    return [...new Set(rec)].slice(0, 3);
+}
+
+function checkFollowUps() {
+    const db = getDB();
+    const now = Date.now();
+    db.cases.forEach(c => {
+        if (c.status !== 'active') return;
+        const last = c.actions && c.actions.length > 0 ? c.actions[c.actions.length - 1].timestamp : c.createdAt;
+        const days = (now - last) / 86400000;
+        c.followUpNeeded = days > 7;
+    });
+    saveDB(db);
+}
+
+// ================================================================
+// RENDER FUNCTIONS
+// ================================================================
+const LEVEL_FA = { green: 'سبز', yellow: 'زرد', orange: 'نارنجی', red: 'قرمز' };
+
+function renderStudentsTable() {
+    const db = getDB();
+    const tb = document.getElementById('studentsTableBody');
+    tb.innerHTML = '';
+    db.students.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><strong>${s.id}</strong></td><td>${s.firstName}</td><td>${s.lastName}</td>
+            <td><span class="school-badge">${s.schoolType||'—'}</span></td>
+            <td>${s.gradeLevel||'—'}</td><td>${s.grade||'—'}</td><td>${s.class||'—'}</td>
+            <td><span class="badge ${s.riskLevel}">${LEVEL_FA[s.riskLevel]}</span></td>
+            <td>${s.victimizationRisk||0}</td><td>${s.perpetrationRisk||0}</td>
+            <td>${s.bystanderRisk||0}</td><td>${s.supportNeedRisk||0}</td>
+            <td><button class="btn btn-outline btn-sm" onclick="deleteStudent(${s.id})">🗑️</button>
+                <button class="btn btn-sm" onclick="viewStudentProfile(${s.id})">👁️</button></td>`;
+        tb.appendChild(tr);
+    });
+}
+
+function renderIncidents() {
+    const db = getDB();
+    const tb = document.getElementById('incidentsTableBody');
+    tb.innerHTML = '';
+    const sevFa = ['','خیلی کم','کم','متوسط','زیاد','خیلی زیاد'];
+    const statusFa = { pending: 'در انتظار', confirmed: 'تأییدشده', rejected: 'ردشده', resolved: 'حل‌شده' };
+    db.incidents.slice().reverse().forEach(i => {
+        const v = getStudentById(i.victimId);
+        const vName = v ? getStudentDisplay(v) : (i.victimId ? `کد ${i.victimId}` : 'ناشناس');
+        let actions = '';
+        if (i.status === 'pending') actions = `<button class="btn btn-success btn-sm" onclick="confirmIncident(${i.id})">تأیید</button>
+            <button class="btn btn-danger btn-sm" onclick="rejectIncident(${i.id})">رد</button>`;
+        else if (i.status === 'confirmed') actions = `<button class="btn btn-warning btn-sm" onclick="resolveIncident(${i.id})">حل‌شده</button>`;
+        else actions = '<span class="text-muted">—</span>';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${i.incidentId||'INC-'+i.id}</td><td>${i.type||'—'}</td><td>${i.location||'—'}</td>
+            <td>${sevFa[i.severity||1]}</td><td>${vName}</td><td>${i.source||'—'}</td>
+            <td><span class="badge gray">${statusFa[i.status]||i.status}</span></td><td>${actions}</td>`;
+        tb.appendChild(tr);
+    });
+}
+
+window.confirmIncident = function(id) {
+    const db = getDB(); const inc = db.incidents.find(i => i.id === id);
+    if (inc) { inc.status = 'confirmed'; saveDB(db); addAuditLog('مدیر','CONFIRM_INCIDENT','INCIDENT',id); renderAll(); }
+};
+window.rejectIncident = function(id) {
+    const db = getDB(); const inc = db.incidents.find(i => i.id === id);
+    if (inc) { inc.status = 'rejected'; saveDB(db); addAuditLog('مدیر','REJECT_INCIDENT','INCIDENT',id); renderAll(); }
+};
+window.resolveIncident = function(id) {
+    const db = getDB(); const inc = db.incidents.find(i => i.id === id);
+    if (inc) { inc.status = 'resolved'; inc.resolvedAt = Date.now(); saveDB(db); addAuditLog('مدیر','RESOLVE_INCIDENT','INCIDENT',id); renderAll(); }
+};
+
+function renderScreenings() {
+    const db = getDB();
+    const tb = document.getElementById('screeningResultsBody');
+    tb.innerHTML = '';
+    db.screenings.forEach(s => {
+        const st = getStudentById(s.studentId);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${st?getStudentDisplay(st):'کد '+s.studentId}</td>
+            <td>${s.victimization||'—'}</td><td>${s.perpetration||'—'}</td><td>${s.isolation||'—'}</td>
+            <td>${s.assertiveness||'—'}</td><td>${s.peerPressure||'—'}</td><td>${s.belonging||'—'}</td>
+            <td>${s.helpSeeking||'—'}</td><td>${s.bystander||'—'}</td>
+            <td>${new Date(s.timestamp).toLocaleDateString('fa-IR')}</td>`;
+        tb.appendChild(tr);
+    });
+}
+
+function renderRiskMap() {
+    const db = getDB();
+    const c = document.getElementById('riskMapContainer');
+    c.innerHTML = '';
+    const locations = db.locations && db.locations.length ? [...db.locations] : [...DEFAULT_LOCATIONS];
+
+    const locCount = {};
+    locations.forEach(l => locCount[l] = 0);
+    db.incidents.forEach(i => {
+        const loc = i.location || 'نامشخص';
+        locCount[loc] = (locCount[loc] || 0) + 1;
+        if (!locations.includes(loc)) locations.push(loc);
+    });
+
+    locations.forEach(loc => {
+        const count = locCount[loc] || 0;
+        let color, label;
+        if (count >= 15) { color = '#dc3545'; label = '🔴 قرمز (بالا)'; }
+        else if (count >= 7) { color = '#ffc107'; label = '🟡 زرد (متوسط)'; }
+        else { color = '#28a745'; label = '🟢 سبز (ایمن)'; }
+        const div = document.createElement('div');
+        div.className = 'risk-map-item';
+        div.innerHTML = `<div class="location-name">📍 ${loc}</div>
+            <div class="location-risk"><strong>${count}</strong> حادثه ثبت‌شده</div>
+            <div class="location-risk">${label}</div>
+            <div class="risk-indicator" style="background:${color};"></div>`;
+        c.appendChild(div);
+    });
+
+    const sorted = Object.entries(locCount).sort((a,b) => b[1]-a[1]).filter(x => x[1] > 0);
+    if (sorted.length > 0) {
+        const top = sorted[0];
+        document.getElementById('riskMapInsight').textContent =
+            `📍 پرحادثه‌ترین مکان: ${top[0]} با ${top[1]} حادثه. ${top[1]>=15?'⚠️ نیازمند مداخله فوری.':top[1]>=7?'پیشنهاد: افزایش نظارت.':'وضعیت قابل قبول.'}`;
+    } else {
+        document.getElementById('riskMapInsight').textContent = 'هیچ حادثه‌ای ثبت نشده است.';
+    }
+}
+
+function renderInterventions() {
+    const db = getDB();
+    const list = document.getElementById('activeInterventionsList');
+    list.innerHTML = '';
+    const ivs = db.interventions || [];
+    if (ivs.length === 0) { list.innerHTML = '<div class="text-muted">هیچ مداخله‌ای ثبت نشده است.</div>'; return; }
+    ivs.slice().reverse().forEach(iv => {
+        const st = getStudentById(iv.studentId);
+        const statusFa = { active:'فعال', completed:'تکمیل', pending:'در انتظار' };
+        const div = document.createElement('div');
+        div.style.cssText = 'padding:6px 0;border-bottom:1px solid #e5ecf5;display:flex;justify-content:space-between;';
+        div.innerHTML = `<span>${st?getStudentDisplay(st):'کد '+iv.studentId} – <strong>${iv.moduleId}</strong>
+            <span class="badge gray">${statusFa[iv.status]||iv.status}</span></span>
+            <span class="text-muted">${new Date(iv.assignedDate).toLocaleDateString('fa-IR')}</span>`;
+        list.appendChild(div);
+    });
+}
+
+function renderCases() {
+    const db = getDB();
+    const list = document.getElementById('activeCasesList');
+    list.innerHTML = '';
+    const active = db.cases.filter(c => c.status === 'active');
+    if (active.length === 0) list.innerHTML = '<div class="text-muted">پرونده فعالی وجود ندارد.</div>';
+    active.forEach(c => {
+        const st = getStudentById(c.studentId);
+        const li = document.createElement('li');
+        li.style.cssText = 'padding:8px 0;border-bottom:1px solid #e5ecf5;display:flex;justify-content:space-between;align-items:center;gap:8px;';
+        li.innerHTML = `<span><span class="badge ${c.riskLevel}">${LEVEL_FA[c.riskLevel]}</span>
+            ${st?getStudentDisplay(st):'—'} ${c.followUpNeeded?'🔄':''}<br>
+            <span class="text-muted" style="font-size:.75rem;">شناسه: <strong>${c.caseId}</strong></span></span>
+            <button class="btn btn-danger btn-sm" onclick="deleteCase('${c.caseId}')">🗑️ حذف</button>`;
+        list.appendChild(li);
+    });
+    const sel = document.getElementById('caseActionSelect');
+    sel.innerHTML = '<option value="">— انتخاب پرونده —</option>';
+    db.cases.filter(c => c.status === 'active').forEach(c => {
+        const st = getStudentById(c.studentId);
+        const opt = document.createElement('option');
+        opt.value = c.caseId;
+        opt.textContent = `${c.caseId} – ${st?getStudentName(st):'—'}`;
+        sel.appendChild(opt);
+    });
+
+    renderCaseActionsHistory();
+}
+
+function renderCaseActionsHistory() {
+    const db = getDB();
+    const container = document.getElementById('caseActionsHistory');
+    container.innerHTML = '';
+
+    const allActions = [];
+    db.cases.forEach(c => {
+        if (c.actions && c.actions.length > 0) {
+            c.actions.forEach(a => {
+                allActions.push({
+                    caseId: c.caseId,
+                    studentId: c.studentId,
+                    actionType: a.type,
+                    description: a.description,
+                    timestamp: a.timestamp,
+                    user: a.user
+                });
+            });
+        }
+    });
+
+    if (allActions.length === 0) {
+        container.innerHTML = '<div class="text-muted">هنوز هیچ اقدامی روی پرونده‌ها ثبت نشده است.</div>';
+        return;
+    }
+
+    allActions.sort((a,b) => b.timestamp - a.timestamp);
+
+    const typeFa = { note: 'یادداشت', followup: 'پیگیری', reassessment: 'بازارزیابی', close: 'بستن پرونده' };
+    const typeColor = { note: 'blue', followup: 'orange', reassessment: 'yellow', close: 'green' };
+
+    allActions.forEach(a => {
+        const st = getStudentById(a.studentId);
+        const div = document.createElement('div');
+        div.className = 'case-action-item';
+        div.innerHTML = `
+            <div class="ca-header">
+                <span class="ca-case-id">📁 ${a.caseId}</span>
+                <span class="badge ${typeColor[a.actionType]||'gray'}">${typeFa[a.actionType]||a.actionType}</span>
+            </div>
+            <div class="ca-desc">👤 ${st?getStudentDisplay(st):'—'} — ${a.description}</div>
+            <div class="ca-meta">🕒 ${new Date(a.timestamp).toLocaleString('fa-IR')} | ثبت توسط: ${a.user||'—'}</div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+window.deleteCase = function(caseId) {
+    if (!confirm('این پرونده حذف شود؟')) return;
+    const db = getDB();
+    db.cases = db.cases.filter(c => c.caseId !== caseId);
+    saveDB(db);
+    addAuditLog('مدیر', 'DELETE_CASE', 'CASE', caseId);
+    renderAll();
+};
+
+function renderOutcomes() {
+    const db = getDB();
+    const scr = db.screenings;
+    if (scr.length > 0) {
+        document.getElementById('outcomeVictimization').textContent = (scr.reduce((s,x)=>s+(x.victimization||0),0)/scr.length).toFixed(1);
+        document.getElementById('outcomeAssertiveness').textContent = (scr.reduce((s,x)=>s+(x.assertiveness||0),0)/scr.length).toFixed(1);
+        document.getElementById('outcomeBelonging').textContent = (scr.reduce((s,x)=>s+(x.belonging||0),0)/scr.length).toFixed(1);
+    } else {
+        ['outcomeVictimization','outcomeAssertiveness','outcomeBelonging'].forEach(id => document.getElementById(id).textContent = '—');
+    }
+    document.getElementById('outcomeClosedCases').textContent = db.cases.filter(c => c.status === 'closed').length;
+    const sel = document.getElementById('outcomeStudentSelect');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— انتخاب —</option>';
+    db.students.forEach(s => {
+        const o = document.createElement('option');
+        o.value = s.id; o.textContent = getStudentDisplay(s);
+        sel.appendChild(o);
+    });
+    if (cur) sel.value = cur;
+}
+
+function renderParentPanel() {
+    const db = getDB();
+    const sel = document.getElementById('parentStudentSelect');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— انتخاب فرزند —</option>';
+    db.students.forEach(s => {
+        const o = document.createElement('option');
+        o.value = s.id; o.textContent = getStudentDisplay(s);
+        sel.appendChild(o);
+    });
+    if (cur) sel.value = cur;
+
+    const sid = parseInt(sel.value);
+    const suggestions = document.getElementById('parentSuggestions');
+    suggestions.innerHTML = '';
+    if (!sid) {
+        document.getElementById('parentChildName').textContent = '(انتخاب نشده)';
+        ['parentScreeningStatus','parentRiskLevel','parentVictimScore','parentPerpScore','parentActiveModule'].forEach(id => document.getElementById(id).textContent = '—');
+        suggestions.innerHTML = '<li>دانش‌آموزی انتخاب نشده است.</li>';
+        return;
+    }
+    const st = getStudentById(sid);
+    if (!st) return;
+    document.getElementById('parentChildName').textContent = getStudentName(st);
+    const s = db.screenings.find(x => x.studentId === sid);
+    document.getElementById('parentScreeningStatus').textContent = s ? 'انجام شده' : 'انجام نشده';
+    const r = calculateRisks(sid);
+    document.getElementById('parentRiskLevel').textContent = `${LEVEL_FA[r.level]} (${r.overall})`;
+    document.getElementById('parentVictimScore').textContent = r.victimization;
+    document.getElementById('parentPerpScore').textContent = r.perpetration;
+    document.getElementById('parentActiveModule').textContent = st.activeModule || '—';
+
+    const suggests = [];
+    if (r.victimization >= 50) suggests.push('🛡️ فرزند شما احتمالاً در معرض قلدری است. با او همدلانه صحبت کنید و از مشاور مدرسه کمک بگیرید.');
+    if (r.perpetration >= 50) suggests.push('⚠️ فرزند شما احتمالاً رفتار قلدرانه دارد. درباره پیامد رفتارش با او صحبت کنید.');
+    if (r.bystander >= 40) suggests.push('👀 فرزند شما شاهد قلدری است. به او بیاموزید سکوت نکند.');
+    if (r.supportNeed >= 60) suggests.push('🤝 فرزند شما نیازمند حمایت عاطفی است. زمان بیشتری با او بگذرانید.');
+    if (s && (s.isolation||0) >= 6) suggests.push('📞 با مشاور مدرسه برای جلسه حضوری وقت بگیرید.');
+    if (s && (s.peerPressure||0) >= 6) suggests.push('🧑‍🤝‍🧑 به فرزندتان مهارت «نه گفتن» را تمرین دهید.');
+    if (suggests.length === 0) suggests.push('✅ وضعیت فرزند شما مطلوب به نظر می‌رسد.');
+
+    suggests.forEach(t => {
+        const li = document.createElement('li');
+        li.textContent = t;
+        suggestions.appendChild(li);
+    });
+}
+
+function renderTeacherPanel() {
+    const db = getDB();
+    const classes = [...new Set(db.students.map(s => s.class).filter(Boolean))];
+    const activeClass = classes[0] || '';
+    const classStudents = activeClass ? db.students.filter(s => s.class === activeClass) : db.students;
+
+    document.getElementById('teacherClassSize').textContent = classStudents.length;
+    const weekAgo = Date.now() - 7*86400000;
+    const weekly = db.observations.filter(o => o.timestamp >= weekAgo && o.source === 'teacher');
+    document.getElementById('teacherWeeklyReports').textContent = weekly.length;
+
+    let victims = 0, bullies = 0, attention = 0;
+    classStudents.forEach(s => {
+        const r = calculateRisks(s.id);
+        if (r.victimization >= 45) victims++;
+        if (r.perpetration >= 45) bullies++;
+        if (['red','orange'].includes(r.level)) attention++;
+    });
+    document.getElementById('teacherAttentionNeeded').textContent = attention;
+    document.getElementById('teacherVictimsCount').textContent = victims;
+    document.getElementById('teacherBulliesCount').textContent = bullies;
+
+    const sList = document.getElementById('teacherSmartSuggestions');
+    sList.innerHTML = '';
+    const tips = [];
+    if (classStudents.length === 0) tips.push('هنوز دانش‌آموزی ثبت نشده است.');
+    else {
+        if (victims > 0) tips.push(`🛡️ ${victims} دانش‌آموز کلاس شما در معرض قلدری هستند.`);
+        if (bullies > 0) tips.push(`⚠️ ${bullies} دانش‌آموز رفتار قلدرانه دارند.`);
+        if (attention > 0) tips.push(`📌 ${attention} دانش‌آموز نیازمند توجه فوری هستند.`);
+        if (tips.length === 0) tips.push('✅ وضعیت کلاس شما مطلوب است.');
+    }
+    tips.forEach(t => {
+        const li = document.createElement('li');
+        li.textContent = t;
+        sList.appendChild(li);
+    });
+
+    const box = document.getElementById('teacherActivitiesBox');
+    box.innerHTML = '';
+    const activities = [];
+    if (victims > 0) activities.push({ id: 'A1', title: 'کارگاه جرأت‌ورزی گروهی', desc: 'تقویت مهارت دفاع از خود' });
+    if (bullies > 0) activities.push({ id: 'A2', title: 'جلسه مدیریت خشم', desc: 'آموزش کنترل هیجان' });
+    if (attention >= 2) activities.push({ id: 'A3', title: 'حلقه گفتگو در کلاس', desc: 'ایجاد فضای امن' });
+    activities.push({ id: 'A4', title: 'فعالیت گروهی مشارکتی', desc: 'تقویت همبستگی' });
+    activities.push({ id: 'A5', title: 'آموزش مهارت «نه گفتن»', desc: 'مقابله با فشار همسالان' });
+    activities.push({ id: 'A6', title: 'نمایش فیلم و بحث درباره قلدری', desc: 'افزایش آگاهی' });
+
+    activities.forEach(a => {
+        const div = document.createElement('div');
+        div.className = 'activity-item';
+        div.innerHTML = `<div><strong>${a.title}</strong><div class="text-muted">${a.desc}</div></div>
+            <input type="radio" name="activityRadio" value="${a.id}|${a.title}">`;
+        box.appendChild(div);
+    });
+
+    const tSel = document.getElementById('teacherObsStudent');
+    const cur = tSel.value;
+    tSel.innerHTML = '<option value="">— انتخاب —</option>';
+    classStudents.forEach(s => {
+        const o = document.createElement('option');
+        o.value = s.id; o.textContent = getStudentDisplay(s);
+        tSel.appendChild(o);
+    });
+    if (cur) tSel.value = cur;
+}
+
+function renderAuditLog() {
+    const db = getDB();
+    const tb = document.getElementById('auditLogBody');
+    tb.innerHTML = '';
+    db.auditLogs.slice().reverse().forEach(log => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${new Date(log.timestamp).toLocaleString('fa-IR')}</td>
+            <td>${log.user}</td><td>${log.action}</td>
+            <td>${log.entity} ${log.entityId||''} ${log.note?'- '+log.note:''}</td>`;
+        tb.appendChild(tr);
+    });
+}
+
+function renderDashboard() {
+    const db = updateAllStudentRisks();
+    const st = db.students, inc = db.incidents;
+    document.getElementById('greenCount').textContent = st.filter(s => s.riskLevel === 'green').length;
+    document.getElementById('yellowCount').textContent = st.filter(s => s.riskLevel === 'yellow').length;
+    document.getElementById('orangeCount').textContent = st.filter(s => s.riskLevel === 'orange').length;
+    document.getElementById('redCount').textContent = st.filter(s => s.riskLevel === 'red').length;
+    document.getElementById('totalStudents').textContent = st.length;
+
+    const now = new Date();
+    const monthly = inc.filter(i => {
+        const d = new Date(i.timestamp);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    });
+    document.getElementById('monthlyReports').textContent = monthly.length;
+    document.getElementById('confirmedIncidents').textContent = inc.filter(i => i.status === 'confirmed' || i.status === 'resolved').length;
+    document.getElementById('activeCases').textContent = db.cases.filter(c => c.status === 'active').length;
+
+    const resolved = inc.filter(i => i.resolvedAt && i.timestamp);
+    if (resolved.length > 0) {
+        const totalDays = resolved.reduce((s, i) => s + (i.resolvedAt - i.timestamp) / 86400000, 0);
+        document.getElementById('avgResponseTime').textContent = (totalDays / resolved.length).toFixed(1) + ' روز';
+    } else {
+        document.getElementById('avgResponseTime').textContent = '—';
+    }
+
+    const tObs = db.observations.filter(o => o.source === 'teacher').length;
+    const pObs = db.observations.filter(o => o.source === 'parent').length;
+    const total = db.observations.length;
+    document.getElementById('teacherParticipation').textContent = total ? Math.round(tObs/total*100)+'٪' : '۰٪';
+    document.getElementById('parentParticipation').textContent = total ? Math.round(pObs/total*100)+'٪' : '۰٪';
+
+    const sr = calculateSchoolRisk();
+    document.getElementById('schoolRiskLevel').textContent = st.length ? (LEVEL_FA[sr.level]||'—') : '—';
+    document.getElementById('highRiskClasses').textContent = sr.highRiskClasses;
+    document.getElementById('highRiskLocations').textContent = sr.highRiskLocations;
+    document.getElementById('highRiskGrades').textContent = sr.highRiskGrades;
+
+    const sList = document.getElementById('smartSuggestions');
+    sList.innerHTML = '';
+    if (st.length === 0 && inc.length === 0) sList.innerHTML = '<li>هیچ داده‌ای ثبت نشده است.</li>';
+    else {
+        const high = st.filter(s => ['red','orange'].includes(s.riskLevel));
+        if (high.length > 0) sList.innerHTML += `<li>🔴 ${high.length} دانش‌آموز پرخطر</li>`;
+        const locCount = {};
+        inc.forEach(i => { if (i.location) locCount[i.location] = (locCount[i.location]||0)+1; });
+        const sorted = Object.entries(locCount).sort((a,b) => b[1]-a[1]);
+        if (sorted[0]) sList.innerHTML += `<li>📍 ${sorted[0][0]} – ${sorted[0][1]} حادثه</li>`;
+        if (sList.innerHTML === '') sList.innerHTML = '<li>✅ وضعیت مطلوب</li>';
+    }
+    checkFollowUps();
+
+    ['screeningStudentSelect','interventionStudentSelect','caseStudentSelect','outcomeStudentSelect','parentStudentSelect','incidentVictim','incidentPerpetrator'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const cur = el.value;
+        el.innerHTML = id === 'incidentPerpetrator' ? '<option value="">— اختیاری —</option>' : '<option value="">— انتخاب —</option>';
+        db.students.forEach(s => {
+            const o = document.createElement('option');
+            o.value = s.id; o.textContent = getStudentDisplay(s);
+            el.appendChild(o);
+        });
+        if (cur) el.value = cur;
+    });
+}
+
+function renderLocationOptions() {
+    const db = getDB();
+    const sel = document.getElementById('incidentLocation');
+    if (!sel) return;
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— انتخاب مکان —</option>';
+    (db.locations || DEFAULT_LOCATIONS).forEach(loc => {
+        const o = document.createElement('option');
+        o.value = loc; o.textContent = loc;
+        sel.appendChild(o);
+    });
+    if (cur) sel.value = cur;
+}
+
+window.openLocationModal = function() {
+    document.getElementById('newLocationName').value = '';
+    document.getElementById('locationModalMsg').textContent = '';
+    document.getElementById('locationModal').classList.add('active');
+};
+window.saveNewLocation = function() {
+    const name = document.getElementById('newLocationName').value.trim();
+    const msg = document.getElementById('locationModalMsg');
+    if (!name) { msg.style.color = '#b02a37'; msg.textContent = '❌ نام مکان را وارد کنید.'; return; }
+    const db = getDB();
+    if (!db.locations) db.locations = [...DEFAULT_LOCATIONS];
+    if (db.locations.includes(name)) { msg.style.color = '#c98b1a'; msg.textContent = '⚠️ این مکان قبلاً وجود دارد.'; return; }
+    db.locations.push(name);
+    saveDB(db);
+    addAuditLog('مدیر','ADD_LOCATION','LOCATION', name);
+    msg.style.color = '#1e7e34'; msg.textContent = '✅ مکان اضافه شد.';
+    renderLocationOptions();
+    setTimeout(() => document.getElementById('locationModal').classList.remove('active'), 700);
+};
+
+window.openRiskGuide = function() {
+    document.getElementById('riskGuideModal').classList.add('active');
+};
+
+function renderAll() {
+    if (!checkLicenseAndRender()) return;
+    updateAllStudentRisks();
+    renderDashboard();
+    renderStudentsTable();
+    renderIncidents();
+    renderScreenings();
+    renderRiskMap();
+    renderInterventions();
+    renderCases();
+    renderOutcomes();
+    renderParentPanel();
+    renderTeacherPanel();
+    renderAuditLog();
+    renderLocationOptions();
+}
+
+// ================================================================
+// CRUD
+// ================================================================
+window.deleteStudent = function(id) {
+    if (!confirm(`دانش‌آموز ${id} حذف شود؟`)) return;
+    const db = getDB();
+    db.students = db.students.filter(s => s.id !== id);
+    db.incidents = db.incidents.filter(i => i.victimId !== id && i.perpetratorId !== id);
+    db.observations = db.observations.filter(o => o.studentId !== id);
+    db.screenings = db.screenings.filter(s => s.studentId !== id);
+    db.cases = db.cases.filter(c => c.studentId !== id);
+    db.interventions = db.interventions.filter(iv => iv.studentId !== id);
+    saveDB(db);
+    addAuditLog('مدیر','DELETE_STUDENT','STUDENT',id);
+    renderAll();
+};
+
+window.viewStudentProfile = function(id) {
+    const s = getStudentById(id);
+    if (!s) return;
+    const r = calculateRisks(id);
+    alert(`📋 ${getStudentName(s)} (کد ${s.id})\nخطر: ${LEVEL_FA[r.level]} (${r.overall})\nقربانی: ${r.victimization}\nقلدری: ${r.perpetration}\nتماشاگر: ${r.bystander}\nنیاز حمایت: ${r.supportNeed}`);
+};
+
+window.resetAll = function() {
+    if (!confirm('⚠️ تمام داده‌ها پاک می‌شود. مطمئن هستید؟')) return;
+    if (!confirm('این عمل قابل بازگشت نیست. ادامه؟')) return;
+    localStorage.removeItem(DB_KEY);
+    location.reload();
+};
+
+// ================================================================
+// EVENT BINDINGS
+// ================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    getLicenseInfo();
+    if (!checkLicenseAndRender()) return;
+
+    const roleBtns = document.querySelectorAll('.role-selector button');
+    const roleBadge = document.getElementById('roleBadge');
+    const tabs = document.querySelectorAll('.tabs button');
+    const dashTitle = document.getElementById('dashboardTitle');
+
+    roleBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            roleBtns.forEach(b => b.classList.remove('active-role'));
+            this.classList.add('active-role');
+            const role = this.dataset.role;
+            const labels = { admin:'مدیر', counselor:'مشاور', teacher:'معلم', parent:'والدین' };
+            roleBadge.innerHTML = `👤 نقش: <strong>${labels[role]}</strong>`;
+            document.querySelector('.tabs button[data-panel="dashboard"]').textContent = `📊 داشبورد ${labels[role]}`;
+            dashTitle.textContent = `📊 داشبورد ${labels[role]}`;
+            tabs.forEach(tab => {
+                const roles = tab.dataset.role ? tab.dataset.role.split(',') : ['admin'];
+                tab.classList.toggle('hidden-tab', !roles.includes(role));
+            });
+            const first = document.querySelector('.tabs button:not(.hidden-tab)');
+            if (first) {
+                document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                document.getElementById('panel-'+first.dataset.panel)?.classList.add('active');
+                document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+                first.classList.add('active');
+            }
+        });
+    });
+
+    document.querySelectorAll('.tabs button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const pid = this.dataset.panel;
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById('panel-'+pid)?.classList.add('active');
+            document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+
+    document.getElementById('incidentType').addEventListener('change', function() {
+        document.getElementById('customTypeContainer').style.display = this.value === 'سایر' ? 'block' : 'none';
+    });
+
+    document.getElementById('addStudentBtn').addEventListener('click', function() {
+        const db = getDB();
+        const fn = document.getElementById('studentFirstName').value.trim();
+        const ln = document.getElementById('studentLastName').value.trim();
+        if (!fn || !ln) { document.getElementById('studentFeedback').textContent = '❌ نام و نام خانوادگی را وارد کنید.'; return; }
+        const s = {
+            id: db.nextStudentId++,
+            firstName: fn, lastName: ln,
+            schoolType: document.getElementById('studentSchoolType').value,
+            gradeLevel: document.getElementById('studentGradeLevel').value,
+            grade: document.getElementById('studentGrade').value,
+            class: document.getElementById('studentClass').value.trim() || 'نامشخص',
+            riskLevel: 'green', riskScore: 0, victimizationRisk: 0, perpetrationRisk: 0, bystanderRisk: 0, supportNeedRisk: 0, activeModule: 'پیشگیری عمومی'
+        };
+        db.students.push(s);
+        saveDB(db);
+        addAuditLog('مدیر','ADD_STUDENT','STUDENT',s.id,getStudentName(s));
+        renderAll();
+        document.getElementById('studentFeedback').textContent = `✅ دانش‌آموز ${getStudentName(s)} با کد ${s.id} افزوده شد.`;
+        ['studentFirstName','studentLastName','studentClass'].forEach(id => document.getElementById(id).value = '');
+    });
+
+    document.getElementById('submitIncidentBtn').addEventListener('click', function() {
+        const db = getDB();
+        let type = document.getElementById('incidentType').value;
+        if (type === 'سایر') {
+            type = document.getElementById('customIncidentType').value.trim();
+            if (!type) return alert('نوع حادثه را وارد کنید.');
+        }
+        const location = document.getElementById('incidentLocation').value;
+        if (!location) { document.getElementById('incidentFeedback').textContent = '❌ لطفاً مکان را انتخاب کنید.'; return; }
+        const victimId = parseInt(document.getElementById('incidentVictim').value);
+        if (!victimId) { document.getElementById('incidentFeedback').textContent = '❌ قربانی را انتخاب کنید.'; return; }
+        const perpId = parseInt(document.getElementById('incidentPerpetrator').value) || null;
+        db.incidents.push({
+            id: db.nextIncidentId++,
+            incidentId: `INC-2026-${String(db.nextIncidentId).padStart(4,'0')}`,
+            type, location,
+            severity: parseInt(document.getElementById('incidentSeverity').value) || 1,
+            victimId, perpetratorId: perpId,
+            source: document.getElementById('incidentSource').value,
+            status: 'pending',
+            description: document.getElementById('incidentDescription').value || '',
+            timestamp: Date.now(), resolvedAt: null
+        });
+        saveDB(db);
+        addAuditLog(document.getElementById('incidentSource').value,'ADD_INCIDENT','INCIDENT',db.incidents[db.incidents.length-1].id,type);
+        document.getElementById('incidentFeedback').textContent = '✅ حادثه ثبت شد.';
+        ['incidentDescription','customIncidentType'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('incidentLocation').value = '';
+        document.getElementById('incidentVictim').value = '';
+        document.getElementById('incidentPerpetrator').value = '';
+        renderAll();
+    });
+
+    document.getElementById('submitAnonymousIncidentBtn').addEventListener('click', function() {
+        const db = getDB();
+        let type = document.getElementById('incidentType').value;
+        if (type === 'سایر') {
+            type = document.getElementById('customIncidentType').value.trim();
+            if (!type) return alert('نوع حادثه را وارد کنید.');
+        }
+        const location = document.getElementById('incidentLocation').value || 'نامشخص';
+        db.incidents.push({
+            id: db.nextIncidentId++,
+            incidentId: `INC-2026-${String(db.nextIncidentId).padStart(4,'0')}`,
+            type, location,
+            severity: parseInt(document.getElementById('incidentSeverity').value) || 1,
+            victimId: null, perpetratorId: null,
+            source: 'ناشناس', status: 'pending',
+            description: '[ناشناس] ' + (document.getElementById('incidentDescription').value || ''),
+            timestamp: Date.now(), resolvedAt: null
+        });
+        saveDB(db);
+        addAuditLog('ناشناس','ADD_INCIDENT_ANON','INCIDENT',db.incidents[db.incidents.length-1].id);
+        document.getElementById('incidentFeedback').textContent = '✅ گزارش ناشناس ثبت شد.';
+        ['incidentDescription','customIncidentType'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('incidentLocation').value = '';
+        renderAll();
+    });
+
+    document.getElementById('startScreeningBtn').addEventListener('click', function() {
+        const v = document.getElementById('screeningStudentSelect').value;
+        if (!v) return alert('دانش‌آموز را انتخاب کنید.');
+        document.getElementById('screeningForm').style.display = 'block';
+        document.getElementById('screeningForm').dataset.studentId = v;
+        ['scrVictimization','scrPerpetration','scrIsolation','scrAssertiveness','scrPeerPressure','scrBelonging','scrHelpSeeking','scrBystander'].forEach(id => document.getElementById(id).value = '');
+    });
+    document.getElementById('cancelScreeningBtn').addEventListener('click', () => {
+        document.getElementById('screeningForm').style.display = 'none';
+    });
+    document.getElementById('saveScreeningBtn').addEventListener('click', function() {
+        const db = getDB();
+        const sid = parseInt(document.getElementById('screeningForm').dataset.studentId);
+        const ids = { victimization:'scrVictimization', perpetration:'scrPerpetration', isolation:'scrIsolation', assertiveness:'scrAssertiveness', peerPressure:'scrPeerPressure', belonging:'scrBelonging', helpSeeking:'scrHelpSeeking', bystander:'scrBystander' };
+        const vals = {};
+        for (const k in ids) {
+            const v = parseInt(document.getElementById(ids[k]).value);
+            if (isNaN(v) || v < 1 || v > 10) {
+                document.getElementById('screeningFeedback').textContent = `❌ مقدار معتبر (۱ تا ۱۰) برای ${k} وارد کنید.`;
+                return;
+            }
+            vals[k] = v;
+        }
+        db.screenings = db.screenings.filter(s => s.studentId !== sid);
+        db.screenings.push({ studentId: sid, ...vals, timestamp: Date.now() });
+        const rec = recommendModules(sid);
+        if (rec.length) {
+            rec.forEach(m => db.interventions.push({ id: db.interventions.length+1, studentId: sid, moduleId: m, status: 'active', assignedDate: Date.now() }));
+            const st = db.students.find(s => s.id === sid);
+            if (st) st.activeModule = rec.join(', ');
+        }
+        saveDB(db);
+        addAuditLog('مشاور','ADD_SCREENING','SCREENING',sid);
+        document.getElementById('screeningFeedback').textContent = '✅ غربالگری ذخیره شد.';
+        document.getElementById('screeningForm').style.display = 'none';
+        renderAll();
+    });
+
+    document.getElementById('assignInterventionBtn').addEventListener('click', function() {
+        const db = getDB();
+        const sid = parseInt(document.getElementById('interventionStudentSelect').value);
+        const mid = document.getElementById('interventionModuleSelect').value;
+        if (!sid) return alert('دانش‌آموز را انتخاب کنید.');
+        db.interventions.push({ id: db.interventions.length+1, studentId: sid, moduleId: mid, status: 'active', assignedDate: Date.now() });
+        const st = db.students.find(s => s.id === sid);
+        if (st) st.activeModule = mid;
+        saveDB(db);
+        addAuditLog('مشاور','ADD_INTERVENTION','INTERVENTION',sid,mid);
+        document.getElementById('interventionFeedback').textContent = `✅ ${mid} به کد ${sid} افزوده شد.`;
+        renderAll();
+    });
+
+    document.getElementById('createCaseBtn').addEventListener('click', function() {
+        const db = getDB();
+        const sid = parseInt(document.getElementById('caseStudentSelect').value);
+        if (!sid) return alert('دانش‌آموز را انتخاب کنید.');
+        if (db.cases.some(c => c.studentId === sid && c.status === 'active')) {
+            document.getElementById('caseCreateFeedback').textContent = '❌ پرونده فعال برای این دانش‌آموز وجود دارد.';
+            return;
+        }
+        const caseId = `CASE-2026-${String(db.nextCaseId).padStart(4,'0')}`;
+        db.nextCaseId++;
+        db.cases.push({
+            id: db.cases.length+1, caseId, studentId: sid,
+            riskLevel: document.getElementById('caseRiskLevel').value,
+            status: 'active', createdAt: Date.now(), updatedAt: Date.now(),
+            actions: [], followUpNeeded: false
+        });
+        saveDB(db);
+        addAuditLog('مدیر','CREATE_CASE','CASE',caseId);
+        document.getElementById('caseCreateFeedback').textContent = `✅ پرونده با شناسه ${caseId} ایجاد شد.`;
+        renderAll();
+    });
+
+    document.getElementById('addCaseActionBtn').addEventListener('click', function() {
+        const db = getDB();
+        const caseId = document.getElementById('caseActionSelect').value;
+        const type = document.getElementById('caseActionType').value;
+        const desc = document.getElementById('caseActionDesc').value.trim();
+        if (!caseId) return alert('پرونده را انتخاب کنید.');
+        if (!desc) return alert('توضیحات را وارد کنید.');
+        const c = db.cases.find(x => x.caseId === caseId);
+        if (!c) return alert('پرونده یافت نشد.');
+        if (!c.actions) c.actions = [];
+        c.actions.push({ timestamp: Date.now(), type, description: desc, user: 'مشاور' });
+        c.updatedAt = Date.now();
+        if (type === 'close') c.status = 'closed';
+        if (type === 'reassessment') c.riskLevel = calculateRisks(c.studentId).level;
+        saveDB(db);
+        addAuditLog('مشاور','CASE_ACTION','CASE',caseId,type);
+        document.getElementById('caseActionFeedback').textContent = `✅ اقدام روی پرونده ${caseId} ثبت شد.`;
+        document.getElementById('caseActionDesc').value = '';
+        renderAll();
+    });
+
+    document.getElementById('submitTeacherObsBtn').addEventListener('click', function() {
+        const db = getDB();
+        const sid = parseInt(document.getElementById('teacherObsStudent').value);
+        const desc = document.getElementById('teacherObsDesc').value.trim();
+        if (!sid) return alert('دانش‌آموز را انتخاب کنید.');
+        if (!desc) return alert('توضیحات را وارد کنید.');
+        db.observations.push({
+            id: db.observations.length+1, studentId: sid,
+            type: document.getElementById('teacherObsType').value,
+            description: desc, source: 'teacher', timestamp: Date.now()
+        });
+        saveDB(db);
+        addAuditLog('معلم','ADD_OBSERVATION','OBSERVATION',sid);
+        document.getElementById('teacherObsFeedback').textContent = '✅ مشاهده ثبت شد.';
+        document.getElementById('teacherObsDesc').value = '';
+        renderAll();
+    });
+
+    document.getElementById('registerActivityBtn').addEventListener('click', function() {
+        const sel = document.querySelector('input[name="activityRadio"]:checked');
+        if (!sel) { document.getElementById('teacherActivityFeedback').textContent = '❌ یک فعالیت را انتخاب کنید.'; return; }
+        const [id, title] = sel.value.split('|');
+        const db = getDB();
+        db.activities.push({ id: db.activities.length+1, activityId: id, title, timestamp: Date.now(), user: 'معلم' });
+        saveDB(db);
+        addAuditLog('معلم','REGISTER_ACTIVITY','ACTIVITY',id,title);
+        document.getElementById('teacherActivityFeedback').textContent = `✅ فعالیت «${title}» ثبت و اجرا شد.`;
+        sel.checked = false;
+        document.querySelectorAll('.activity-item').forEach(el => el.classList.remove('selected'));
+    });
+    document.getElementById('teacherActivitiesBox').addEventListener('change', e => {
+        if (e.target.name === 'activityRadio') {
+            document.querySelectorAll('.activity-item').forEach(el => el.classList.remove('selected'));
+            e.target.closest('.activity-item').classList.add('selected');
+        }
+    });
+
+    document.getElementById('submitParentObsBtn').addEventListener('click', function() {
+        const db = getDB();
+        const sid = parseInt(document.getElementById('parentStudentSelect').value);
+        const desc = document.getElementById('parentObservationDesc').value.trim();
+        if (!sid) return alert('فرزند خود را انتخاب کنید.');
+        if (!desc) return alert('توضیحات را وارد کنید.');
+        db.observations.push({
+            id: db.observations.length+1, studentId: sid,
+            type: 'گزارش والدین', description: desc, source: 'parent', timestamp: Date.now()
+        });
+        saveDB(db);
+        addAuditLog('والدین','ADD_OBSERVATION_PARENT','OBSERVATION',sid);
+        document.getElementById('parentObsFeedback').textContent = '✅ مشاهده ثبت شد.';
+        document.getElementById('parentObservationDesc').value = '';
+        renderAll();
+    });
+
+    document.getElementById('parentStudentSelect').addEventListener('change', renderParentPanel);
+
+    document.getElementById('outcomeStudentSelect').addEventListener('change', function() {
+        const v = parseInt(this.value);
+        const rep = document.getElementById('outcomeIndividualReport');
+        if (!v) { rep.textContent = 'انتخاب کنید.'; return; }
+        const st = getStudentById(v);
+        const r = calculateRisks(v);
+        if (st) rep.innerHTML = `<strong>${getStudentName(st)}</strong><br>
+            <span class="badge ${r.level}">${LEVEL_FA[r.level]}</span> نمره: ${r.overall}<br>
+            قربانی: ${r.victimization} | قلدری: ${r.perpetration} | تماشاگر: ${r.bystander} | حمایت: ${r.supportNeed}`;
+    });
+
+    document.getElementById('refreshRiskMap').addEventListener('click', renderRiskMap);
+
+    document.getElementById('clearAuditBtn').addEventListener('click', function() {
+        if (!confirm('لاگ پاک شود؟')) return;
+        const db = getDB();
+        db.auditLogs = [];
+        saveDB(db);
+        renderAll();
+    });
+
+    document.getElementById('studentGradeLevel').addEventListener('change', function() {
+        const level = this.value;
+        const gs = document.getElementById('studentGrade');
+        gs.innerHTML = '';
+        const opts = level === 'ابتدایی' ? ['1','2','3','4','5','6'] : ['1','2','3'];
+        opts.forEach(g => {
+            const o = document.createElement('option');
+            o.value = g; o.textContent = g;
+            gs.appendChild(o);
+        });
+    });
+    document.getElementById('studentGradeLevel').dispatchEvent(new Event('change'));
+
+    renderAll();
+});
+</script>
+</body>
+</html>

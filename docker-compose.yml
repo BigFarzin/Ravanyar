@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: payesh
+      POSTGRES_USER: payesh
+      POSTGRES_PASSWORD: CHANGE_DB_PASSWORD
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U payesh -d payesh"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      NODE_ENV: production
+      DATABASE_URL: postgresql://payesh:CHANGE_DB_PASSWORD@db:5432/payesh
+      ADMIN_PASSWORD: CHANGE_ADMIN_PASSWORD
+      SESSION_TTL_MS: 28800000
+      LOGIN_MAX_ATTEMPTS: 8
+      MAX_UPLOAD_MB: 500
+      PAYMENT_MODE: real
+      PAYMENT_GATEWAY: YOUR_GATEWAY
+    ports:
+      - "3000:3000"
+    volumes:
+      - product_storage:/app/storage/products
+volumes:
+  pgdata:
+  product_storage:

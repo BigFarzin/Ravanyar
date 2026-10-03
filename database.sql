@@ -1,0 +1,55 @@
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+CREATE TABLE IF NOT EXISTS users (
+  id BIGSERIAL PRIMARY KEY, first_name TEXT NOT NULL DEFAULT 'ثبت‌نشده', last_name TEXT NOT NULL DEFAULT 'ثبت‌نشده',
+  national_id VARCHAR(10) NOT NULL UNIQUE, father_name TEXT NOT NULL DEFAULT 'ثبت‌نشده',
+  spouse_name TEXT, children_names TEXT, username TEXT NOT NULL UNIQUE, password_hash TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'personal' CHECK (role IN ('personal','employee','professional','clinic','school','admin')), created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE TABLE IF NOT EXISTS employee_profiles (
+  user_id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  personnel_code TEXT, full_name TEXT, age SMALLINT CHECK(age BETWEEN 15 AND 100), gender TEXT,
+  marital_status TEXT, children_count SMALLINT CHECK(children_count >= 0), organizational_unit TEXT, position_title TEXT,
+  work_experience_years NUMERIC(5,1) CHECK(work_experience_years >= 0), employment_type TEXT, shift_type TEXT,
+  work_status TEXT, work_hours TEXT, family_distance TEXT, shift_change_history TEXT,
+  perceived_workload TEXT, occupational_incidents TEXT, absence TEXT, sick_leave TEXT, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE TABLE IF NOT EXISTS spouse_profiles (
+  user_id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+  full_name TEXT, age SMALLINT CHECK(age BETWEEN 15 AND 100), education TEXT, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE TABLE IF NOT EXISTS children_profiles (
+  id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  full_name TEXT NOT NULL, age SMALLINT CHECK(age BETWEEN 0 AND 100), education TEXT, sort_order SMALLINT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS assessments (id TEXT PRIMARY KEY, title TEXT NOT NULL, description TEXT NOT NULL, category TEXT NOT NULL, threshold INTEGER NOT NULL, questions JSONB NOT NULL, sort_order INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS results (id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, assessment_id TEXT NOT NULL REFERENCES assessments(id), score INTEGER NOT NULL, max_score INTEGER NOT NULL, status TEXT NOT NULL, answers JSONB NOT NULL, completed_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), UNIQUE(user_id,assessment_id));
+CREATE TABLE IF NOT EXISTS referrals (id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id), result_id BIGINT NOT NULL UNIQUE REFERENCES results(id), status TEXT NOT NULL DEFAULT 'new', note TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE IF NOT EXISTS plans (id TEXT PRIMARY KEY, title TEXT NOT NULL, price INTEGER NOT NULL DEFAULT 0, features JSONB NOT NULL DEFAULT '[]');
+CREATE TABLE IF NOT EXISTS subscriptions (id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE, plan_id TEXT NOT NULL REFERENCES plans(id), status TEXT NOT NULL DEFAULT 'active', starts_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), ends_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '30 days'));
+CREATE TABLE IF NOT EXISTS product_categories (id TEXT PRIMARY KEY, title TEXT NOT NULL, icon TEXT NOT NULL, sort_order INTEGER NOT NULL DEFAULT 0);
+CREATE TABLE IF NOT EXISTS products (id TEXT PRIMARY KEY, title TEXT NOT NULL, description TEXT NOT NULL, product_type TEXT NOT NULL, category_id TEXT REFERENCES product_categories(id), audience TEXT, required_plan TEXT NOT NULL DEFAULT 'normal', is_beta BOOLEAN NOT NULL DEFAULT FALSE, is_published BOOLEAN NOT NULL DEFAULT TRUE, duration TEXT, sort_order INTEGER NOT NULL DEFAULT 0, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE IF NOT EXISTS user_activity (id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, product_id TEXT REFERENCES products(id), action TEXT NOT NULL, progress INTEGER NOT NULL DEFAULT 0, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), UNIQUE(user_id, product_id));
+CREATE TABLE IF NOT EXISTS product_files (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE, original_name TEXT NOT NULL, stored_name TEXT NOT NULL, mime_type TEXT, size_bytes BIGINT NOT NULL DEFAULT 0, file_role TEXT NOT NULL DEFAULT 'main', version_label TEXT, is_active BOOLEAN NOT NULL DEFAULT TRUE, uploaded_by BIGINT REFERENCES users(id), created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE IF NOT EXISTS product_versions (id BIGSERIAL PRIMARY KEY, product_id TEXT NOT NULL REFERENCES products(id) ON DELETE CASCADE, version_label TEXT NOT NULL, changelog TEXT NOT NULL DEFAULT '', status TEXT NOT NULL DEFAULT 'draft', released_at TIMESTAMPTZ, created_by BIGINT REFERENCES users(id), created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), UNIQUE(product_id, version_label));
+CREATE TABLE IF NOT EXISTS orders (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, plan_id TEXT NOT NULL REFERENCES plans(id), amount INTEGER NOT NULL DEFAULT 0, discount_amount INTEGER NOT NULL DEFAULT 0, final_amount INTEGER NOT NULL DEFAULT 0, status TEXT NOT NULL DEFAULT 'pending', coupon_code TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), paid_at TIMESTAMPTZ);
+CREATE TABLE IF NOT EXISTS payments (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), order_id UUID NOT NULL UNIQUE REFERENCES orders(id) ON DELETE CASCADE, gateway TEXT NOT NULL DEFAULT 'mock', authority TEXT, ref_id TEXT, amount INTEGER NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), paid_at TIMESTAMPTZ);
+CREATE TABLE IF NOT EXISTS coupons (id BIGSERIAL PRIMARY KEY, code TEXT NOT NULL UNIQUE, discount_type TEXT NOT NULL DEFAULT 'percent', discount_value INTEGER NOT NULL, max_uses INTEGER, used_count INTEGER NOT NULL DEFAULT 0, expires_at TIMESTAMPTZ, is_active BOOLEAN NOT NULL DEFAULT TRUE, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE IF NOT EXISTS coupon_redemptions (id BIGSERIAL PRIMARY KEY, coupon_id BIGINT NOT NULL REFERENCES coupons(id) ON DELETE CASCADE, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), UNIQUE(coupon_id,user_id));
+CREATE TABLE IF NOT EXISTS tickets (id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, subject TEXT NOT NULL, category TEXT NOT NULL DEFAULT 'عمومی', priority TEXT NOT NULL DEFAULT 'normal', status TEXT NOT NULL DEFAULT 'open', created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE IF NOT EXISTS ticket_messages (id BIGSERIAL PRIMARY KEY, ticket_id BIGINT NOT NULL REFERENCES tickets(id) ON DELETE CASCADE, sender_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, body TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE IF NOT EXISTS notifications (id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, title TEXT NOT NULL, body TEXT NOT NULL, type TEXT NOT NULL DEFAULT 'info', is_read BOOLEAN NOT NULL DEFAULT FALSE, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE IF NOT EXISTS admin_audit_logs (id BIGSERIAL PRIMARY KEY, admin_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, action TEXT NOT NULL, entity_type TEXT, entity_id TEXT, details JSONB NOT NULL DEFAULT '{}', created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+
+
+CREATE TABLE IF NOT EXISTS invoices (
+  id BIGSERIAL PRIMARY KEY,
+  invoice_no TEXT NOT NULL UNIQUE,
+  order_id UUID NOT NULL UNIQUE REFERENCES orders(id) ON DELETE CASCADE,
+  user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  amount INTEGER NOT NULL,
+  discount_amount INTEGER NOT NULL DEFAULT 0,
+  final_amount INTEGER NOT NULL,
+  status TEXT NOT NULL DEFAULT 'issued',
+  issued_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
