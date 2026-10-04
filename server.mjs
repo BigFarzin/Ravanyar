@@ -1098,45 +1098,49 @@ async function handler(req, res) {
       )
         return json(res, 400, { error: "نقش نامعتبر است." });
       if (d.role) await q("UPDATE users SET role=$1 WHERE id=$2", [d.role, id]);
-      if (d.plan_id) {
-        if (!["normal", "silver", "gold"].includes(d.plan_id))
+      if (d.plan_id !== undefined) {
+        const planId = String(d.plan_id);
+
+        if (!["normal", "silver", "gold"].includes(planId)) {
           return json(res, 400, { error: "پلن نامعتبر است." });
+        }
 
-        const usageLimit =
-          d.plan_id === "silver" ? 3 : d.plan_id === "gold" ? 9 : null;
+        // کاربر عادی = بدون subscription
+        if (planId === "normal") {
+          await q("DELETE FROM subscriptions WHERE user_id=$1", [id]);
+        } else {
+          const usageLimit = planId === "silver" ? 3 : 9;
 
-        await q(
-          `INSERT INTO subscriptions(
-      user_id,
-      plan_id,
-      status,
-      starts_at,
-      ends_at,
-      usage_limit,
-      usage_count
-    )
-    VALUES(
-      $1,
-      $2,
-      'active',
-      NOW(),
-      CASE
-        WHEN $2 = 'normal' THEN NULL
-        ELSE NOW() + INTERVAL '30 days'
-      END,
-      $3,
-      0
-    )
-    ON CONFLICT(user_id)
-    DO UPDATE SET
-      plan_id = EXCLUDED.plan_id,
-      status = 'active',
-      starts_at = EXCLUDED.starts_at,
-      ends_at = EXCLUDED.ends_at,
-      usage_limit = EXCLUDED.usage_limit,
-      usage_count = 0`,
-          [id, d.plan_id, usageLimit],
-        );
+          await q(
+            `INSERT INTO subscriptions(
+        user_id,
+        plan_id,
+        status,
+        starts_at,
+        ends_at,
+        usage_limit,
+        usage_count
+      )
+      VALUES(
+        $1,
+        $2,
+        'active',
+        NOW(),
+        NOW() + INTERVAL '30 days',
+        $3,
+        0
+      )
+      ON CONFLICT(user_id)
+      DO UPDATE SET
+        plan_id = EXCLUDED.plan_id,
+        status = 'active',
+        starts_at = EXCLUDED.starts_at,
+        ends_at = EXCLUDED.ends_at,
+        usage_limit = EXCLUDED.usage_limit,
+        usage_count = 0`,
+            [id, planId, usageLimit],
+          );
+        }
       }
       return json(res, 200, { message: "اطلاعات کاربر به‌روزرسانی شد." });
     }
