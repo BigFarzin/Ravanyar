@@ -49,7 +49,7 @@ npm start
 
 ## پرداخت
 
-حالت محلی `mock` است تا پروژه بدون credentials بانکی قابل تست باشد. برای فروش واقعی باید آداپتور درگاه بانکی، callback و verify واقعی با credentials پذیرنده شما پیاده‌سازی و سپس `PAYMENT_MODE=real` فعال شود. در حالت Production، endpoint تأیید Mock عمداً غیرفعال است.
+حالت محلی `mock` است. برای پرداخت واقعی بله، `PAYMENT_MODE=real`، `PAYMENT_GATEWAY=bale` و سه مقدار `BALE_BOT_TOKEN`، `BALE_BOT_USERNAME` و `BALE_PAYMENT_PROVIDER_TOKEN` را تنظیم کنید. برنامه درخواست پول را به چت بلهٔ متصل‌شدهٔ کاربر می‌فرستد؛ سرویس جداگانهٔ `bale-bot` تأیید پیش‌پرداخت و پرداخت موفق را پردازش می‌کند. فعال‌شدن اشتراک فقط پس از آپدیت `SuccessfulPayment` انجام می‌شود.
 
 ## Docker
 

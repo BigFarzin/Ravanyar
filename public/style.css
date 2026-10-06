@@ -5580,3 +5580,188 @@ header p {
     height: 9px;
   }
 }
+/* Bale Connection */
+.bale-connect-section {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 14px;
+  background: var(--card-bg, #fff);
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s ease;
+}
+
+.bale-connect-section:hover {
+  border-color: #8ab7e8;
+  box-shadow: 0 6px 20px rgba(35, 112, 190, 0.07);
+  transform: translateY(-1px);
+}
+
+.bale-connect-info,
+.bale-connect-actions {
+  display: flex;
+  align-items: center;
+}
+
+.bale-connect-info {
+  gap: 12px;
+  min-width: 0;
+}
+
+.bale-icon {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: #eaf3ff;
+  color: #2877c7;
+  font-size: 17px;
+}
+
+.bale-connect-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bale-connect-text strong {
+  font-size: 14px;
+  color: var(--text-color, #1f2937);
+}
+
+.bale-connect-text span {
+  font-size: 12px;
+  color: var(--muted-color, #8993a4);
+}
+
+.bale-connect-actions {
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.bale-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #b8c0cc;
+  transition: background 0.3s ease;
+}
+
+.bale-status-dot.connected {
+  background: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
+}
+
+.bale-connect-btn {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 9px;
+  background: #2877c7;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease,
+    opacity 0.25s ease;
+}
+
+.bale-connect-btn:hover {
+  background: #1d65ad;
+  transform: translateY(-1px);
+}
+
+.bale-connect-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+  transform: none;
+}
+
+/* Smooth loading */
+.bale-connect-btn.loading {
+  pointer-events: none;
+  position: relative;
+  color: transparent;
+}
+
+.bale-connect-btn.loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 13px;
+  height: 13px;
+  margin: -7px 0 0 -7px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: baleSpin 0.8s linear infinite;
+}
+
+@keyframes baleSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 480px) {
+  .bale-connect-section {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .bale-connect-info {
+    gap: 9px;
+  }
+
+  .bale-icon {
+    width: 35px;
+    height: 35px;
+    font-size: 15px;
+  }
+
+  .bale-connect-text strong {
+    font-size: 13px;
+  }
+
+  .bale-connect-text span {
+    font-size: 11px;
+  }
+
+  .bale-connect-btn {
+    padding: 8px 11px;
+  }
+}
+.bale-icon {
+  width: 40px !important;
+  height: 40px !important;
+  min-width: 40px;
+  max-width: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #eaf3ff;
+}
+
+.bale-icon img {
+  display: block !important;
+  position: static !important;
+  width: 25px !important;
+  height: 25px !important;
+  max-width: 25px !important;
+  max-height: 25px !important;
+  object-fit: contain;
+  margin: 0;
+}

@@ -28,11 +28,25 @@ services:
       LOGIN_MAX_ATTEMPTS: 8
       MAX_UPLOAD_MB: 500
       PAYMENT_MODE: real
-      PAYMENT_GATEWAY: YOUR_GATEWAY
+      PAYMENT_GATEWAY: bale
+      BALE_BOT_TOKEN: ${BALE_BOT_TOKEN}
+      BALE_BOT_USERNAME: ${BALE_BOT_USERNAME}
+      BALE_PAYMENT_PROVIDER_TOKEN: ${BALE_PAYMENT_PROVIDER_TOKEN}
     ports:
       - "3000:3000"
     volumes:
       - product_storage:/app/storage/products
+  bale-bot:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["node", "bale-bot.mjs"]
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://payesh:CHANGE_DB_PASSWORD@db:5432/payesh
+      BALE_BOT_TOKEN: ${BALE_BOT_TOKEN}
 volumes:
   pgdata:
   product_storage:

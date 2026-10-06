@@ -7,8 +7,10 @@ import {
   scryptSync,
   timingSafeEqual,
   randomUUID,
+  createHash,
 } from "node:crypto";
 import pg from "pg";
+import { activatePayment } from "./payment-service.mjs";
 
 const PORT = Number(process.env.PORT || 3000);
 const ROOT = join(process.cwd(), "public");
@@ -27,7 +29,171 @@ const rateLimits = new Map();
 const MAX_UPLOAD_BYTES = Number(process.env.MAX_UPLOAD_MB || 500) * 1024 * 1024;
 const MAX_JSON_BYTES = Number(process.env.MAX_JSON_MB || 2) * 1024 * 1024;
 const q = (text, values = []) => pool.query(text, values);
+// Prices in the application database/UI are toman; Bale's payment API uses IRR.
+function tomanToRial(amount) {
+  const rial = Number(amount) * 10;
+  if (!Number.isSafeInteger(rial) || rial < 0)
+    throw Object.assign(new Error("مبلغ پرداخت نامعتبر است."), { status: 400 });
+  return rial;
+}
+const BALE_API = process.env.BALE_BOT_TOKEN
+  ? `https://tapi.bale.ai/bot${process.env.BALE_BOT_TOKEN}`
+  : null;
+const BALE_WEBHOOK_PATH = "/api/bale/webhook";
+async function baleRequest(method, data) {
+  if (!BALE_API) throw new Error("توکن ربات بله تنظیم نشده است.");
+  const response = await fetch(`${BALE_API}/${method}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+    signal: AbortSignal.timeout(20_000),
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || !result.ok)
+    throw new Error(
+      result.description || "ارسال درخواست پرداخت به بله ناموفق بود.",
+    );
+  return result.result;
+}
+async function sendBaleMessage(chatId, text) {
+  return baleRequest("sendMessage", {
+    chat_id: chatId,
+    text,
+  });
+}
+async function baleBotUsername() {
+  // Do not rely on a manually typed username: it is easy to confuse a bot's
+  // display name with its @username. The token is authoritative.
+  const bot = await baleRequest("getMe", {});
+  const username = String(bot?.username || "")
+    .replace(/^@/, "")
+    .trim();
+  if (!username) throw new Error("نام کاربری ربات بله از API دریافت نشد.");
+  return username;
+}
+async function handleBalePreCheckout(preCheckout) {
+  const payload = String(preCheckout?.invoice_payload || "");
+  const match = payload.match(/^rypay:([0-9a-f-]{36})$/i);
+  const paymentId = match?.[1];
 
+  let ok = true;
+  let errorMessage = "";
+
+  try {
+    if (!paymentId) {
+      throw new Error("شناسه پرداخت نامعتبر است.");
+    }
+
+    if (String(preCheckout?.currency || "").toUpperCase() !== "IRR") {
+      throw new Error("ارز پرداخت نامعتبر است.");
+    }
+
+    const {
+      rows: [payment],
+    } = await q(
+      `SELECT
+         p.*,
+         o.user_id,
+         o.final_amount,
+         ba.chat_id
+       FROM payments p
+       JOIN orders o ON o.id = p.order_id
+       JOIN bale_accounts ba ON ba.user_id = o.user_id
+       WHERE p.id = $1`,
+      [paymentId],
+    );
+
+    if (!payment) {
+      throw new Error("پرداخت یافت نشد.");
+    }
+
+    if (payment.status !== "pending") {
+      throw new Error("این پرداخت دیگر قابل پرداخت نیست.");
+    }
+
+    if (payment.bale_payload !== payload) {
+      throw new Error("اطلاعات پرداخت معتبر نیست.");
+    }
+
+    const expectedAmount = tomanToRial(payment.final_amount);
+    const receivedAmount = Number(preCheckout?.total_amount);
+
+    if (receivedAmount !== expectedAmount) {
+      throw new Error("مبلغ پرداخت صحیح نیست.");
+    }
+
+    if (String(payment.chat_id) !== String(preCheckout?.from?.id)) {
+      throw new Error("حساب بله با سفارش مطابقت ندارد.");
+    }
+  } catch (error) {
+    ok = false;
+    errorMessage = error.message || "پرداخت قابل تأیید نیست.";
+    console.error("Bale pre-checkout error:", error);
+  }
+
+  await baleRequest("answerPreCheckoutQuery", {
+    pre_checkout_query_id: preCheckout.id,
+    ok,
+    ...(ok ? {} : { error_message: errorMessage }),
+  });
+}
+async function handleBaleSuccessfulPayment(message) {
+  const paid = message?.successful_payment;
+  const payload = String(paid?.invoice_payload || "");
+
+  const match = payload.match(/^rypay:([0-9a-f-]{36})$/i);
+  const paymentId = match?.[1];
+
+  if (!paymentId) {
+    throw new Error("شناسه پرداخت بله نامعتبر است.");
+  }
+
+  if (String(paid?.currency || "").toUpperCase() !== "IRR") {
+    throw new Error("ارز پرداخت بله نامعتبر است.");
+  }
+
+  const {
+    rows: [payment],
+  } = await q(
+    `SELECT p.*, o.user_id, o.final_amount, ba.chat_id
+     FROM payments p
+     JOIN orders o ON o.id = p.order_id
+     JOIN bale_accounts ba ON ba.user_id = o.user_id
+     WHERE p.id = $1`,
+    [paymentId],
+  );
+
+  if (!payment) {
+    throw new Error("پرداخت یافت نشد.");
+  }
+
+  if (payment.bale_payload !== payload) {
+    throw new Error("اطلاعات پرداخت بله معتبر نیست.");
+  }
+
+  if (Number(paid.total_amount) !== tomanToRial(payment.final_amount)) {
+    throw new Error("مبلغ پرداخت بله صحیح نیست.");
+  }
+
+  if (String(payment.chat_id) !== String(message?.chat?.id)) {
+    throw new Error("حساب بله با سفارش مطابقت ندارد.");
+  }
+
+  const result = await activatePayment(pool, {
+    paymentId,
+    gateway: "bale",
+    authority: paid.telegram_payment_charge_id,
+    refId: paid.provider_payment_charge_id || paid.telegram_payment_charge_id,
+    balePayload: paid.invoice_payload,
+    baleChargeId: paid.telegram_payment_charge_id,
+  });
+  if (!result.alreadyPaid) {
+    await sendBaleMessage(
+      message.chat.id,
+      "✅ پرداخت با موفقیت انجام شد و اشتراک شما فعال شد.",
+    );
+  }
+}
 const schema = `
 CREATE TABLE IF NOT EXISTS users (
   id BIGSERIAL PRIMARY KEY, first_name TEXT NOT NULL DEFAULT 'ثبت‌نشده', last_name TEXT NOT NULL DEFAULT 'ثبت‌نشده',
@@ -56,6 +222,8 @@ CREATE TABLE IF NOT EXISTS results (id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT
 CREATE TABLE IF NOT EXISTS referrals (id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id), result_id BIGINT NOT NULL UNIQUE REFERENCES results(id), status TEXT NOT NULL DEFAULT 'new', note TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE TABLE IF NOT EXISTS plans (id TEXT PRIMARY KEY, title TEXT NOT NULL, price INTEGER NOT NULL DEFAULT 0, features JSONB NOT NULL DEFAULT '[]');
 CREATE TABLE IF NOT EXISTS subscriptions (id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE, plan_id TEXT NOT NULL REFERENCES plans(id), status TEXT NOT NULL DEFAULT 'active', starts_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), ends_at TIMESTAMPTZ NOT NULL DEFAULT (NOW() + INTERVAL '30 days'));
+ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS usage_limit INTEGER;
+ALTER TABLE subscriptions ADD COLUMN IF NOT EXISTS usage_count INTEGER NOT NULL DEFAULT 0;
 CREATE TABLE IF NOT EXISTS product_categories (id TEXT PRIMARY KEY, title TEXT NOT NULL, icon TEXT NOT NULL, sort_order INTEGER NOT NULL DEFAULT 0);
 CREATE TABLE IF NOT EXISTS products (id TEXT PRIMARY KEY, title TEXT NOT NULL, description TEXT NOT NULL, product_type TEXT NOT NULL, category_id TEXT REFERENCES product_categories(id), audience TEXT, required_plan TEXT NOT NULL DEFAULT 'normal', is_beta BOOLEAN NOT NULL DEFAULT FALSE, is_published BOOLEAN NOT NULL DEFAULT TRUE, duration TEXT, sort_order INTEGER NOT NULL DEFAULT 0, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE TABLE IF NOT EXISTS user_activity (id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, product_id TEXT REFERENCES products(id), action TEXT NOT NULL, progress INTEGER NOT NULL DEFAULT 0, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), UNIQUE(user_id, product_id));
@@ -70,6 +238,31 @@ CREATE TABLE IF NOT EXISTS tickets (id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT
 CREATE TABLE IF NOT EXISTS ticket_messages (id BIGSERIAL PRIMARY KEY, ticket_id BIGINT NOT NULL REFERENCES tickets(id) ON DELETE CASCADE, sender_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, body TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE TABLE IF NOT EXISTS notifications (id BIGSERIAL PRIMARY KEY, user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, title TEXT NOT NULL, body TEXT NOT NULL, type TEXT NOT NULL DEFAULT 'info', is_read BOOLEAN NOT NULL DEFAULT FALSE, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
 CREATE TABLE IF NOT EXISTS admin_audit_logs (id BIGSERIAL PRIMARY KEY, admin_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE, action TEXT NOT NULL, entity_type TEXT, entity_id TEXT, details JSONB NOT NULL DEFAULT '{}', created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+CREATE TABLE IF NOT EXISTS bale_accounts (
+  user_id BIGINT PRIMARY KEY
+    REFERENCES users(id) ON DELETE CASCADE,
+  chat_id TEXT NOT NULL UNIQUE,
+  linked_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS bale_link_tokens (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id BIGINT NOT NULL
+    REFERENCES users(id) ON DELETE CASCADE,
+  token_hash TEXT NOT NULL UNIQUE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  used_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE payments
+  ADD COLUMN IF NOT EXISTS bale_payload TEXT;
+
+ALTER TABLE payments
+  ADD COLUMN IF NOT EXISTS bale_charge_id TEXT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS payments_bale_charge_id_unique
+  ON payments(bale_charge_id) WHERE bale_charge_id IS NOT NULL;
 
 `;
 const seeds = [
@@ -627,6 +820,21 @@ async function handler(req, res) {
   try {
     const url = new URL(req.url, `http://${req.headers.host}`),
       p = url.pathname;
+    if (req.method === "POST" && p === BALE_WEBHOOK_PATH) {
+      const update = await body(req);
+
+      console.log("Bale webhook received:", update);
+
+      if (update.pre_checkout_query) {
+        await handleBalePreCheckout(update.pre_checkout_query);
+      }
+
+      if (update.message?.successful_payment) {
+        await handleBaleSuccessfulPayment(update.message);
+      }
+
+      return json(res, 200, { ok: true });
+    }
     if (req.method === "GET" && p === "/health")
       return json(res, 200, {
         status: "ok",
@@ -868,6 +1076,51 @@ async function handler(req, res) {
       const u = await need(req, res);
       if (u) json(res, 200, { user: safe(u) });
       return;
+    }
+    if (req.method === "POST" && p === "/api/bale/link-token") {
+      const u = await need(req, res);
+      if (!u) return;
+
+      if (!BALE_API)
+        return json(res, 503, {
+          error: "توکن ربات بله در سرور تنظیم نشده است.",
+        });
+
+      let botUsername;
+      try {
+        botUsername = await baleBotUsername();
+      } catch (error) {
+        console.error("Bale bot lookup error:", error.message);
+        return json(res, 503, {
+          error: "ارتباط با ربات بله برقرار نشد. تنظیمات ربات را بررسی کنید.",
+        });
+      }
+
+      const rawToken = randomBytes(32).toString("hex");
+      const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+
+      // حذف توکن‌های قبلی و استفاده‌نشده این کاربر
+      await q(
+        `DELETE FROM bale_link_tokens
+     WHERE user_id = $1 AND used_at IS NULL`,
+        [u.id],
+      );
+
+      await q(
+        `INSERT INTO bale_link_tokens (user_id, token_hash, expires_at)
+     VALUES ($1, $2, $3)`,
+        [u.id, tokenHash, expiresAt],
+      );
+
+      return json(res, 201, {
+        link: `https://ble.ir/${botUsername}?start=${rawToken}`,
+        botLink: `https://ble.ir/${botUsername}`,
+        connectionCode: rawToken,
+        expiresAt,
+        message: "لینک اتصال با موفقیت ساخته شد.",
+      });
     }
     if (req.method === "GET" && p === "/api/profile") {
       const u = await need(req, res);
@@ -1627,6 +1880,74 @@ async function handler(req, res) {
       ]);
       return json(res, 201, { message: "پیام ثبت شد." });
     }
+    // بررسی وضعیت اتصال بله
+    if (req.method === "GET" && p === "/api/bale/status") {
+      const u = await need(req, res);
+      if (!u) return;
+
+      try {
+        const {
+          rows: [account],
+        } = await q(
+          `SELECT linked_at
+       FROM bale_accounts
+       WHERE user_id = $1`,
+          [u.id],
+        );
+
+        return json(res, 200, {
+          connected: Boolean(account),
+          linkedAt: account?.linked_at || null,
+        });
+      } catch (error) {
+        console.error("Bale status error:", error);
+        return json(res, 500, {
+          error: "بررسی وضعیت اتصال با خطا مواجه شد.",
+        });
+      }
+    }
+    if (req.method === "DELETE" && p === "/api/bale/account") {
+      const u = await need(req, res);
+      if (!u) return;
+
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        const { rowCount } = await client.query(
+          "DELETE FROM bale_accounts WHERE user_id=$1",
+          [u.id],
+        );
+        // A delivered invoice must not remain payable after its account is unlinked.
+        await client.query(
+          `UPDATE payments p SET status='failed'
+           FROM orders o
+           WHERE p.order_id=o.id AND o.user_id=$1
+             AND p.gateway='bale' AND p.status='pending'`,
+          [u.id],
+        );
+        await client.query(
+          `UPDATE orders SET status='failed'
+           WHERE user_id=$1 AND status='pending'
+             AND id IN (SELECT order_id FROM payments WHERE gateway='bale' AND status='failed')`,
+          [u.id],
+        );
+        await client.query(
+          "DELETE FROM bale_link_tokens WHERE user_id=$1 AND used_at IS NULL",
+          [u.id],
+        );
+        await client.query("COMMIT");
+        return json(res, 200, {
+          disconnected: Boolean(rowCount),
+          message: "اتصال حساب بله با موفقیت قطع شد.",
+        });
+      } catch (error) {
+        await client.query("ROLLBACK");
+        console.error("Bale disconnect error:", error);
+        return json(res, 500, { error: "قطع اتصال بله با خطا مواجه شد." });
+      } finally {
+        client.release();
+      }
+    }
     if (req.method === "POST" && p === "/api/checkout") {
       const u = await need(req, res);
       if (!u) return;
@@ -1670,6 +1991,57 @@ async function handler(req, res) {
         coupon = c;
       }
       const final = Math.max(0, pl.price - discount);
+      const isBale =
+        process.env.PAYMENT_MODE === "real" &&
+        process.env.PAYMENT_GATEWAY === "bale";
+      if (process.env.PAYMENT_MODE === "real" && !isBale)
+        return json(res, 503, {
+          error: "درگاه پرداخت واقعی بله پیکربندی نشده است.",
+        });
+      let baleAccount = null;
+      let baleBotLink = null;
+      if (isBale) {
+        if (
+          !process.env.BALE_PAYMENT_PROVIDER_TOKEN ||
+          !process.env.BALE_BOT_TOKEN
+        )
+          return json(res, 503, {
+            error: "تنظیمات پرداخت بله در سرور کامل نیست.",
+          });
+        const {
+          rows: [account],
+        } = await q("SELECT chat_id FROM bale_accounts WHERE user_id=$1", [
+          u.id,
+        ]);
+        if (!account)
+          return json(res, 409, {
+            error: "ابتدا حساب بله خود را در بخش اشتراک متصل کنید.",
+          });
+        baleAccount = account;
+        try {
+          baleBotLink = `https://ble.ir/${await baleBotUsername()}`;
+        } catch (error) {
+          console.error("Bale bot lookup error:", error.message);
+          return json(res, 503, {
+            error: "ارتباط با ربات بله برقرار نشد. تنظیمات ربات را بررسی کنید.",
+          });
+        }
+        // Only the latest unpaid Bale invoice for a user is payable. Older messages
+        // remain in the chat but are rejected during pre-checkout validation.
+        await q(
+          `UPDATE payments p SET status='failed'
+           FROM orders o
+           WHERE p.order_id=o.id AND o.user_id=$1
+             AND p.gateway='bale' AND p.status='pending'`,
+          [u.id],
+        );
+        await q(
+          `UPDATE orders SET status='failed'
+           WHERE user_id=$1 AND status='pending'
+             AND id IN (SELECT order_id FROM payments WHERE gateway='bale' AND status='failed')`,
+          [u.id],
+        );
+      }
       const {
         rows: [order],
       } = await q(
@@ -1688,12 +2060,61 @@ async function handler(req, res) {
         rows: [payment],
       } = await q(
         "INSERT INTO payments(order_id,amount,gateway,status) VALUES($1,$2,$3,$4) RETURNING *",
-        [order.id, final, process.env.PAYMENT_GATEWAY || "mock", "pending"],
+        [
+          order.id,
+          final,
+          isBale ? "bale" : process.env.PAYMENT_GATEWAY || "mock",
+          "pending",
+        ],
       );
+      if (final === 0) {
+        await activatePayment(pool, {
+          paymentId: payment.id,
+          gateway: "discount",
+          authority: "FREE",
+          refId: "FREE",
+        });
+        return json(res, 201, {
+          order,
+          payment: { ...payment, status: "paid" },
+          mode: "free",
+          message: "سفارش با تخفیف کامل ثبت شد.",
+        });
+      }
+      if (isBale) {
+        const payload = `rypay:${payment.id}`;
+        const baleAmount = tomanToRial(final);
+        await q("UPDATE payments SET bale_payload=$1 WHERE id=$2", [
+          payload,
+          payment.id,
+        ]);
+        try {
+          await baleRequest("sendInvoice", {
+            chat_id: baleAccount.chat_id,
+            title: "اشتراک روان‌یار",
+            description: `خرید ${pl.title} برای ۳۰ روز`,
+            payload,
+            provider_token: process.env.BALE_PAYMENT_PROVIDER_TOKEN,
+            prices: [{ label: pl.title, amount: baleAmount }],
+          });
+        } catch (error) {
+          await q(
+            "UPDATE payments SET status='failed' WHERE id=$1 AND status='pending'",
+            [payment.id],
+          );
+          await q(
+            "UPDATE orders SET status='failed' WHERE id=$1 AND status='pending'",
+            [order.id],
+          );
+          throw error;
+        }
+      }
       return json(res, 201, {
         order,
         payment,
-        mode: process.env.PAYMENT_MODE || "mock",
+        mode: isBale ? "bale" : process.env.PAYMENT_MODE || "mock",
+        message: isBale ? "درخواست پرداخت به چت بله شما ارسال شد." : undefined,
+        baleBotLink,
       });
     }
     const payMatch = p.match(/^\/api\/payments\/([^/]+)\/confirm$/);

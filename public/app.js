@@ -1566,6 +1566,7 @@ async function subscription() {
         Math.ceil((endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
       )
     : 0;
+
   const usageLimit = Number(sub.usage_limit || 0);
   const usageCount = Number(sub.usage_count || 0);
 
@@ -1575,6 +1576,11 @@ async function subscription() {
     usageLimit > 0
       ? Math.min(100, Math.max(0, (usageRemaining / usageLimit) * 100))
       : 0;
+
+  const percentRemaining = isActive
+    ? Math.min(100, Math.max(0, (daysLeft / 30) * 100))
+    : 0;
+
   const planTitle =
     currentPlan === "gold"
       ? "طلایی"
@@ -1585,33 +1591,15 @@ async function subscription() {
   const planIcon =
     currentPlan === "gold" ? "👑" : currentPlan === "silver" ? "⭐" : "○";
 
-  const statusText = isActive
-    ? "فعال"
-    : isExpired
-      ? "منقضی شده"
-      : "بدون اشتراک پولی";
-
   const statusClass = isActive ? "active" : isExpired ? "expired" : "normal";
 
-  const formatDate = (date) =>
-    date
-      ? date.toLocaleDateString("fa-IR", {
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
-      : "—";
-
-  const percentRemaining =
-    isActive && startDate && endDate
-      ? Math.min(
-          100,
-          Math.max(0, ((endDate - now) / (endDate - startDate)) * 100),
-        )
-      : 0;
+  const statusText = isActive ? "فعال" : isExpired ? "منقضی شده" : "پایه";
 
   shell(
     `
+    <!-- =========================
+         PAGE TITLE
+    ========================== -->
     <div class="page-title">
       <div>
         <span class="eyebrow">
@@ -1629,7 +1617,69 @@ async function subscription() {
     </div>
 
 
-    <!-- Current Subscription -->
+    <!-- =========================
+         BALE CONNECTION
+    ========================== -->
+    <section class="bale-connect-section">
+
+      <div class="bale-connect-info">
+
+        <div class="bale-icon">
+          <img
+            src="/images/bale.webp"
+            alt="بله"
+          />
+        </div>
+
+        <div class="bale-connect-text">
+
+          <strong>
+            اتصال به بله
+          </strong>
+
+          <span id="baleConnectionStatus">
+            در حال بررسی وضعیت اتصال...
+          </span>
+
+          <small id="baleConnectHelp" hidden></small>
+
+        </div>
+
+      </div>
+
+
+      <div class="bale-connect-actions">
+
+        <span
+          class="bale-status-dot"
+          id="baleStatusDot"
+        ></span>
+
+        <button
+          id="baleConnectBtn"
+          class="bale-connect-btn"
+          type="button"
+        >
+          اتصال
+        </button>
+
+        <button
+          id="baleDisconnectBtn"
+          class="secondary"
+          type="button"
+          hidden
+        >
+          قطع اتصال
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         CURRENT SUBSCRIPTION
+    ========================== -->
     <section class="subscription-current-card ${statusClass}">
 
       <div class="subscription-current-main">
@@ -1687,134 +1737,141 @@ async function subscription() {
       ${
         isActive
           ? `
-      <div class="subscription-details">
+            <!-- Subscription Details -->
 
-        <div class="subscription-detail">
+            <div class="subscription-details">
 
-          <span>
-            شروع اشتراک
-          </span>
+              <div class="subscription-detail">
+                <span>
+                  شروع اشتراک
+                </span>
 
-          <strong>
-            ${formatDate(startDate)}
-          </strong>
-
-        </div>
-
-
-        <div class="subscription-detail">
-
-          <span>
-            پایان اشتراک
-          </span>
-
-          <strong>
-            ${formatDate(endDate)}
-          </strong>
-
-        </div>
+                <strong>
+                  ${formatDate(startDate)}
+                </strong>
+              </div>
 
 
-        <div class="subscription-detail highlight">
+              <div class="subscription-detail">
+                <span>
+                  پایان اشتراک
+                </span>
 
-          <span>
-            زمان باقی‌مانده
-          </span>
-
-          <strong>
-            ${daysLeft}
-            <small>روز</small>
-          </strong>
-
-        </div>
+                <strong>
+                  ${formatDate(endDate)}
+                </strong>
+              </div>
 
 
-        <div class="subscription-detail usage-highlight">
+              <div class="subscription-detail highlight">
+                <span>
+                  زمان باقی‌مانده
+                </span>
 
-          <span>
-            استفاده باقی‌مانده
-          </span>
-
-          <strong>
-            ${usageRemaining}
-            <small>از ${usageLimit} بار</small>
-          </strong>
-
-        </div>
-
-      </div>
+                <strong>
+                  ${daysLeft}
+                  <small>
+                    روز
+                  </small>
+                </strong>
+              </div>
 
 
-      <div class="subscription-progress">
+              <div class="subscription-detail usage-highlight">
+                <span>
+                  استفاده باقی‌مانده
+                </span>
 
-        <div class="subscription-progress-top">
+                <strong>
+                  ${usageRemaining}
+                  <small>
+                    از ${usageLimit} بار
+                  </small>
+                </strong>
+              </div>
 
-          <span>
-            مدت باقی‌مانده اشتراک
-          </span>
-
-          <strong>
-            ${daysLeft} روز
-          </strong>
-
-        </div>
-
-        <div class="subscription-progress-track">
-
-          <div
-            class="subscription-progress-bar"
-            style="width: ${percentRemaining}%"
-          ></div>
-
-        </div>
-
-      </div>
+            </div>
 
 
-      <div class="subscription-progress usage-progress">
+            <!-- Subscription Time Progress -->
 
-        <div class="subscription-progress-top">
+            <div class="subscription-progress">
 
-          <span>
-            استفاده باقی‌مانده از سامانه انتخاب رشته
-          </span>
+              <div class="subscription-progress-top">
 
-          <strong>
-            ${usageRemaining} از ${usageLimit} بار
-          </strong>
+                <span>
+                  مدت باقی‌مانده اشتراک
+                </span>
 
-        </div>
+                <strong>
+                  ${daysLeft} روز
+                </strong>
 
-        <div class="subscription-progress-track">
+              </div>
 
-          <div
-            class="subscription-progress-bar"
-            style="width: ${usagePercent}%"
-          ></div>
 
-        </div>
+              <div class="subscription-progress-track">
 
-      </div>
-    `
+                <div
+                  class="subscription-progress-bar"
+                  style="width: ${percentRemaining}%"
+                ></div>
+
+              </div>
+
+            </div>
+
+
+            <!-- Career Usage Progress -->
+
+            <div class="subscription-progress usage-progress">
+
+              <div class="subscription-progress-top">
+
+                <span>
+                  استفاده باقی‌مانده از سامانه انتخاب رشته
+                </span>
+
+                <strong>
+                  ${usageRemaining} از ${usageLimit} بار
+                </strong>
+
+              </div>
+
+
+              <div class="subscription-progress-track">
+
+                <div
+                  class="subscription-progress-bar"
+                  style="width: ${usagePercent}%"
+                ></div>
+
+              </div>
+
+            </div>
+          `
           : `
-      <div class="subscription-no-active">
+            <div class="subscription-no-active">
 
-        <div>
+              <div>
 
-          <strong>
-            دسترسی ویژه فعال نیست
-          </strong>
+                <strong>
+                  دسترسی ویژه فعال نیست
+                </strong>
 
-          <span>
-            با انتخاب اشتراک نقره‌ای یا طلایی، دسترسی شما فعال می‌شود.
-          </span>
+                <span>
+                  با انتخاب اشتراک نقره‌ای یا طلایی،
+                  دسترسی شما فعال می‌شود.
+                </span>
 
-        </div>
+              </div>
 
-      </div>
-    `
+            </div>
+          `
       }
 
+
+      <!-- Current Subscription Actions -->
 
       <div class="subscription-current-actions">
 
@@ -1842,6 +1899,7 @@ async function subscription() {
             `
         }
 
+
         <button
           class="secondary"
           data-orders
@@ -1855,7 +1913,9 @@ async function subscription() {
     </section>
 
 
-    <!-- Plans -->
+    <!-- =========================
+         PLANS
+    ========================== -->
     <section
       class="subscription-plans-section"
       id="subscriptionPlans"
@@ -1909,9 +1969,7 @@ async function subscription() {
                 <div class="plan-top">
 
                   <span class="plan-icon">
-
                     ${p.id === "gold" ? "👑" : p.id === "silver" ? "⭐" : "○"}
-
                   </span>
 
                   <h2>
@@ -1922,9 +1980,7 @@ async function subscription() {
 
 
                 <div class="price">
-
                   ${p.price ? money(p.price) : "رایگان"}
-
                 </div>
 
 
@@ -1939,11 +1995,9 @@ async function subscription() {
 
 
                 <ul>
-
                   ${(p.features || [])
                     .map((x) => `<li>✓ ${esc(x)}</li>`)
                     .join("")}
-
                 </ul>
 
 
@@ -1976,7 +2030,9 @@ async function subscription() {
                         >
                           ${isExpired ? "تمدید اشتراک" : "تهیه اشتراک"}
 
-                          <span>←</span>
+                          <span>
+                            ←
+                          </span>
                         </button>
                       `
                 }
@@ -1993,24 +2049,207 @@ async function subscription() {
     "subscription",
   );
 
+  // =====================================================
+  // BALE CONNECTION
+  // =====================================================
+
+  const baleBtn = document.querySelector("#baleConnectBtn");
+
+  const baleDisconnectBtn = document.querySelector("#baleDisconnectBtn");
+
+  const baleStatus = document.querySelector("#baleConnectionStatus");
+
+  const baleConnectHelp = document.querySelector("#baleConnectHelp");
+
+  const baleDot = document.querySelector("#baleStatusDot");
+
+  async function checkBaleStatus() {
+    try {
+      const result = await api("/api/bale/status");
+
+      if (result.connected) {
+        baleStatus.textContent = "حساب بله شما متصل است";
+
+        baleDot.classList.add("connected");
+
+        baleBtn.textContent = "متصل است";
+
+        baleBtn.disabled = true;
+
+        baleDisconnectBtn.hidden = false;
+
+        baleConnectHelp.hidden = true;
+
+        return true;
+      }
+
+      baleStatus.textContent = "حساب بله خود را متصل کنید";
+
+      baleDot.classList.remove("connected");
+
+      baleBtn.textContent = "اتصال";
+
+      baleBtn.disabled = false;
+
+      baleDisconnectBtn.hidden = true;
+
+      return false;
+    } catch (error) {
+      console.error("Bale status error:", error);
+
+      baleStatus.textContent = "خطا در بررسی وضعیت اتصال";
+
+      baleDot.classList.remove("connected");
+
+      baleBtn.disabled = false;
+
+      baleDisconnectBtn.hidden = true;
+
+      baleBtn.textContent = "اتصال";
+
+      return false;
+    }
+  }
+
+  baleBtn?.addEventListener("click", async () => {
+    try {
+      baleBtn.disabled = true;
+
+      baleBtn.textContent = "در حال اتصال...";
+
+      baleStatus.textContent = "در حال ساخت لینک اتصال...";
+
+      const result = await api("/api/bale/link-token", {
+        method: "POST",
+        body: JSON.stringify({}),
+      });
+
+      if (!result.link) {
+        throw new Error("لینک اتصال از سرور دریافت نشد.");
+      }
+
+      const fallback = `اگر ربات باز نشد، <a href="${esc(result.botLink || "https://ble.ir")}" target="_blank" rel="noopener noreferrer">چت ربات را باز کنید</a>، «شروع» را بزنید و این کد را ارسال کنید: <code>${esc(result.connectionCode || "")}</code>`;
+      baleConnectHelp.innerHTML = fallback;
+      baleConnectHelp.hidden = false;
+
+      baleStatus.textContent = "در حال انتقال به بله...";
+
+      /*
+       * باز کردن لینک بله
+       */
+      const baleWindow = window.open(result.link, "_blank");
+
+      /*
+       * اگر مرورگر popup را مسدود کرده باشد
+       */
+      if (!baleWindow) {
+        baleStatus.innerHTML = `
+            پنجره بله توسط مرورگر مسدود شد.
+            <a
+              href="${result.link}"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              برای اتصال اینجا کلیک کنید
+            </a>
+          `;
+      } else {
+        baleStatus.textContent = "لینک بله باز شد؛ اتصال را در بله تأیید کنید.";
+      }
+
+      /*
+       * هر ۳ ثانیه وضعیت اتصال بررسی می‌شود.
+       * حداکثر حدود ۱ دقیقه.
+       */
+      let attempts = 0;
+
+      const timer = setInterval(async () => {
+        attempts++;
+
+        const connected = await checkBaleStatus();
+
+        if (connected || attempts >= 20) {
+          clearInterval(timer);
+
+          if (!connected) {
+            baleStatus.textContent = "هنوز حساب بله متصل نشده است.";
+
+            baleBtn.disabled = false;
+
+            baleBtn.textContent = "اتصال";
+          }
+        }
+      }, 3000);
+    } catch (error) {
+      console.error("Bale connect error:", error);
+
+      baleStatus.textContent = error.message || "اتصال به بله با خطا مواجه شد.";
+
+      baleBtn.disabled = false;
+
+      baleBtn.textContent = "اتصال";
+    }
+  });
+
+  baleDisconnectBtn?.addEventListener("click", async () => {
+    if (
+      !confirm(
+        "اتصال حساب بله قطع شود؟ درخواست‌های پرداخت بله که هنوز پرداخت نشده‌اند نیز لغو می‌شوند.",
+      )
+    )
+      return;
+    try {
+      baleDisconnectBtn.disabled = true;
+      baleDisconnectBtn.textContent = "در حال قطع اتصال...";
+      await api("/api/bale/account", { method: "DELETE", body: "{}" });
+      baleStatus.textContent = "اتصال حساب بله قطع شد.";
+      baleConnectHelp.hidden = true;
+      await checkBaleStatus();
+    } catch (error) {
+      console.error("Bale disconnect error:", error);
+      baleStatus.textContent =
+        error.message || "قطع اتصال بله با خطا مواجه شد.";
+    } finally {
+      baleDisconnectBtn.disabled = false;
+      baleDisconnectBtn.textContent = "قطع اتصال";
+    }
+  });
+
+  /*
+   * بررسی اولیه وضعیت بله
+   */
+  await checkBaleStatus();
+
+  // =====================================================
   // خرید پلن
+  // =====================================================
+
   document.querySelectorAll("[data-plan]").forEach((button) => {
     button.onclick = () => {
       checkout(button.dataset.plan);
     };
   });
 
+  // =====================================================
   // تمدید اشتراک فعلی
+  // =====================================================
+
   document.querySelector("[data-renew]")?.addEventListener("click", (e) => {
     const planId = e.currentTarget.dataset.renew;
 
     checkout(planId);
   });
 
+  // =====================================================
   // تاریخچه سفارش‌ها
+  // =====================================================
+
   document.querySelector("[data-orders]")?.addEventListener("click", orders);
 
+  // =====================================================
   // رفتن به بخش پلن‌ها
+  // =====================================================
+
   document
     .querySelector("[data-scroll-plans]")
     ?.addEventListener("click", () => {
@@ -2050,8 +2289,18 @@ async function checkout(planId) {
           body: "{}",
         });
         alert("پرداخت آزمایشی با موفقیت ثبت شد.");
+      } else if (order.mode === "bale") {
+        alert(
+          "فاکتور با مبلغ درست به چت بلهٔ شما ارسال شد. اکنون به ربات بله منتقل می‌شوید تا پرداخت را کامل کنید.",
+        );
+        if (order.baleBotLink) {
+          window.location.assign(order.baleBotLink);
+          return;
+        }
+      } else if (order.mode === "free") {
+        alert("سفارش با تخفیف کامل ثبت و اشتراک فعال شد.");
       } else {
-        alert("سفارش ایجاد شد. برای پرداخت به درگاه بانکی منتقل خواهید شد.");
+        alert("سفارش ایجاد شد.");
       }
       d.remove();
       await home();
