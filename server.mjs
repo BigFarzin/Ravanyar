@@ -820,17 +820,98 @@ async function handler(req, res) {
   try {
     const url = new URL(req.url, `http://${req.headers.host}`),
       p = url.pathname;
+
     if (req.method === "POST" && p === BALE_WEBHOOK_PATH) {
       const update = await body(req);
 
       console.log("Bale webhook received:", update);
 
+      const message = update.message;
+      const startMatch = String(message?.text || "")
+        .trim()
+        .match(/^\/start(?:@\w+)?(?:\s+([a-f0-9]{64}))?$/i);
+
+      if (startMatch && message?.chat?.id != null) {
+        const chatId = String(message.chat.id);
+        const rawToken = startMatch[1];
+
+        if (!rawToken) {
+          await sendBaleMessage(
+            chatId,
+            "برای اتصال حساب، از پنل سایت لینک اتصال جدید بله را دریافت و باز کنید.",
+          );
+        } else {
+          const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+
+          const client = await pool.connect();
+          let linked = false;
+          let invalidToken = false;
+
+          try {
+            await client.query("BEGIN");
+
+            const { rows } = await client.query(
+              `SELECT user_id
+               FROM bale_link_tokens
+               WHERE token_hash = $1
+                 AND used_at IS NULL
+                 AND expires_at > NOW()
+               FOR UPDATE`,
+              [tokenHash],
+            );
+
+            if (!rows.length) {
+              invalidToken = true;
+              await client.query("ROLLBACK");
+            } else {
+              await client.query(
+                `INSERT INTO bale_accounts (user_id, chat_id)
+                 VALUES ($1, $2)
+                 ON CONFLICT (user_id)
+                 DO UPDATE SET chat_id = EXCLUDED.chat_id,
+                               linked_at = NOW()`,
+                [rows[0].user_id, chatId],
+              );
+
+              await client.query(
+                `UPDATE bale_link_tokens
+                 SET used_at = NOW()
+                 WHERE token_hash = $1`,
+                [tokenHash],
+              );
+
+              await client.query("COMMIT");
+              linked = true;
+            }
+          } catch (error) {
+            await client.query("ROLLBACK").catch(() => {});
+            console.error("Bale account linking error:", error);
+          } finally {
+            client.release();
+          }
+
+          if (linked) {
+            await sendBaleMessage(
+              chatId,
+              "✅ حساب بله شما با موفقیت به حساب سایت متصل شد.",
+            );
+          } else {
+            await sendBaleMessage(
+              chatId,
+              invalidToken
+                ? "❌ لینک اتصال نامعتبر یا منقضی شده است. لطفاً از پنل سایت لینک جدید بگیرید."
+                : "❌ اتصال انجام نشد. ممکن است این حساب بله قبلاً به حساب دیگری متصل باشد؛ لطفاً وضعیت را در سایت بررسی کنید.",
+            );
+          }
+        }
+      }
+
       if (update.pre_checkout_query) {
         await handleBalePreCheckout(update.pre_checkout_query);
       }
 
-      if (update.message?.successful_payment) {
-        await handleBaleSuccessfulPayment(update.message);
+      if (message?.successful_payment) {
+        await handleBaleSuccessfulPayment(message);
       }
 
       return json(res, 200, { ok: true });
