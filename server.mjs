@@ -49,6 +49,7 @@ async function baleRequest(method, data) {
     signal: AbortSignal.timeout(20_000),
   });
   const result = await response.json().catch(() => ({}));
+  console.log("BALE API:", method, JSON.stringify(result));
   if (!response.ok || !result.ok)
     throw new Error(
       result.description || "ارسال درخواست پرداخت به بله ناموفق بود.",
@@ -2176,6 +2177,7 @@ async function handler(req, res) {
             description: `خرید ${pl.title} برای ۳۰ روز`,
             payload,
             provider_token: process.env.BALE_PAYMENT_PROVIDER_TOKEN,
+            currency: "IRR",
             prices: [{ label: pl.title, amount: baleAmount }],
           });
         } catch (error) {

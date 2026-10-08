@@ -1542,6 +1542,15 @@ const moneyBytes = (n) => {
   if (n < 1024 ** 3) return (n / 1024 ** 2).toFixed(1) + " MB";
   return (n / 1024 ** 3).toFixed(1) + " GB";
 };
+function formatDate(date) {
+  if (!date) return "-";
+
+  return new Date(date).toLocaleDateString("fa-IR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+}
 async function subscription() {
   const d = await api("/api/plans");
 
