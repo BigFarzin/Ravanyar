@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>تحلیل خواندن — سامانه ارزیابی</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/rastikerdar/vazir-font@v30.1.0/dist/font-face.css"
+    />
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="ambient ambientOne" aria-hidden="true"></div>
+    <div class="ambient ambientTwo" aria-hidden="true"></div>
+    <main>
+      <header class="appHeader">
+        <div class="headerTop">
+          <div class="brand">
+            <div>
+              <span class="eyebrow">سامانه پژوهشی و آموزشی</span>
+              <h1>تحلیل خواندن بر اساس متن مرجع</h1>
+            </div>
+          </div>
+          <div class="headerBtns">
+            <button id="aboutBtn" class="secondaryBtn">درباره سامانه</button>
+          </div>
+        </div>
+        <p class="headerLead">
+          ارزیابی منظم، مشاهده دقیق‌تر و تصمیم‌گیری آگاهانه‌تر برای مسیر
+          یادگیری.
+        </p>
+      </header>
+      <div id="warnModal" class="modal">
+        <div class="modalBox">
+          <h3>پیش از استفاده</h3>
+          <p>
+            این سامانه برای تحلیل پژوهشی/آموزشی الگوی خواندن طراحی شده و جایگزین
+            تشخیص بالینی نیست. تشخیص گفتار و زمان‌بندی می‌تواند خطا داشته باشد و
+            بازبینی متخصص ضروری است.
+          </p>
+          <button id="closeWarn">بستن</button>
+        </div>
+      </div>
+      <section class="card">
+        <h2>مشخصات دانش‌آموز و ارزیاب</h2>
+        <div class="studentGrid">
+          <input id="studentName" placeholder="نام دانش‌آموز" /><input
+            id="studentGrade"
+            placeholder="پایه تحصیلی"
+          /><input id="studentAge" placeholder="سن" /><input
+            id="studentGender"
+            placeholder="جنسیت"
+          /><input id="counselor" placeholder="نام مشاور / ارزیاب" />
+        </div>
+      </section>
+      <section class="card">
+        <h2>۱. ورود اطلاعات (متن ۱)</h2>
+        <textarea
+          id="ref"
+          rows="4"
+          placeholder="متن دقیق خوانده‌شده توسط هر دو نفر"
+        ></textarea>
+        <div class="actions">
+          <button id="makeWords">ساخت فهرست واژه‌ها</button
+          ><button id="newTextBtn">متن جدید</button>
+        </div>
+        <div id="words" class="words hidden"></div>
+        <div class="files">
+          <label class="uploadPicker" data-default="انتخاب فایل صوتی">
+            <input id="normal" type="file" accept="audio/*" />
+            <span class="uploadIcon" aria-hidden="true">↑</span>
+            <span class="uploadCopy"
+              ><strong>خواننده معمولی</strong
+              ><small>انتخاب فایل صوتی</small></span
+            >
+            <span class="uploadState" aria-live="polite">بارگذاری</span>
+          </label>
+          <label class="uploadPicker" data-default="انتخاب فایل صوتی">
+            <input id="test" type="file" accept="audio/*" />
+            <span class="uploadIcon" aria-hidden="true">↑</span>
+            <span class="uploadCopy"
+              ><strong>مراجع</strong><small>انتخاب فایل صوتی</small></span
+            >
+            <span class="uploadState" aria-live="polite">بارگذاری</span>
+          </label>
+        </div>
+        <div id="fileState"></div>
+        <button id="analyze">بارگذاری و آماده‌سازی تحلیل</button>
+        <div id="additionalTexts"></div>
+      </section>
+      <section id="audioSec" class="card hidden">
+        <h2>۲. صداها</h2>
+        <div class="audioGrid">
+          <div>
+            <h3>خواننده معمولی</h3>
+            <audio id="np" controls preload="auto"></audio>
+            <div id="nmeta"></div>
+          </div>
+          <div>
+            <h3>مراجع</h3>
+            <audio id="tp" controls preload="auto"></audio>
+            <div id="tmeta"></div>
+          </div>
+        </div>
+        <p class="hint">
+          زمان‌های واژه‌های متن مرجع ابتدا خودکار برآورد می‌شوند. موارد
+          اصلاح‌شده توسط کاربر در تحلیل‌های بعدی استفاده می‌شوند.
+        </p>
+      </section>
+      <section id="detailsSec" class="card hidden">
+        <h2>۳. جزئیات تحلیل</h2>
+        <div class="detailButtons">
+          <button id="showWordListsBtn">فهرست واژه به واژه</button
+          ><button id="showPauseBtn">مکث‌های پیشنهادی</button
+          ><button id="showTestTextBtn">متن تبدیل‌شده مراجع</button
+          ><button id="showComparisonBtn">مقایسه متن مرجع و مراجع</button
+          ><button id="showAdvancedBtn" class="advancedBtn">
+            تحلیل پیشرفته</button
+          ><button id="showInterventionsPage" class="interventionBtn">
+            مداخلات درمانی
+          </button>
+        </div>
+        <div id="wordListsPanel" class="detailPanel hidden">
+          <div class="subTabs">
+            <button id="normalWordsTab">
+              فهرست واژه به واژه خواننده معمولی</button
+            ><button id="testWordsTab">فهرست واژه به واژه مراجع</button>
+          </div>
+          <div id="tablePanel" class="wordSubPanel">
+            <h3>فهرست واژه به واژه خواننده معمولی</h3>
+            <div class="scroll">
+              <table class="normalWordTable">
+                <thead>
+                  <tr>
+                    <th>ردیف</th>
+                    <th>واژه مرجع</th>
+                    <th>زمان شروع/پایان</th>
+                    <th>مدت</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="testWordsPanel" class="wordSubPanel hidden">
+            <h3>فهرست واژه به واژه مراجع</h3>
+            <div class="addWordBox">
+              <input
+                id="newTestWord"
+                placeholder="واژه تشخیص‌داده‌نشده"
+              /><input
+                id="newTestStart"
+                type="number"
+                step=".01"
+                min="0"
+                placeholder="شروع (ثانیه)"
+              /><input
+                id="newTestEnd"
+                type="number"
+                step=".01"
+                min="0"
+                placeholder="پایان (ثانیه)"
+              /><select id="newTestRef"></select
+              ><button id="addTestWord">افزودن واژه</button>
+            </div>
+            <div class="toolbar">
+              <button id="saveTestWords">
+                ذخیره فهرست مراجع و اعمال اصلاحات</button
+              ><button id="clearTestWords" class="danger">
+                حذف کل فهرست مراجع
+              </button>
+            </div>
+            <div class="scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>واژه مراجع</th>
+                    <th>واژه مرجع</th>
+                    <th>شروع</th>
+                    <th>پایان</th>
+                    <th>مدت</th>
+                    <th>نوع خطا</th>
+                    <th>ویرایش</th>
+                    <th>حذف</th>
+                    <th>پخش</th>
+                  </tr>
+                </thead>
+                <tbody id="testWordsBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div id="pausePanel" class="detailPanel hidden">
+          <h3>مکث‌های پیشنهادی</h3>
+          <div class="audioGrid">
+            <div>
+              <h4>خواننده معمولی</h4>
+              <div id="npause"></div>
+            </div>
+            <div>
+              <h4>مراجع</h4>
+              <div id="tpause"></div>
+            </div>
+          </div>
+        </div>
+        <div id="advancedPanel" class="detailPanel hidden">
+          <h3>تحلیل پیشرفته</h3>
+          <div id="advancedAnalysis">
+            <div id="advancedFluency" class="advancedSummary"></div>
+            <h4>جدول طبقه‌بندی خطاها</h4>
+            <div class="scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>کد</th>
+                    <th>دسته خطا</th>
+                    <th>تعداد</th>
+                    <th>درصد</th>
+                  </tr>
+                </thead>
+                <tbody id="advancedStats"></tbody>
+              </table>
+            </div>
+            <h4>جزئیات طبقه‌بندی واژه‌ها</h4>
+            <div class="scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>مرجع</th>
+                    <th>خوانش</th>
+                    <th>دسته</th>
+                    <th>نوع خطا</th>
+                    <th>توضیح</th>
+                  </tr>
+                </thead>
+                <tbody id="advancedDetail"></tbody>
+              </table>
+            </div>
+            <div id="clinicalSummary" class="reportBox"></div>
+            <div id="interventionOutput"></div>
+          </div>
+        </div>
+        <div id="comparisonPanel" class="detailPanel hidden">
+          <h3>مقایسه متن مرجع و مراجع</h3>
+          <p class="hint">
+            برای هر واژه مرجع، تمام بخش‌های خوانش مراجع که در «فهرست
+            واژه‌به‌واژه مراجع» به آن متصل شده‌اند، بر اساس زمان شروع مرتب و در
+            یک ردیف تجمیع می‌شوند. ستون یادداشت در این جدول حذف شده است.
+          </p>
+          <div class="scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>واژه مرجع</th>
+                  <th>خوانش مراجع / هجاها</th>
+                  <th>وضعیت</th>
+                  <th>نوع خطا</th>
+                </tr>
+              </thead>
+              <tbody id="comparisonBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="testTextPanel" class="detailPanel hidden">
+          <h3>متن تبدیل‌شده مراجع</h3>
+          <p class="hint">
+            متن زیر حاصل تبدیل صوت به متن است و می‌توانید واژه‌ها را اصلاح، حذف
+            یا اضافه کنید. پس از ویرایش، دکمه زیر را بزنید؛ زمان‌های واژه‌های
+            موجود تا حد امکان حفظ می‌شوند و برای واژه‌های جدید باید زمان را در
+            فهرست واژه‌به‌واژه تنظیم کنید.
+          </p>
+          <textarea id="testText" rows="7"></textarea>
+          <div
+            id="testTextNumbered"
+            class="numberedTextList"
+            aria-label="متن شماره‌گذاری‌شده مراجع"
+          ></div>
+          <div class="toolbar">
+            <button id="saveTestText">اعمال متن و ساخت فهرست واژه‌ها</button>
+          </div>
+        </div>
+      </section>
+      <div id="interventionsPage" class="fullPagePanel hidden">
+        <div class="fullPageHeader">
+          <h2>برنامه‌های مداخله درمانی</h2>
+          <button id="closeInterventionsPage">بستن</button>
+        </div>
+        <div id="interventionsPageBody"></div>
+      </div>
+      <section class="card">
+        <h2>تحلیل چند متن و گزارش نهایی</h2>
+        <div id="textSessionButtons" class="detailButtons"></div>
+        <div class="toolbar">
+          <button id="runFinalBtn">تحلیل نهایی چند متن</button
+          ><button id="openPrintBtn">چاپ</button>
+        </div>
+        <div id="finalReport" class="detailPanel hidden">
+          <div id="finalIdentity"></div>
+          <section class="reportSection">
+            <h3>بخش ۲: جدول طبقه‌بندی نهایی خطاها بر اساس میانگین</h3>
+            <div class="scroll">
+              <table class="reportTable">
+                <thead>
+                  <tr>
+                    <th>کد</th>
+                    <th>طبقه خطا</th>
+                    <th>میانگین تعداد خطا</th>
+                    <th>درصد از کل خطاها</th>
+                  </tr>
+                </thead>
+                <tbody id="finalStats"></tbody>
+              </table>
+            </div>
+          </section>
+          <div id="finalFluency"></div>
+          <div id="finalInterventions"></div>
+        </div>
+      </section>
+      <div id="aboutModal" class="modal">
+        <div class="modalBox">
+          <h3>درباره سامانه</h3>
+          <p>طراحی و توسعه : دکتر سیاوش طالع پسند - استاد دانشگاه سمنان</p>
+          <button id="closeAbout">بستن</button>
+        </div>
+      </div>
+      <div id="printModal" class="modal">
+        <div class="modalBox">
+          <h3>انتخاب بخش‌های چاپ</h3>
+          <label class="printOption"
+            ><input type="checkbox" id="printIdentity" checked /> اطلاعات
+            شناسنامه‌ای</label
+          ><label class="printOption"
+            ><input type="checkbox" id="printAnalysis" checked /> تحلیل
+            متن</label
+          ><label class="printOption"
+            ><input type="checkbox" id="printClinical" checked /> خلاصه بالینی و
+            نتیجه‌گیری نهایی</label
+          ><label class="printOption"
+            ><input type="checkbox" id="printInterventions" /> مداخلات
+            درمانی</label
+          >
+          <div class="toolbar">
+            <button id="doPrint">چاپ</button
+            ><button id="closePrint">انصراف</button>
+          </div>
+        </div>
+      </div>
+      <div id="msg"></div>
+    </main>
+    <script src="/static/app.js?v=9.9.13"></script>
+    <script>
+      /* کنترل مستقل جزئیات؛ با event delegation حتی در صورت خطای بخش دیگری از JS فعال می‌ماند. */
+      (function () {
+        function hide(ids) {
+          ids.forEach(function (id) {
+            var e = document.getElementById(id);
+            if (e) e.classList.add("hidden");
+          });
+        }
+        function openPanel(id) {
+          hide([
+            "wordListsPanel",
+            "pausePanel",
+            "testTextPanel",
+            "comparisonPanel",
+            "advancedPanel",
+          ]);
+          var e = document.getElementById(id);
+          if (e) {
+            e.classList.remove("hidden");
+            setTimeout(function () {
+              e.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 20);
+          }
+        }
+        function openWordSub(id) {
+          hide(["tablePanel", "testWordsPanel"]);
+          var e = document.getElementById(id);
+          if (e) e.classList.remove("hidden");
+        }
+        document.addEventListener(
+          "click",
+          function (ev) {
+            var id = ev.target && ev.target.id;
+            if (id === "showWordListsBtn") {
+              ev.preventDefault();
+              openPanel("wordListsPanel");
+              openWordSub("tablePanel");
+            } else if (id === "showPauseBtn") {
+              ev.preventDefault();
+              openPanel("pausePanel");
+            } else if (id === "showTestTextBtn") {
+              ev.preventDefault();
+              openPanel("testTextPanel");
+            } else if (id === "showComparisonBtn") {
+              ev.preventDefault();
+              openPanel("comparisonPanel");
+            } else if (id === "showAdvancedBtn") {
+              return;
+            } else if (id === "normalWordsTab") {
+              ev.preventDefault();
+              openWordSub("tablePanel");
+            } else if (id === "testWordsTab") {
+              ev.preventDefault();
+              openWordSub("testWordsPanel");
+            }
+          },
+          true,
+        );
+        window.__detailButtonsReady = true;
+      })();
+    </script>
+  </body>
+</html>

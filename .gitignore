@@ -3,3 +3,14 @@ node_modules/
 .env.*
 !.env.example
 
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# IDE
+.idea/
+
+# Local backups
+payment-service.backup.mjs

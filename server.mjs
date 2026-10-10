@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { createServer } from "node:http";
+import { createServer, request as httpRequest } from "node:http";
 import { readFile, stat, mkdir, unlink, writeFile } from "node:fs/promises";
 import { join, extname, normalize } from "node:path";
 import {
@@ -13,6 +13,7 @@ import pg from "pg";
 import { activatePayment } from "./payment-service.mjs";
 
 const PORT = Number(process.env.PORT || 3000);
+const FLASK_URL = process.env.FLASK_URL || "http://127.0.0.1:5050";
 const ROOT = join(process.cwd(), "public");
 const UPLOAD_ROOT = join(process.cwd(), "storage", "products");
 const { Pool } = pg;
@@ -357,38 +358,38 @@ async function setup() {
     [hash(process.env.ADMIN_PASSWORD || "admin123")],
   );
   const planSeeds = [
-    [
-      "normal",
-      "عادی",
-      0,
-      ["دسترسی به محصولات پایه", "کتابخانه عمومی", "گزارش‌های پایه"],
-    ],
+    ["normal", "عادی", 0, ["دسترسی به امکانات پایه"]],
     [
       "silver",
       "نقره‌ای",
-      1500000,
+      3000000,
       [
-        "همه امکانات عادی",
-        "آزمون‌های پیشرفته",
-        "مداخلات منتخب",
-        "گزارش حرفه‌ای",
+        "مدت اشتراک: ۳۰ روز",
+        "۱۵۰ تحلیل مشترک",
+        "دسترسی به سامانه نارساخوانی",
+        "عدم دسترسی به سامانه انتخاب رشته",
       ],
     ],
     [
       "gold",
       "طلایی",
-      3000000,
+      7000000,
       [
-        "تمام امکانات نقره‌ای",
-        "همه سامانه‌های تخصصی",
-        "دسترسی بتا",
-        "اولویت پشتیبانی",
+        "مدت اشتراک: ۶۰ روز",
+        "۳۰۰ تحلیل مشترک",
+        "دسترسی به سامانه انتخاب رشته",
+        "دسترسی به سامانه نارساخوانی",
       ],
     ],
   ];
   for (const x of planSeeds)
     await q(
-      "INSERT INTO plans(id,title,price,features) VALUES($1,$2,$3,$4) ON CONFLICT(id) DO NOTHING",
+      `INSERT INTO plans(id, title, price, features)
+     VALUES($1, $2, $3, $4)
+     ON CONFLICT(id) DO UPDATE SET
+       title = EXCLUDED.title,
+       price = EXCLUDED.price,
+       features = EXCLUDED.features`,
       [x[0], x[1], x[2], JSON.stringify(x[3])],
     );
   const cats = [
@@ -667,38 +668,123 @@ async function canAccessProduct(userId, product) {
 async function canAccessCareerSystem(userId) {
   const sub = await currentSubscription(userId);
 
-  if (!sub) return false;
-
-  // پلن عادی دسترسی ندارد
-  if (!["silver", "gold"].includes(sub.plan_id)) {
+  // فقط اشتراک طلایی اجازه دسترسی دارد
+  if (!sub || sub.plan_id !== "gold") {
     return false;
   }
 
-  // اشتراک باید فعال باشد
+  // اشتراک باید فعال و منقضی‌نشده باشد
   if (sub.status !== "active") {
     return false;
   }
 
-  // بررسی پایان ۳۰ روز
   if (sub.ends_at && new Date(sub.ends_at) <= new Date()) {
     return false;
   }
 
-  // بررسی تعداد دفعات استفاده
+  // سهمیه مشترک تحلیل‌ها نباید تمام شده باشد
   const usageLimit = Number(sub.usage_limit || 0);
   const usageCount = Number(sub.usage_count || 0);
 
-  if (usageLimit <= 0) {
+  return usageLimit > 0 && usageCount < usageLimit;
+}
+async function canAccessDyslexiaSystem(userId) {
+  const sub = await currentSubscription(userId);
+  if (!sub || !["silver", "gold"].includes(sub.plan_id)) {
     return false;
   }
-
-  if (usageCount >= usageLimit) {
+  if (sub.status !== "active") {
     return false;
   }
-
+  if (sub.ends_at && new Date(sub.ends_at) <= new Date()) {
+    return false;
+  }
   return true;
 }
-async function consumeCareerUsage(userId) {
+function isFlaskAppPath(p) {
+  return p === "/dyslexia-app" || p.startsWith("/dyslexia-app/");
+}
+function isFlaskApiPath(p) {
+  return (
+    p === "/api/analyze" ||
+    p === "/api/save" ||
+    p === "/api/retime" ||
+    p === "/api/advanced" ||
+    p.startsWith("/audio/") ||
+    p.startsWith("/static/")
+  );
+}
+function flaskPathFromNode(p) {
+  if (p === "/dyslexia-app") return "/";
+  if (p.startsWith("/dyslexia-app/")) {
+    const rest = p.slice("/dyslexia-app".length);
+    return rest || "/";
+  }
+  return p;
+}
+function proxyToFlask(req, res, flaskPath) {
+  return new Promise((resolve) => {
+    const flask = new URL(FLASK_URL);
+    const search = new URL(req.url, "http://localhost").search || "";
+    const headers = { ...req.headers, host: flask.host };
+    const pReq = httpRequest(
+      {
+        protocol: flask.protocol,
+        hostname: flask.hostname,
+        port: flask.port || (flask.protocol === "https:" ? 443 : 80),
+        path: flaskPath + search,
+        method: req.method,
+        headers,
+      },
+      (pRes) => {
+        const outHeaders = { ...pRes.headers };
+        delete outHeaders.connection;
+        res.writeHead(pRes.statusCode || 502, outHeaders);
+        pRes.pipe(res);
+        pRes.on("end", resolve);
+      },
+    );
+    pReq.on("error", () => {
+      if (!res.headersSent) {
+        json(res, 502, {
+          error: "سامانه تحلیل خواندن در دسترس نیست.",
+        });
+      } else {
+        res.end();
+      }
+      resolve();
+    });
+    req.pipe(pReq);
+  });
+}
+function analysisUsageDenied(result, kind) {
+  const dyslexia = kind === "dyslexia";
+  const messages = {
+    NO_SUBSCRIPTION: dyslexia
+      ? "برای تحلیل پیشرفته، اشتراک نقره‌ای یا طلایی لازم است."
+      : "برای استفاده از سامانه انتخاب رشته، اشتراک نقره‌ای یا طلایی لازم است.",
+    INVALID_PLAN: dyslexia
+      ? "اشتراک فعلی شما اجازه تحلیل پیشرفته را ندارد."
+      : "اشتراک فعلی شما اجازه استفاده از سامانه انتخاب رشته را ندارد.",
+    INACTIVE: "اشتراک شما فعال نیست.",
+    EXPIRED: dyslexia
+      ? "مدت اشتراک شما به پایان رسیده است."
+      : "مدت ۳۰ روزه اشتراک شما به پایان رسیده است.",
+    USAGE_LIMIT: dyslexia
+      ? "سهمیه تحلیل مشترک شما به پایان رسیده است."
+      : "تعداد دفعات مجاز استفاده از سامانه در اشتراک شما به پایان رسیده است.",
+    PLAN_RESTRICTED: dyslexia
+      ? "اشتراک شما اجازه استفاده از این سامانه را ندارد."
+      : "برای استفاده از سامانه انتخاب رشته، اشتراک طلایی لازم است.",
+  };
+  return (
+    messages[result.reason] ||
+    (dyslexia
+      ? "امکان انجام تحلیل وجود ندارد."
+      : "امکان استفاده از سامانه انتخاب رشته وجود ندارد.")
+  );
+}
+async function consumeAnalysisUsage(userId, system) {
   const client = await pool.connect();
 
   try {
@@ -709,45 +795,40 @@ async function consumeCareerUsage(userId) {
     } = await client.query(
       `SELECT *
        FROM subscriptions
-       WHERE user_id=$1
+       WHERE user_id = $1
        FOR UPDATE`,
       [userId],
     );
 
     if (!sub) {
       await client.query("ROLLBACK");
-
-      return {
-        allowed: false,
-        reason: "NO_SUBSCRIPTION",
-      };
+      return { allowed: false, reason: "NO_SUBSCRIPTION" };
     }
 
     if (!["silver", "gold"].includes(sub.plan_id)) {
       await client.query("ROLLBACK");
-
-      return {
-        allowed: false,
-        reason: "INVALID_PLAN",
-      };
+      return { allowed: false, reason: "INVALID_PLAN" };
     }
 
     if (sub.status !== "active") {
       await client.query("ROLLBACK");
-
-      return {
-        allowed: false,
-        reason: "INACTIVE",
-      };
+      return { allowed: false, reason: "INACTIVE" };
     }
 
     if (sub.ends_at && new Date(sub.ends_at) <= new Date()) {
       await client.query("ROLLBACK");
+      return { allowed: false, reason: "EXPIRED" };
+    }
 
-      return {
-        allowed: false,
-        reason: "EXPIRED",
-      };
+    // نقره‌ای فقط نارساخوانی؛ طلایی هر دو سامانه
+    if (system === "career" && sub.plan_id !== "gold") {
+      await client.query("ROLLBACK");
+      return { allowed: false, reason: "PLAN_RESTRICTED" };
+    }
+
+    if (!["career", "dyslexia"].includes(system)) {
+      await client.query("ROLLBACK");
+      return { allowed: false, reason: "INVALID_SYSTEM" };
     }
 
     const usageLimit = Number(sub.usage_limit || 0);
@@ -755,11 +836,7 @@ async function consumeCareerUsage(userId) {
 
     if (usageLimit <= 0 || usageCount >= usageLimit) {
       await client.query("ROLLBACK");
-
-      return {
-        allowed: false,
-        reason: "USAGE_LIMIT",
-      };
+      return { allowed: false, reason: "USAGE_LIMIT" };
     }
 
     const {
@@ -767,10 +844,18 @@ async function consumeCareerUsage(userId) {
     } = await client.query(
       `UPDATE subscriptions
        SET usage_count = usage_count + 1
-       WHERE id=$1
+       WHERE id = $1
+         AND status = 'active'
+         AND (ends_at IS NULL OR ends_at > NOW())
+         AND usage_count < usage_limit
        RETURNING *`,
       [sub.id],
     );
+
+    if (!updated) {
+      await client.query("ROLLBACK");
+      return { allowed: false, reason: "USAGE_LIMIT" };
+    }
 
     await client.query("COMMIT");
 
@@ -1444,7 +1529,7 @@ async function handler(req, res) {
         if (planId === "normal") {
           await q("DELETE FROM subscriptions WHERE user_id=$1", [id]);
         } else {
-          const usageLimit = planId === "silver" ? 3 : 9;
+          const usageLimit = planId === "silver" ? 150 : 300;
 
           await q(
             `INSERT INTO subscriptions(
@@ -1461,7 +1546,12 @@ async function handler(req, res) {
         $2,
         'active',
         NOW(),
-        NOW() + INTERVAL '30 days',
+        NOW() + (
+          CASE
+            WHEN $2 = 'gold' THEN INTERVAL '60 days'
+            ELSE INTERVAL '30 days'
+          END
+          ),
         $3,
         0
       )
@@ -2174,7 +2264,7 @@ async function handler(req, res) {
           await baleRequest("sendInvoice", {
             chat_id: baleAccount.chat_id,
             title: "اشتراک روان‌یار",
-            description: `خرید ${pl.title} برای ۳۰ روز`,
+            description: `خرید ${pl.title} برای ${d.plan_id === "gold" ? "۶۰" : "۳۰"} روز`,
             payload,
             provider_token: process.env.BALE_PAYMENT_PROVIDER_TOKEN,
             currency: "IRR",
@@ -2243,9 +2333,9 @@ async function handler(req, res) {
         );
         const usageLimit =
           payment.plan_id === "silver"
-            ? 3
+            ? 150
             : payment.plan_id === "gold"
-              ? 9
+              ? 300
               : null;
 
         await client.query(
@@ -2658,28 +2748,11 @@ async function handler(req, res) {
 
       if (!u) return;
 
-      const result = await consumeCareerUsage(u.id);
+      const result = await consumeAnalysisUsage(u.id, "career");
 
       if (!result.allowed) {
-        const messages = {
-          NO_SUBSCRIPTION:
-            "برای استفاده از سامانه انتخاب رشته، اشتراک نقره‌ای یا طلایی لازم است.",
-
-          INVALID_PLAN:
-            "اشتراک فعلی شما اجازه استفاده از سامانه انتخاب رشته را ندارد.",
-
-          INACTIVE: "اشتراک شما فعال نیست.",
-
-          EXPIRED: "مدت ۳۰ روزه اشتراک شما به پایان رسیده است.",
-
-          USAGE_LIMIT:
-            "تعداد دفعات مجاز استفاده از سامانه در اشتراک شما به پایان رسیده است.",
-        };
-
         return json(res, 403, {
-          error:
-            messages[result.reason] ||
-            "امکان استفاده از سامانه انتخاب رشته وجود ندارد.",
+          error: analysisUsageDenied(result, "career"),
         });
       }
 
@@ -2689,6 +2762,41 @@ async function handler(req, res) {
         usageLimit: result.usageLimit,
         usageRemaining: result.remaining,
       });
+    }
+    if (req.method === "POST" && p === "/api/dyslexia/consume") {
+      const u = await need(req, res);
+      if (!u) return;
+
+      const result = await consumeAnalysisUsage(u.id, "dyslexia");
+
+      if (!result.allowed) {
+        return json(res, 403, {
+          ok: false,
+          code: result.reason,
+          error: analysisUsageDenied(result, "dyslexia"),
+        });
+      }
+
+      return json(res, 200, {
+        ok: true,
+        usageCount: result.usageCount,
+        usageLimit: result.usageLimit,
+        usageRemaining: result.remaining,
+      });
+    }
+    if (isFlaskAppPath(p)) {
+      const u = await need(req, res);
+      if (!u) return;
+      if (!(await canAccessDyslexiaSystem(u.id))) {
+        return json(res, 403, {
+          error:
+            "برای ورود به سامانه نارساخوانی، اشتراک نقره‌ای یا طلایی فعال لازم است.",
+        });
+      }
+      return proxyToFlask(req, res, flaskPathFromNode(p));
+    }
+    if (isFlaskApiPath(p)) {
+      return proxyToFlask(req, res, p);
     }
     // ============================================
     // PROTECTED CAREER EXCEL FILES

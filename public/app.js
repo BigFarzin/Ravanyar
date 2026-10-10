@@ -652,6 +652,7 @@ function navItems(role) {
   // داشبورد کاربران عادی
   return [
     ["academy", "📚", "سامانه انتخاب رشته"],
+    ["dyslexia", "🧠", "سامانه نارساخوانی"],
     ["subscription", "💳", "اشتراک"],
   ];
 }
@@ -890,472 +891,359 @@ async function personalHome() {
     state.user?.firstName || state.user?.first_name || "کاربر",
   );
 
+  const dyslexiaAccess = hasDyslexiaAccess();
+
   shell(
     `
-    <!-- =========================
-         DASHBOARD HERO
-    ========================== -->
+  <!-- =========================
+       DASHBOARD HERO
+  ========================== -->
 
-    <section class="dashboard-hero">
+  <section class="dashboard-hero">
+    <div class="dashboard-hero-content">
+      <div class="dashboard-hero-top">
+        <span class="dashboard-hero-badge">
+          ${esc(state.subscription.plan_title || "عادی")}
+        </span>
 
-      <div class="dashboard-hero-content">
-
-        <div class="dashboard-hero-top">
-
-          <span class="dashboard-hero-badge">
-            ${esc(state.subscription.plan_title || "عادی")}
-          </span>
-
-          <span class="dashboard-hero-status">
-            ● حساب فعال
-          </span>
-
-        </div>
-
-        <h1>
-          سلام ${firstName} 👋
-        </h1>
-
-        <p>
-          مسیر رشد و شناخت خودت را ادامه بده؛
-          از همین‌جا می‌توانی فعالیت‌های خود را مدیریت کنی.
-        </p>
-
-        <div class="dashboard-hero-actions">
-
-          ${
-            careerAccess
-              ? `
-                <button
-                  class="hero-primary-btn"
-                  data-page="academy"
-                  type="button"
-                >
-                  <span>شروع ارزیابی</span>
-                  <strong>←</strong>
-                </button>
-              `
-              : `
-                <button
-                  class="hero-primary-btn hero-locked-btn"
-                  data-page="subscription"
-                  type="button"
-                >
-                  <span class="hero-lock-icon">🔒</span>
-                  <span>ارتقای اشتراک</span>
-                  <strong>←</strong>
-                </button>
-              `
-          }
-
-
-        </div>
-
+        <span class="dashboard-hero-status">
+          ● حساب فعال
+        </span>
       </div>
 
+      <h1>سلام ${firstName} 👋</h1>
 
-      <div class="dashboard-hero-visual">
+      <p>
+        مسیر رشد و شناخت خودت را ادامه بده؛
+        از همین‌جا می‌توانی فعالیت‌های خود را مدیریت کنی.
+      </p>
 
-        <div class="hero-orbit orbit-one"></div>
-        <div class="hero-orbit orbit-two"></div>
-
-        <div class="hero-brain">
-          🧠
-        </div>
-
-        <div class="hero-floating-card floating-one">
-
-          <span>✓</span>
-
-          <div>
-            <b>مسیر شما آماده است</b>
-            <small>ادامه مسیر رشد</small>
-          </div>
-
-        </div>
-
-        <div class="hero-floating-card floating-two">
-
-          <span>✦</span>
-
-          <div>
-            <b>${completed}</b>
-            <small>ارزیابی تکمیل‌شده</small>
-          </div>
-
-        </div>
-
+      <div class="dashboard-hero-actions">
+        ${
+          (state.subscription.plan_id || "normal") === "normal"
+            ? `
+              <button
+                class="hero-primary-btn hero-locked-btn"
+                data-page="subscription"
+                type="button"
+              >
+                <span class="hero-lock-icon">🔒</span>
+                <span>ارتقای اشتراک</span>
+                <strong>←</strong>
+              </button>
+            `
+            : `
+              <button
+                class="hero-primary-btn"
+                data-page="academy"
+                type="button"
+              >
+                <span>شروع ارزیابی</span>
+                <strong>←</strong>
+              </button>
+            `
+        }
       </div>
+    </div>
 
-    </section>
+    <div class="dashboard-hero-visual">
+      <div class="hero-orbit orbit-one"></div>
+      <div class="hero-orbit orbit-two"></div>
 
+      <div class="hero-brain">🧠</div>
 
-    <!-- =========================
-         STATISTICS
-    ========================== -->
-
-    <section class="dashboard-stats">
-
-      <div class="dashboard-stat-card">
-
-        <div class="stat-icon purple">
-          🧪
-        </div>
-
-        <div class="stat-content">
-
-          <span>
-            ارزیابی‌های تکمیل‌شده
-          </span>
-
-          <strong>
-            ${completed}
-          </strong>
-
-          <small>
-            فعالیت‌های انجام‌شده
-          </small>
-
-        </div>
-
-      </div>
-
-
-      <div class="dashboard-stat-card">
-
-        <div class="stat-icon blue">
-          🔓
-        </div>
-
-        <div class="stat-content">
-
-          <span>
-            محصولات قابل دسترس
-          </span>
-
-          <strong>
-            ${availableProducts}
-          </strong>
-
-          <small>
-            بر اساس سطح اشتراک
-          </small>
-
-        </div>
-
-      </div>
-
-
-      <div class="dashboard-stat-card">
-
-        <div class="stat-icon green">
-          📈
-        </div>
-
-        <div class="stat-content">
-
-          <span>
-            فعالیت‌های اخیر
-          </span>
-
-          <strong>
-            ${d.recent.length}
-          </strong>
-
-          <small>
-            فعالیت ثبت‌شده
-          </small>
-
-        </div>
-
-      </div>
-
-
-      <div class="dashboard-stat-card">
-
-        <div class="stat-icon orange">
-          💳
-        </div>
-
-        <div class="stat-content">
-
-          <span>
-            سطح اشتراک
-          </span>
-
-          <strong class="plan-value">
-            ${esc(state.subscription.plan_title || "عادی")}
-          </strong>
-
-          <small>
-            وضعیت حساب شما
-          </small>
-
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =========================
-         QUICK START
-    ========================== -->
-
-    <section class="dashboard-section">
-
-      <div class="dashboard-section-header">
-
+      <div class="hero-floating-card floating-one">
+        <span>✓</span>
         <div>
-
-          <span class="section-eyebrow">
-            شروع سریع
-          </span>
-
-          <h2>
-            از کجا شروع کنیم؟
-          </h2>
-
-          <p>
-            دسترسی سریع به مهم‌ترین بخش‌های روان‌یار
-          </p>
-
+          <b>مسیر شما آماده است</b>
+          <small>ادامه مسیر رشد</small>
         </div>
-
       </div>
 
-
-      <div class="quick-actions-grid">
-
-
-        <!-- =========================
-             CAREER SYSTEM
-        ========================== -->
-
-        <button
-          class="quick-action-card featured career-quick-card ${
-            careerAccess ? "career-quick-active" : "career-quick-locked"
-          }"
-          data-page="${careerAccess ? "academy" : "subscription"}"
-          type="button"
-        >
-
-          <div class="quick-action-icon">
-            ${careerAccess ? "🎓" : "🔒"}
-          </div>
-
-          <div class="quick-action-body">
-
-            <span>
-              ${careerAccess ? "پیشنهاد ویژه" : "دسترسی محدود"}
-            </span>
-
-            <h3>
-              سامانه انتخاب رشته تحصیلی
-            </h3>
-
-            <p>
-              ${
-                careerAccess
-                  ? `
-                    انتخاب رشته مناسب و بررسی مسیر تحصیلی
-                    خود را از اینجا شروع کنید.
-                  `
-                  : `
-                    برای استفاده از سامانه، اشتراک خود را
-                    ارتقا دهید.
-                  `
-              }
-            </p>
-
-          </div>
-
-          <div class="quick-action-arrow">
-            ←
-          </div>
-
-        </button>
-
-
-        <!-- =========================
-             EDUCATION
-        ========================== -->
-
-        <button
-          class="quick-action-card"
-          data-page="academy"
-          type="button"
-        >
-
-          <div class="quick-action-icon blue">
-            🎥
-          </div>
-
-          <div class="quick-action-body">
-
-            <span>
-              آموزش
-            </span>
-
-            <h3>
-              آموزش استفاده از سامانه
-            </h3>
-
-            <p>
-              ویدئوی آموزشی نحوه استفاده از سامانه
-              انتخاب رشته را مشاهده کنید.
-            </p>
-
-          </div>
-
-          <div class="quick-action-arrow">
-            ←
-          </div>
-
-        </button>
-
-
-        <!-- =========================
-             SUBSCRIPTION
-        ========================== -->
-
-        <button
-          class="quick-action-card"
-          data-page="subscription"
-          type="button"
-        >
-
-          <div class="quick-action-icon orange">
-            💳
-          </div>
-
-          <div class="quick-action-body">
-
-            <span>
-              حساب شما
-            </span>
-
-            <h3>
-              مدیریت اشتراک
-            </h3>
-
-            <p>
-              وضعیت اشتراک و امکانات قابل دسترس
-              خود را مشاهده کنید.
-            </p>
-
-          </div>
-
-          <div class="quick-action-arrow">
-            ←
-          </div>
-
-        </button>
-
-      </div>
-
-    </section>
-
-
-    <!-- =========================
-         CAREER SYSTEM ACCESS
-    ========================== -->
-
-    <section class="dashboard-section products-section">
-
-      <div class="dashboard-section-header">
-
+      <div class="hero-floating-card floating-two">
+        <span>✦</span>
         <div>
-
-          <span class="section-eyebrow">
-            دسترسی سریع
-          </span>
-
-          <h2>
-            سامانه انتخاب رشته
-          </h2>
-
-          <p>
-            ورود مستقیم به سامانه انتخاب رشته تحصیلی
-          </p>
-
+          <b>${completed}</b>
+          <small>ارزیابی تکمیل‌شده</small>
         </div>
-
       </div>
+    </div>
+  </section>
 
+  <!-- =========================
+       STATISTICS
+  ========================== -->
+
+  <section class="dashboard-stats">
+    <div class="dashboard-stat-card">
+      <div class="stat-icon purple">🧪</div>
+      <div class="stat-content">
+        <span>ارزیابی‌های تکمیل‌شده</span>
+        <strong>${completed}</strong>
+        <small>فعالیت‌های انجام‌شده</small>
+      </div>
+    </div>
+
+    <div class="dashboard-stat-card">
+      <div class="stat-icon blue">🔓</div>
+      <div class="stat-content">
+        <span>محصولات قابل دسترس</span>
+        <strong>${availableProducts}</strong>
+        <small>بر اساس سطح اشتراک</small>
+      </div>
+    </div>
+
+    <div class="dashboard-stat-card">
+      <div class="stat-icon green">📈</div>
+      <div class="stat-content">
+        <span>فعالیت‌های اخیر</span>
+        <strong>${d.recent.length}</strong>
+        <small>فعالیت ثبت‌شده</small>
+      </div>
+    </div>
+
+    <div class="dashboard-stat-card">
+      <div class="stat-icon orange">💳</div>
+      <div class="stat-content">
+        <span>سطح اشتراک</span>
+        <strong class="plan-value">
+          ${esc(state.subscription.plan_title || "عادی")}
+        </strong>
+        <small>وضعیت حساب شما</small>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- =========================
+       QUICK START
+  ========================== -->
+
+  <section class="dashboard-section">
+    <div class="dashboard-section-header">
+      <div>
+        <span class="section-eyebrow">شروع سریع</span>
+        <h2>از کجا شروع کنیم؟</h2>
+        <p>دسترسی سریع به مهم‌ترین بخش‌های روان‌یار</p>
+      </div>
+    </div>
+
+    <div class="quick-actions-grid">
+
+      <!-- CAREER SYSTEM -->
 
       <button
-        class="career-system-card ${
-          careerAccess ? "career-system-active" : "career-system-locked"
+        class="quick-action-card featured career-quick-card ${
+          careerAccess ? "career-quick-active" : "career-quick-locked"
         }"
         data-page="${careerAccess ? "career-guidance" : "subscription"}"
         type="button"
       >
-
-        <div class="career-system-icon">
+        <div class="quick-action-icon">
           ${careerAccess ? "🎓" : "🔒"}
         </div>
 
+        <div class="quick-action-body">
+          <span>
+            ${careerAccess ? "پیشنهاد ویژه" : "دسترسی محدود"}
+          </span>
 
-        <div class="career-system-content">
+          <h3>سامانه انتخاب رشته تحصیلی</h3>
 
-          <h3>
-            سامانه انتخاب رشته
-          </h3>
-
-          ${
-            careerAccess
-              ? `
-                <div class="career-system-link">
-
-                  ورود به سامانه انتخاب رشته
-
-                  <strong>
-                    ←
-                  </strong>
-
-                </div>
-              `
-              : `
-                <div class="career-system-link career-system-upgrade">
-
-                  ارتقای اشتراک برای دسترسی
-
-                  <strong>
-                    ←
-                  </strong>
-
-                </div>
-              `
-          }
-
+          <p>
+            ${
+              careerAccess
+                ? "انتخاب رشته مناسب و بررسی مسیر تحصیلی خود را از اینجا شروع کنید."
+                : "برای استفاده از سامانه انتخاب رشته، اشتراک طلایی تهیه کنید."
+            }
+          </p>
         </div>
 
-
-        <div class="career-system-arrow">
-          ${careerAccess ? "←" : "🔒"}
-        </div>
-
+        <div class="quick-action-arrow">←</div>
       </button>
 
-    </section>
-    `,
-    "home",
-  );
 
-  bind();
-}
-async function professionalHome() {
-  const d = await api("/api/dashboard");
-  state.user = d.user;
-  state.subscription = d.subscription;
-  await load();
-  const assessments =
-    (await api("/api/assessments").catch(() => ({ assessments: [] })))
-      .assessments || [];
-  const completed = assessments.filter((x) => x.score != null).length;
-  shell(
-    `<section class="welcome-card professional"><div><span class="pill">محیط حرفه‌ای</span><h1>مرکز کار حرفه‌ای شما</h1><p>مراجع، ارزیابی، گزارش و مداخله را از یک مسیر واحد مدیریت کنید.</p><div class="hero-actions"><button class="primary" data-page="clients">+ افزودن مراجع</button><button class="secondary" data-page="assessments">شروع ارزیابی</button></div></div><div class="welcome-icon">🧠</div></section><div class="metric-grid">${metric("ارزیابی‌های تکمیل‌شده", completed, "🧪")}${metric("مداخلات فعال", "—", "🧩")}${metric("گزارش‌های آماده", "—", "📊")}${metric("اشتراک", esc(state.subscription.plan_title || "عادی"), "💳")}</div><section class="section-head"><div><h2>اقدامات سریع</h2><p>کارهای اصلی را از همین‌جا انجام دهید.</p></div></section><div class="action-grid">${actionCard("👥", "مراجعان", "ایجاد و مدیریت پرونده‌های مراجعان.", "clients")}${actionCard("🧪", "ارزیابی‌ها", "انتخاب و اجرای ابزارهای ارزیابی.", "assessments")}${actionCard("🧩", "مداخلات", "مشاهده و شروع برنامه‌های مداخله‌ای.", "interventions")}${actionCard("📊", "گزارش‌ها", "مشاهده نتایج و گزارش‌های حرفه‌ای.", "reports")}</div><div class="notice-card"><b>نکته</b><p>در این نسخه، ساختار پنل حرفه‌ای آماده شده است؛ ماژول‌های پرونده الکترونیک و مدیریت مراجعان را می‌توان در مرحله بعد به همین معماری متصل کرد.</p></div>`,
+      <!-- DYSLEXIA SYSTEM -->
+
+      <button
+        class="quick-action-card featured ${
+          dyslexiaAccess ? "career-quick-active" : "career-quick-locked"
+        }"
+        data-page="${dyslexiaAccess ? "dyslexia" : "subscription"}"
+        type="button"
+      >
+        <div class="quick-action-icon">
+          ${dyslexiaAccess ? "🧠" : "🔒"}
+        </div>
+
+        <div class="quick-action-body">
+          <span>
+            ${dyslexiaAccess ? "قابل استفاده" : "دسترسی محدود"}
+          </span>
+
+          <h3>سامانه نارساخوانی</h3>
+
+          <p>
+            ${
+              dyslexiaAccess
+                ? "ورود به سامانه نارساخوانی و مشاهده راهنمای استفاده."
+                : "برای استفاده از سامانه نارساخوانی، اشتراک نقره‌ای یا طلایی تهیه کنید."
+            }
+          </p>
+        </div>
+
+        <div class="quick-action-arrow">←</div>
+      </button>
+
+
+      <!-- EDUCATION -->
+
+      <button
+        class="quick-action-card"
+        data-page="academy"
+        type="button"
+      >
+        <div class="quick-action-icon blue">🎥</div>
+
+        <div class="quick-action-body">
+          <span>آموزش</span>
+          <h3>آموزش استفاده از سامانه</h3>
+
+          <p>
+            ویدئوهای آموزشی نحوه استفاده از سامانه‌ها را مشاهده کنید.
+          </p>
+        </div>
+
+        <div class="quick-action-arrow">←</div>
+      </button>
+
+
+      <!-- SUBSCRIPTION -->
+
+      <button
+        class="quick-action-card"
+        data-page="subscription"
+        type="button"
+      >
+        <div class="quick-action-icon orange">💳</div>
+
+        <div class="quick-action-body">
+          <span>حساب شما</span>
+          <h3>مدیریت اشتراک</h3>
+
+          <p>
+            وضعیت اشتراک و امکانات قابل دسترس خود را مشاهده کنید.
+          </p>
+        </div>
+
+        <div class="quick-action-arrow">←</div>
+      </button>
+
+    </div>
+  </section>
+
+
+  <!-- =========================
+       CAREER SYSTEM ACCESS
+  ========================== -->
+
+  <section class="dashboard-section products-section">
+    <div class="dashboard-section-header">
+      <div>
+        <span class="section-eyebrow">دسترسی سریع</span>
+        <h2>سامانه انتخاب رشته</h2>
+        <p>ورود مستقیم به سامانه انتخاب رشته تحصیلی</p>
+      </div>
+    </div>
+
+    <button
+      class="career-system-card ${
+        careerAccess ? "career-system-active" : "career-system-locked"
+      }"
+      data-page="${careerAccess ? "career-guidance" : "subscription"}"
+      type="button"
+    >
+      <div class="career-system-icon">
+        ${careerAccess ? "🎓" : "🔒"}
+      </div>
+
+      <div class="career-system-content">
+        <h3>سامانه انتخاب رشته</h3>
+
+        ${
+          careerAccess
+            ? `
+              <div class="career-system-link">
+                ورود به سامانه انتخاب رشته
+                <strong>←</strong>
+              </div>
+            `
+            : `
+              <div class="career-system-link career-system-upgrade">
+                ارتقای اشتراک به طلایی برای دسترسی
+                <strong>←</strong>
+              </div>
+            `
+        }
+      </div>
+
+      <div class="career-system-arrow">
+        ${careerAccess ? "←" : "🔒"}
+      </div>
+    </button>
+  </section>
+
+
+  <!-- =========================
+       DYSLEXIA SYSTEM ACCESS
+  ========================== -->
+
+  <section class="dashboard-section products-section">
+    <div class="dashboard-section-header">
+      <div>
+        <span class="section-eyebrow">دسترسی سریع</span>
+        <h2>سامانه نارساخوانی</h2>
+        <p>ورود به سامانه نارساخوانی و مشاهده آموزش استفاده</p>
+      </div>
+    </div>
+
+    <button
+      class="career-system-card ${
+        dyslexiaAccess ? "career-system-active" : "career-system-locked"
+      }"
+      data-page="${dyslexiaAccess ? "dyslexia" : "subscription"}"
+      type="button"
+    >
+      <div class="career-system-icon">
+        ${dyslexiaAccess ? "🧠" : "🔒"}
+      </div>
+
+      <div class="career-system-content">
+        <h3>سامانه نارساخوانی</h3>
+
+        ${
+          dyslexiaAccess
+            ? `
+              <div class="career-system-link">
+                ورود به سامانه نارساخوانی و آموزش
+                <strong>←</strong>
+              </div>
+            `
+            : `
+              <div class="career-system-link career-system-upgrade">
+                ارتقای اشتراک به نقره‌ای یا طلایی
+                <strong>←</strong>
+              </div>
+            `
+        }
+      </div>
+
+      <div class="career-system-arrow">
+        ${dyslexiaAccess ? "←" : "🔒"}
+      </div>
+    </button>
+  </section>
+  `,
     "home",
   );
   bind();
@@ -1999,7 +1887,13 @@ async function subscription() {
                     ${isNormal ? "normal-duration" : ""}
                   "
                 >
-                  ${isNormal ? "پلن پایه" : "۳۰ روز اعتبار"}
+                  ${
+                    p.id === "gold"
+                      ? "۶۰ روز اعتبار"
+                      : p.id === "normal"
+                        ? "۳۰ روز اعتبار"
+                        : "۳۰ روز اعتبار"
+                  }
                 </div>
 
 
@@ -2939,7 +2833,150 @@ function nav(p) {
   if (p === "support") return support();
   if (p === "notifications") return notifications();
   if (p === "admin") return admin();
+  if (p === "dyslexia") return dyslexiaPage();
   return home();
+}
+function hasDyslexiaAccess() {
+  const sub = state.subscription;
+  if (!sub) return false;
+  if (!["silver", "gold"].includes(sub.plan_id)) return false;
+  if (sub.status !== "active") return false;
+  if (sub.ends_at && new Date(sub.ends_at) <= new Date()) return false;
+  return true;
+}
+function dyslexiaPage() {
+  if (!hasDyslexiaAccess()) {
+    alert(
+      "برای استفاده از سامانه نارساخوانی، ابتدا باید اشتراک نقره‌ای یا طلایی تهیه کنید.",
+    );
+    return subscription();
+  }
+
+  return dyslexiaGuidance();
+}
+function dyslexiaGuidance() {
+  shell(
+    `
+    <section class="dashboard-section">
+      <div class="dashboard-section-header">
+        <div>
+          <span class="section-eyebrow">سامانه تخصصی</span>
+          <h2>سامانه نارساخوانی</h2>
+          <p>
+            برای ورود به سامانه یا مشاهده آموزش استفاده، یکی از گزینه‌های زیر را انتخاب کنید.
+          </p>
+        </div>
+      </div>
+
+      <div class="career-guidance-grid">
+
+        <button
+          class="career-guidance-card"
+          id="openDyslexiaSystem"
+          type="button"
+        >
+          <div class="career-card-icon">🧠</div>
+
+          <div class="career-card-content">
+            <h3>سامانه نارساخوانی</h3>
+            <p>
+              ورود به سامانه و شروع استفاده از امکانات ارزیابی نارساخوانی
+            </p>
+          </div>
+
+          <div class="career-card-arrow">←</div>
+        </button>
+
+        <button
+          class="career-guidance-card"
+          id="openDyslexiaVideo"
+          type="button"
+        >
+          <div class="career-card-icon">🎥</div>
+
+          <div class="career-card-content">
+            <h3>آموزش فیلم استفاده از سامانه نارساخوانی</h3>
+            <p>
+              مشاهده راهنمای ویدئویی برای آشنایی با نحوه استفاده از سامانه
+            </p>
+          </div>
+
+          <div class="career-card-arrow">←</div>
+        </button>
+
+      </div>
+    </section>
+    `,
+    "dyslexia",
+  );
+
+  document
+    .getElementById("openDyslexiaSystem")
+    ?.addEventListener("click", () => {
+      if (!hasDyslexiaAccess()) {
+        alert(
+          "برای استفاده از سامانه نارساخوانی، ابتدا باید اشتراک نقره‌ای یا طلایی تهیه کنید.",
+        );
+        return subscription();
+      }
+
+      window.location.href = "/dyslexia-app/";
+    });
+
+  document
+    .getElementById("openDyslexiaVideo")
+    ?.addEventListener("click", () => {
+      dyslexiaGuidanceVideo();
+    });
+}
+function dyslexiaGuidanceVideo() {
+  shell(
+    `
+    <section class="dashboard-section">
+      <div class="dashboard-section-header">
+        <div>
+          <span class="section-eyebrow">راهنمای استفاده</span>
+          <h2>آموزش فیلم استفاده از سامانه نارساخوانی</h2>
+          <p>
+            در این ویدئو با نحوه استفاده از سامانه نارساخوانی آشنا می‌شوید.
+          </p>
+        </div>
+      </div>
+
+      <div class="career-video-container">
+        <div class="career-video-box">
+          <video
+            controls
+            playsinline
+            preload="metadata"
+            style="width: 100%; max-width: 100%; border-radius: 16px;"
+          >
+            <source
+              src="/assessments/videos/dyslexia-guidance.mp4"
+              type="video/mp4"
+            />
+            مرورگر شما از پخش ویدئو پشتیبانی نمی‌کند.
+          </video>
+        </div>
+      </div>
+
+      <button
+        class="career-back-button"
+        id="backToDyslexiaGuidance"
+        type="button"
+      >
+        ← بازگشت به سامانه نارساخوانی
+      </button>
+    </section>
+    `,
+    "dyslexia-video",
+  );
+
+  document
+    .getElementById("backToDyslexiaGuidance")
+    ?.addEventListener("click", () => {
+      dyslexiaGuidance();
+    });
 }
 async function logout() {
   const token = localStorage.getItem("token");
@@ -2980,25 +3017,30 @@ async function logout() {
     logout();
   }
 })();
+
 function hasCareerAccess() {
   const sub = state.subscription;
 
   if (!sub) return false;
 
-  if (!["silver", "gold"].includes(sub.plan_id)) {
+  // فقط اشتراک طلایی اجازه ورود به انتخاب رشته دارد
+  if (sub.plan_id !== "gold") {
     return false;
   }
 
+  // اشتراک باید فعال باشد
   if (sub.status !== "active") {
     return false;
   }
 
+  // اشتراک نباید منقضی شده باشد
   if (!sub.ends_at) {
     return false;
   }
 
   return new Date(sub.ends_at) > new Date();
 }
+
 function careerGuidance() {
   shell(
     `
@@ -3072,7 +3114,7 @@ function careerGuidance() {
   document.querySelector("#openCareerSystem").onclick = () => {
     if (!hasCareerAccess()) {
       alert(
-        "برای استفاده از سامانه انتخاب رشته، ابتدا باید اشتراک نقره‌ای یا طلایی تهیه کنید.",
+        "برای استفاده از سامانه انتخاب رشته، ابتدا باید اشتراک طلایی تهیه کنید.",
       );
 
       return subscription();

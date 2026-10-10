@@ -46,16 +46,47 @@ export async function activatePayment(
     );
 
     const usageLimit =
-      payment.plan_id === "silver" ? 3 : payment.plan_id === "gold" ? 9 : null;
+      payment.plan_id === "silver"
+        ? 150
+        : payment.plan_id === "gold"
+          ? 300
+          : null;
     await client.query(
-      `INSERT INTO subscriptions(user_id, plan_id, status, starts_at, ends_at, usage_limit, usage_count)
-       VALUES($1,$2,'active',NOW(),NOW() + INTERVAL '30 days',$3,0)
+      `INSERT INTO subscriptions(
+         user_id, plan_id, status, starts_at, ends_at, usage_limit, usage_count
+       )
+       VALUES(
+         $1, $2, 'active', NOW(),
+         NOW() + CASE
+           WHEN $2 = 'gold' THEN INTERVAL '60 days'
+           ELSE INTERVAL '30 days'
+         END,
+         $3, 0
+       )
        ON CONFLICT(user_id) DO UPDATE SET
-         plan_id=EXCLUDED.plan_id, status='active', starts_at=EXCLUDED.starts_at,
-         ends_at=EXCLUDED.ends_at, usage_limit=EXCLUDED.usage_limit, usage_count=0`,
+         plan_id = EXCLUDED.plan_id,
+         status = 'active',
+         starts_at = CASE
+           WHEN subscriptions.status = 'active'
+                AND subscriptions.ends_at > NOW()
+             THEN subscriptions.starts_at
+           ELSE NOW()
+         END,
+         ends_at = CASE
+           WHEN subscriptions.status = 'active'
+                AND subscriptions.ends_at > NOW()
+             THEN subscriptions.ends_at + (
+               CASE
+                 WHEN EXCLUDED.plan_id = 'gold' THEN INTERVAL '60 days'
+                 ELSE INTERVAL '30 days'
+               END
+             )
+           ELSE EXCLUDED.ends_at
+         END,
+         usage_limit = EXCLUDED.usage_limit,
+         usage_count = 0`,
       [payment.user_id, payment.plan_id, usageLimit],
     );
-
     if (payment.coupon_code) {
       const {
         rows: [redemption],
