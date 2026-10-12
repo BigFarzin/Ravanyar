@@ -327,7 +327,16 @@ function login(msg = "", mode = "login") {
 
                     </div>
 
-
+                    <div class="password-hint">
+                      <span class="password-hint-icon">ⓘ</span>
+                      <p>
+                        <strong>توجه:</strong>
+                         گذرواژه باید حداقل ۸ کاراکتر داشته باشد و شامل حداقل
+                         یک حرف بزرگ انگلیسی (A–Z)، یک عدد (0–9) و یک علامت ویژه     
+                         مانند @ _ ( ) * & ^ % $ ! # باشد.
+                      </p>
+                      </div>
+  
                     <label class="glass-input-group">
 
                       <span>تکرار گذرواژه</span>
@@ -2895,7 +2904,7 @@ function dyslexiaGuidance() {
           <div class="career-card-icon">🎥</div>
 
           <div class="career-card-content">
-            <h3>آموزش فیلم استفاده از سامانه نارساخوانی</h3>
+            <h3>فیلم آموزش استفاده از سامانه نارساخوانی</h3>
             <p>
               مشاهده راهنمای ویدئویی برای آشنایی با نحوه استفاده از سامانه
             </p>
@@ -2952,7 +2961,7 @@ function dyslexiaGuidanceVideo() {
             style="width: 100%; max-width: 100%; border-radius: 16px;"
           >
             <source
-              src="/assessments/videos/dyslexia-guidance.mp4"
+              src="/assessments/videos/dyslexia-tutorial-web.mp4"
               type="video/mp4"
             />
             مرورگر شما از پخش ویدئو پشتیبانی نمی‌کند.

@@ -5765,3 +5765,32 @@ header p {
   object-fit: contain;
   margin: 0;
 }
+.password-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  margin: 4px 0 14px;
+  border: 1px solid rgba(246, 179, 184, 0.2);
+  border-radius: 12px;
+  background: rgba(246, 179, 184, 0.06);
+  color: #b6b6b6;
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+.password-hint-icon {
+  flex-shrink: 0;
+  color: #f6b3b8;
+  font-size: 16px;
+  margin-top: 1px;
+}
+
+.password-hint p {
+  margin: 0;
+}
+
+.password-hint strong {
+  color: #f6b3b8;
+  font-weight: 600;
+}
