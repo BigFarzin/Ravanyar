@@ -5794,3 +5794,212 @@ header p {
   color: #f6b3b8;
   font-weight: 600;
 }
+
+/* ==========================================
+   Responsive Fixes - Ravanyar
+   ========================================== */
+
+/* جلوگیری از بیرون‌زدگی افقی */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+body {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  overflow-x: clip;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+}
+
+input,
+select,
+textarea,
+button {
+  max-width: 100%;
+  min-width: 0;
+  font: inherit;
+}
+
+textarea {
+  resize: vertical;
+  overflow-wrap: anywhere;
+}
+
+/* تبلت و موبایل */
+@media (max-width: 768px) {
+  .auth {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .login-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .app-shell {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .main {
+    width: 100%;
+    min-width: 0;
+    margin-right: 0 !important;
+    padding: 16px;
+  }
+
+  .content {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .sidebar {
+    max-width: 85vw;
+  }
+
+  /* فرم‌ها و ورودی‌ها */
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* دکمه‌ها */
+  button {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  /* جدول‌ها: اسکرول داخل محدوده خود جدول */
+  .scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .scroll table {
+    min-width: 600px;
+    width: max-content;
+    max-width: none;
+  }
+
+  /* کارت‌ها و چیدمان‌های چندستونه */
+  .card,
+  .login-card {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* موبایل باریک */
+@media (max-width: 480px) {
+  .main {
+    padding: 12px;
+  }
+
+  .card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  h1 {
+    font-size: clamp(1.25rem, 5vw, 1.7rem);
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+  }
+
+  h2 {
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+
+  .actions,
+  .toolbar,
+  .detailButtons,
+  .subTabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .actions > *,
+  .toolbar > *,
+  .detailButtons > *,
+  .subTabs > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  audio {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .modalBox {
+    width: calc(100% - 24px);
+    max-width: 100%;
+    max-height: 85dvh;
+    overflow-y: auto;
+  }
+}
+/* دکمه بازگشت به داشبورد */
+button.career-back-button[data-page="home"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
+  min-height: 38px;
+  padding: 9px 16px;
+  margin-top: 20px;
+  background-color: #6959e8;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+/* حالت هاور */
+button.career-back-button[data-page="home"]:hover {
+  background-color: #5848d6;
+  transform: translateY(-1px);
+}
+
+/* نمایش مناسب در موبایل */
+@media (max-width: 600px) {
+  button.career-back-button[data-page="home"] {
+    min-height: 36px;
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 9px;
+  }
+}

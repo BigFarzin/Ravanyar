@@ -1957,6 +1957,15 @@ async function subscription() {
       </div>
 
     </section>
+    
+    <button
+  class="career-back-button"
+  data-page="home"
+  type="button"
+  style="margin-top: 24px; width: 100%;"
+  >
+    ← بازگشت به داشبورد
+  </button>
     `,
     "subscription",
   );
@@ -2914,6 +2923,14 @@ function dyslexiaGuidance() {
         </button>
 
       </div>
+            <button
+        class="career-back-button"
+        data-page="home"
+        type="button"
+        style="margin-top: 24px; width: 100%;"
+      >
+        ← بازگشت به داشبورد
+      </button>
     </section>
     `,
     "dyslexia",
@@ -3115,6 +3132,14 @@ function careerGuidance() {
       </button>
 
     </div>
+    <button
+      class="career-back-button"
+      data-page="home"
+      type="button"
+      style="margin-top: 24px; width: 100%;"
+      >
+        ← بازگشت به داشبورد
+    </button>
     `,
     "career-guidance",
   );
