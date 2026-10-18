@@ -662,6 +662,8 @@ function navItems(role) {
   return [
     ["academy", "📚", "سامانه انتخاب رشته"],
     ["dyslexia", "🧠", "سامانه نارساخوانی"],
+    ["dyscalculia", "🔢", "سامانه حساب نارسایی"],
+    ["cognitive-tasks", "🧩", "تکالیف شناختی"],
     ["subscription", "💳", "اشتراک"],
   ];
 }
@@ -870,6 +872,7 @@ function actionCard(icon, title, text, page, tone = "") {
 function metric(label, value, icon = "") {
   return `<div class="metric"><span>${icon} ${label}</span><b>${value}</b></div>`;
 }
+let smartStartTimer = null;
 async function personalHome() {
   const d = await api("/api/dashboard");
 
@@ -901,7 +904,49 @@ async function personalHome() {
   );
 
   const dyslexiaAccess = hasDyslexiaAccess();
-
+  // چهار پیشنهاد برای اسلایدر شروع سریع
+  const startRecommendations = [
+    {
+      icon: "🎓",
+      eyebrow: "ویژه اشتراک طلایی",
+      title: "مسیر تحصیلی خودت را پیدا کن",
+      description:
+        "سامانه انتخاب رشته را برای بررسی مسیر تحصیلی مناسب خودت تجربه کن.",
+      button: careerAccess ? "ورود به انتخاب رشته" : "مشاهده اشتراک طلایی",
+      page: careerAccess ? "career-guidance" : "subscription",
+      unlocked: careerAccess,
+    },
+    {
+      icon: "🧠",
+      eyebrow: "ویژه اشتراک نقره‌ای و طلایی",
+      title: "ارزیابی نارساخوانی",
+      description:
+        "با امکانات سامانه نارساخوانی آشنا شو و مسیر ارزیابی را دنبال کن.",
+      button: dyslexiaAccess ? "ورود به سامانه" : "مشاهده اشتراک‌ها",
+      page: dyslexiaAccess ? "dyslexia" : "subscription",
+      unlocked: dyslexiaAccess,
+    },
+    {
+      icon: "🔢",
+      eyebrow: "ویژه اشتراک نقره‌ای و طلایی",
+      title: "با حساب نارسایی آشنا شو",
+      description:
+        "از راهنمای سامانه حساب نارسایی استفاده کن و امکانات آن را بررسی کن.",
+      button: hasDyscalculiaAccess() ? "ورود به سامانه" : "مشاهده اشتراک‌ها",
+      page: hasDyscalculiaAccess() ? "dyscalculia" : "subscription",
+      unlocked: hasDyscalculiaAccess(),
+    },
+    {
+      icon: "🧩",
+      eyebrow: "قابل استفاده برای همه کاربران",
+      title: "تمرین‌های شناختی را شروع کن",
+      description:
+        "تمرین‌ها و فعالیت‌های شناختی روان‌یار را برای شروع تجربه کن.",
+      button: "شروع فعالیت",
+      page: "cognitive-tasks",
+      unlocked: true,
+    },
+  ];
   shell(
     `
   <!-- =========================
@@ -1024,128 +1069,121 @@ async function personalHome() {
   </section>
 
 
-  <!-- =========================
-       QUICK START
+    <!-- =========================
+       SMART QUICK START
   ========================== -->
 
-  <section class="dashboard-section">
+  <section class="dashboard-section smart-start-section">
+
     <div class="dashboard-section-header">
       <div>
         <span class="section-eyebrow">شروع سریع</span>
         <h2>از کجا شروع کنیم؟</h2>
-        <p>دسترسی سریع به مهم‌ترین بخش‌های روان‌یار</p>
+        <p>یک پیشنهاد متناسب با امکانات حساب شما</p>
       </div>
     </div>
 
-    <div class="quick-actions-grid">
+    <div class="smart-start-layout">
 
-      <!-- CAREER SYSTEM -->
+      <div class="smart-start-feature">
 
+        ${startRecommendations
+          .map(
+            (item, index) => `
+          <div
+            class="smart-start-slide ${index === 0 ? "is-active" : ""}"
+            aria-hidden="${index !== 0}"
+          >
+            <div class="smart-start-feature-content">
+
+              <span class="smart-start-eyebrow">
+                ✨ ${item.eyebrow}
+              </span>
+
+              <h3>${item.title}</h3>
+
+              <p>${item.description}</p>
+
+              <button
+                type="button"
+                class="smart-start-primary-btn"
+                data-page="${item.page}"
+              >
+                ${item.button}
+                <span>←</span>
+              </button>
+
+            </div>
+
+            <div class="smart-start-illustration">
+              <div class="smart-start-icon-orbit orbit-one"></div>
+              <div class="smart-start-icon-orbit orbit-two"></div>
+              <div class="smart-start-main-icon">${item.icon}</div>
+              <span class="smart-start-spark spark-one">✦</span>
+              <span class="smart-start-spark spark-two">✧</span>
+            </div>
+          </div>
+        `,
+          )
+          .join("")}
+
+        <div class="smart-start-indicators">
+          ${startRecommendations
+            .map(
+              (item, index) => `
+            <button
+              type="button"
+              class="smart-start-dot ${index === 0 ? "is-active" : ""}"
+              data-smart-index="${index}"
+              aria-label="نمایش پیشنهاد ${index + 1}"
+              aria-pressed="${index === 0}"
+            ></button>
+          `,
+            )
+            .join("")}
+        </div>
+
+        <div class="smart-start-progress-track">
+          <div class="smart-start-progress is-running"></div>
+        </div>
+
+      </div>
+      <!-- راهنمای استفاده -->
       <button
-        class="quick-action-card featured career-quick-card ${
-          careerAccess ? "career-quick-active" : "career-quick-locked"
-        }"
-        data-page="${careerAccess ? "career-guidance" : "subscription"}"
         type="button"
-      >
-        <div class="quick-action-icon">
-          ${careerAccess ? "🎓" : "🔒"}
-        </div>
-
-        <div class="quick-action-body">
-          <span>
-            ${careerAccess ? "پیشنهاد ویژه" : "دسترسی محدود"}
-          </span>
-
-          <h3>سامانه انتخاب رشته تحصیلی</h3>
-
-          <p>
-            ${
-              careerAccess
-                ? "انتخاب رشته مناسب و بررسی مسیر تحصیلی خود را از اینجا شروع کنید."
-                : "برای استفاده از سامانه انتخاب رشته، اشتراک طلایی تهیه کنید."
-            }
-          </p>
-        </div>
-
-        <div class="quick-action-arrow">←</div>
-      </button>
-
-
-      <!-- DYSLEXIA SYSTEM -->
-
-      <button
-        class="quick-action-card featured ${
-          dyslexiaAccess ? "career-quick-active" : "career-quick-locked"
-        }"
-        data-page="${dyslexiaAccess ? "dyslexia" : "subscription"}"
-        type="button"
-      >
-        <div class="quick-action-icon">
-          ${dyslexiaAccess ? "🧠" : "🔒"}
-        </div>
-
-        <div class="quick-action-body">
-          <span>
-            ${dyslexiaAccess ? "قابل استفاده" : "دسترسی محدود"}
-          </span>
-
-          <h3>سامانه نارساخوانی</h3>
-
-          <p>
-            ${
-              dyslexiaAccess
-                ? "ورود به سامانه نارساخوانی و مشاهده راهنمای استفاده."
-                : "برای استفاده از سامانه نارساخوانی، اشتراک نقره‌ای یا طلایی تهیه کنید."
-            }
-          </p>
-        </div>
-
-        <div class="quick-action-arrow">←</div>
-      </button>
-
-
-      <!-- EDUCATION -->
-
-      <button
-        class="quick-action-card"
+        class="smart-start-mini-card smart-start-guide"
         data-page="academy"
-        type="button"
       >
-        <div class="quick-action-icon blue">🎥</div>
+        <span class="smart-start-mini-icon">📚</span>
 
-        <div class="quick-action-body">
-          <span>آموزش</span>
-          <h3>آموزش استفاده از سامانه</h3>
-
-          <p>
-            ویدئوهای آموزشی نحوه استفاده از سامانه‌ها را مشاهده کنید.
-          </p>
-        </div>
-
-        <div class="quick-action-arrow">←</div>
+        <span class="smart-start-mini-content">
+          <strong>راهنمای استفاده</strong>
+          <small>
+            با نحوه استفاده از سامانه‌های روان‌یار آشنا شو.
+          </small>
+          <span class="smart-start-mini-link">
+            مشاهده راهنما ←
+          </span>
+        </span>
       </button>
 
-
-      <!-- SUBSCRIPTION -->
-
+      <!-- مدیریت اشتراک -->
       <button
-        class="quick-action-card"
-        data-page="subscription"
         type="button"
+        class="smart-start-mini-card smart-start-plan"
+        data-page="subscription"
       >
-        <div class="quick-action-icon orange">💳</div>
+        <span class="smart-start-mini-icon">💎</span>
 
-        <div class="quick-action-body">
-          <span>حساب شما</span>
-          <h3>مدیریت اشتراک</h3>
-
-          <p>
-            وضعیت اشتراک و امکانات قابل دسترس خود را مشاهده کنید.
-          </p>
-        </div>
-
-        <div class="quick-action-arrow">←</div>
+        <span class="smart-start-mini-content">
+          <strong>اشتراک و امکانات</strong>
+          <small>
+            وضعیت اشتراک و امکانات قابل دسترس خود را بررسی کن.
+          </small>
+          <span class="smart-start-mini-link">
+            مدیریت اشتراک ←
+          </span>
+        </span>
       </button>
 
     </div>
@@ -1153,109 +1191,182 @@ async function personalHome() {
 
 
   <!-- =========================
-       CAREER SYSTEM ACCESS
+       QUICK SYSTEM ACCESS
   ========================== -->
 
-  <section class="dashboard-section products-section">
+  <section class="dashboard-section quick-systems-section">
     <div class="dashboard-section-header">
       <div>
         <span class="section-eyebrow">دسترسی سریع</span>
-        <h2>سامانه انتخاب رشته</h2>
-        <p>ورود مستقیم به سامانه انتخاب رشته تحصیلی</p>
+        <h2>سامانه‌های روان‌یار</h2>
+        <p>برای ورود به سامانه موردنظر خود، کارت آن را انتخاب کنید.</p>
       </div>
     </div>
 
-    <button
-      class="career-system-card ${
-        careerAccess ? "career-system-active" : "career-system-locked"
-      }"
-      data-page="${careerAccess ? "career-guidance" : "subscription"}"
-      type="button"
-    >
-      <div class="career-system-icon">
-        ${careerAccess ? "🎓" : "🔒"}
-      </div>
+    <div class="quick-systems-grid">
 
-      <div class="career-system-content">
-        <h3>سامانه انتخاب رشته</h3>
+      <!-- 1. انتخاب رشته: فقط طلایی -->
+      <button
+        type="button"
+        class="system-square-card system-career ${careerAccess ? "is-unlocked" : "is-locked"}"
+        data-page="${careerAccess ? "career-guidance" : "subscription"}"
+      >
+        <span class="system-card-top">
+          <span class="system-card-number">01</span>
+          <span class="system-card-status">
+            ${careerAccess ? "✓ فعال" : "🔒 قفل"}
+          </span>
+        </span>
 
-        ${
-          careerAccess
-            ? `
-              <div class="career-system-link">
-                ورود به سامانه انتخاب رشته
-                <strong>←</strong>
-              </div>
-            `
-            : `
-              <div class="career-system-link career-system-upgrade">
-                ارتقای اشتراک به طلایی برای دسترسی
-                <strong>←</strong>
-              </div>
-            `
-        }
-      </div>
+        <span class="system-card-icon">🎓</span>
+        <span class="system-card-title">انتخاب رشته</span>
+        <span class="system-card-description">
+          ${
+            careerAccess
+              ? "ورود به سامانه انتخاب رشته تحصیلی"
+              : "ویژه اشتراک طلایی"
+          }
+        </span>
+        <span class="system-card-footer">
+          ${careerAccess ? "ورود به سامانه ←" : "مشاهده اشتراک‌ها ←"}
+        </span>
+      </button>
 
-      <div class="career-system-arrow">
-        ${careerAccess ? "←" : "🔒"}
-      </div>
-    </button>
-  </section>
+      <!-- 2. نارساخوانی: نقره‌ای و طلایی -->
+      <button
+        type="button"
+        class="system-square-card system-dyslexia ${dyslexiaAccess ? "is-unlocked" : "is-locked"}"
+        data-page="${dyslexiaAccess ? "dyslexia" : "subscription"}"
+      >
+        <span class="system-card-top">
+          <span class="system-card-number">02</span>
+          <span class="system-card-status">
+            ${dyslexiaAccess ? "✓ فعال" : "🔒 قفل"}
+          </span>
+        </span>
 
+        <span class="system-card-icon">🧠</span>
+        <span class="system-card-title">نارساخوانی</span>
+        <span class="system-card-description">
+          ${
+            dyslexiaAccess
+              ? "ورود به سامانه نارساخوانی"
+              : "ویژه اشتراک نقره‌ای و طلایی"
+          }
+        </span>
+        <span class="system-card-footer">
+          ${dyslexiaAccess ? "ورود به سامانه ←" : "مشاهده اشتراک‌ها ←"}
+        </span>
+      </button>
 
-  <!-- =========================
-       DYSLEXIA SYSTEM ACCESS
-  ========================== -->
+      <!-- 3. حساب نارسایی: نقره‌ای و طلایی -->
+      <button
+        type="button"
+        class="system-square-card system-dyscalculia ${hasDyscalculiaAccess() ? "is-unlocked" : "is-locked"}"
+        data-page="${hasDyscalculiaAccess() ? "dyscalculia" : "subscription"}"
+      >
+        <span class="system-card-top">
+          <span class="system-card-number">03</span>
+          <span class="system-card-status">
+            ${hasDyscalculiaAccess() ? "✓ فعال" : "🔒 قفل"}
+          </span>
+        </span>
 
-  <section class="dashboard-section products-section">
-    <div class="dashboard-section-header">
-      <div>
-        <span class="section-eyebrow">دسترسی سریع</span>
-        <h2>سامانه نارساخوانی</h2>
-        <p>ورود به سامانه نارساخوانی و مشاهده آموزش استفاده</p>
-      </div>
+        <span class="system-card-icon">🔢</span>
+        <span class="system-card-title">حساب نارسایی</span>
+        <span class="system-card-description">
+          ${
+            hasDyscalculiaAccess()
+              ? "ورود به سامانه حساب نارسایی"
+              : "ویژه اشتراک نقره‌ای و طلایی"
+          }
+        </span>
+        <span class="system-card-footer">
+          ${hasDyscalculiaAccess() ? "ورود به سامانه ←" : "مشاهده اشتراک‌ها ←"}
+        </span>
+      </button>
+
+      <!-- 4. تکالیف شناختی: همه کاربران -->
+      <button
+        type="button"
+        class="system-square-card system-cognitive is-unlocked"
+        data-page="cognitive-tasks"
+      >
+        <span class="system-card-top">
+          <span class="system-card-number">04</span>
+          <span class="system-card-status">✓ آزاد</span>
+        </span>
+
+        <span class="system-card-icon">🧩</span>
+        <span class="system-card-title">تکالیف شناختی</span>
+        <span class="system-card-description">
+          تمرین‌ها و فعالیت‌های شناختی
+        </span>
+        <span class="system-card-footer">ورود به سامانه ←</span>
+      </button>
+
     </div>
-
-    <button
-      class="career-system-card ${
-        dyslexiaAccess ? "career-system-active" : "career-system-locked"
-      }"
-      data-page="${dyslexiaAccess ? "dyslexia" : "subscription"}"
-      type="button"
-    >
-      <div class="career-system-icon">
-        ${dyslexiaAccess ? "🧠" : "🔒"}
-      </div>
-
-      <div class="career-system-content">
-        <h3>سامانه نارساخوانی</h3>
-
-        ${
-          dyslexiaAccess
-            ? `
-              <div class="career-system-link">
-                ورود به سامانه نارساخوانی و آموزش
-                <strong>←</strong>
-              </div>
-            `
-            : `
-              <div class="career-system-link career-system-upgrade">
-                ارتقای اشتراک به نقره‌ای یا طلایی
-                <strong>←</strong>
-              </div>
-            `
-        }
-      </div>
-
-      <div class="career-system-arrow">
-        ${dyslexiaAccess ? "←" : "🔒"}
-      </div>
-    </button>
   </section>
   `,
     "home",
   );
   bind();
+  // پاک کردن تایمر قبلی، برای جلوگیری از چند تایمر هم‌زمان
+  if (smartStartTimer) {
+    clearInterval(smartStartTimer);
+    smartStartTimer = null;
+  }
+
+  const smartSlides = [...document.querySelectorAll(".smart-start-slide")];
+
+  const smartDots = [...document.querySelectorAll(".smart-start-dot")];
+
+  const smartProgress = document.querySelector(".smart-start-progress");
+
+  let currentSmartSlide = 0;
+
+  function showSmartSlide(index) {
+    if (!smartSlides.length) return;
+
+    currentSmartSlide = (index + smartSlides.length) % smartSlides.length;
+
+    smartSlides.forEach((slide, i) => {
+      const active = i === currentSmartSlide;
+
+      slide.classList.toggle("is-active", active);
+      slide.setAttribute("aria-hidden", String(!active));
+    });
+
+    smartDots.forEach((dot, i) => {
+      const active = i === currentSmartSlide;
+
+      dot.classList.toggle("is-active", active);
+      dot.setAttribute("aria-pressed", String(active));
+    });
+
+    // شروع مجدد نوار پیشرفت پنج‌ثانیه‌ای
+    if (smartProgress) {
+      smartProgress.classList.remove("is-running");
+      void smartProgress.offsetWidth;
+      smartProgress.classList.add("is-running");
+    }
+  }
+
+  function nextSmartSlide() {
+    showSmartSlide(currentSmartSlide + 1);
+  }
+
+  smartDots.forEach((dot, index) => {
+    dot.addEventListener("click", () => {
+      showSmartSlide(index);
+
+      clearInterval(smartStartTimer);
+      smartStartTimer = setInterval(nextSmartSlide, 5000);
+    });
+  });
+
+  // تعویض خودکار هر پنج ثانیه
+  smartStartTimer = setInterval(nextSmartSlide, 5000);
 }
 async function clinicHome() {
   const d = await api("/api/dashboard");
@@ -2298,24 +2409,64 @@ async function ticketDetail(id) {
     ticketDetail(id);
   };
 }
+
 async function notifications() {
   const d = await api("/api/notifications");
   state.notifications = d.notifications || [];
+
   shell(
-    `<div class="page-title"><h1>اعلان‌ها</h1></div><div class="admin-card">${state.notifications.length ? state.notifications.map((n) => `<div class="notification ${n.is_read ? "read" : ""}" data-notification="${n.id}"><b>${esc(n.title)}</b><p>${esc(n.body)}</p><small>${new Date(n.created_at).toLocaleString("fa-IR")}</small></div>`).join("") : '<div class="empty large">اعلانی ندارید.</div>'}</div>`,
+    `
+      <button
+        class="career-back-button"
+        data-page="home"
+        type="button"
+        style="margin-bottom: 24px; width: 100%;"
+      >
+        ← بازگشت به داشبورد
+      </button>
+
+      <div class="page-title">
+        <h1>اعلان‌ها</h1>
+      </div>
+
+      <div class="admin-card">
+        ${
+          state.notifications.length
+            ? state.notifications
+                .map(
+                  (n) => `
+                    <div
+                      class="notification ${n.is_read ? "read" : ""}"
+                      data-notification="${n.id}"
+                    >
+                      <b>${esc(n.title)}</b>
+                      <p>${esc(n.body)}</p>
+                      <small>
+                        ${new Date(n.created_at).toLocaleString("fa-IR")}
+                      </small>
+                    </div>
+                  `,
+                )
+                .join("")
+            : '<div class="empty large">اعلانی ندارید.</div>'
+        }
+      </div>
+    `,
     "notifications",
   );
-  document.querySelectorAll("[data-notification]").forEach(
-    (x) =>
-      (x.onclick = async () => {
-        await api("/api/notifications/" + x.dataset.notification + "/read", {
-          method: "PATCH",
-          body: "{}",
-        });
-        x.classList.add("read");
-      }),
-  );
+
+  document.querySelectorAll("[data-notification]").forEach((x) => {
+    x.onclick = async () => {
+      await api("/api/notifications/" + x.dataset.notification + "/read", {
+        method: "PATCH",
+        body: "{}",
+      });
+
+      x.classList.add("read");
+    };
+  });
 }
+
 function admin() {
   api("/api/admin/overview").then((o) => {
     root.innerHTML = `<div class="admin-shell"><aside class="admin-sidebar"><h2>🛠 مدیریت تجاری</h2>${[
@@ -2803,6 +2954,10 @@ function openProduct(id) {
   return productDetail(id);
 }
 function nav(p) {
+  if (smartStartTimer) {
+    clearInterval(smartStartTimer);
+    smartStartTimer = null;
+  }
   if (p === "career-guidance") {
     return careerGuidance();
   }
@@ -2852,6 +3007,8 @@ function nav(p) {
   if (p === "notifications") return notifications();
   if (p === "admin") return admin();
   if (p === "dyslexia") return dyslexiaPage();
+  if (p === "dyscalculia") return dyscalculiaPage();
+  if (p === "cognitive-tasks") return cognitiveTasksPage();
   return home();
 }
 function hasDyslexiaAccess() {
@@ -2863,13 +3020,6 @@ function hasDyslexiaAccess() {
   return true;
 }
 function dyslexiaPage() {
-  if (!hasDyslexiaAccess()) {
-    alert(
-      "برای استفاده از سامانه نارساخوانی، ابتدا باید اشتراک نقره‌ای یا طلایی تهیه کنید.",
-    );
-    return subscription();
-  }
-
   return dyslexiaGuidance();
 }
 function dyslexiaGuidance() {
@@ -2941,7 +3091,7 @@ function dyslexiaGuidance() {
     ?.addEventListener("click", () => {
       if (!hasDyslexiaAccess()) {
         alert(
-          "برای استفاده از سامانه نارساخوانی، ابتدا باید اشتراک نقره‌ای یا طلایی تهیه کنید.",
+          "برای استفاده از سامانه نارساخوانی، ابتدا باید اشتراک نقره‌ای تهیه کنید.",
         );
         return subscription();
       }
@@ -3002,6 +3152,300 @@ function dyslexiaGuidanceVideo() {
     .getElementById("backToDyslexiaGuidance")
     ?.addEventListener("click", () => {
       dyslexiaGuidance();
+    });
+}
+// ========================================
+// سامانه حساب نارسایی (Dyscalculia)
+// ========================================
+
+function hasDyscalculiaAccess() {
+  const sub = state.subscription;
+
+  if (!sub) return false;
+  if (!["silver", "gold"].includes(sub.plan_id)) return false;
+  if (sub.status !== "active") return false;
+
+  if (sub.ends_at && new Date(sub.ends_at) <= new Date()) {
+    return false;
+  }
+
+  return true;
+}
+
+function dyscalculiaPage() {
+  return dyscalculiaGuidance();
+}
+
+function dyscalculiaGuidance() {
+  shell(
+    `
+    <section class="dashboard-section">
+      <div class="dashboard-section-header">
+        <div>
+          <span class="section-eyebrow">سامانه تخصصی</span>
+          <h2>سامانه حساب نارسایی</h2>
+          <p>
+            برای ورود به سامانه یا مشاهده فیلم آموزشی، یکی از گزینه‌های زیر را انتخاب کنید.
+          </p>
+        </div>
+      </div>
+
+      <div class="career-guidance-grid">
+
+        <button
+          class="career-guidance-card"
+          id="openDyscalculiaSystem"
+          type="button"
+        >
+          <div class="career-card-icon">🔢</div>
+
+          <div class="career-card-content">
+            <h3>ورود به سامانه حساب نارسایی</h3>
+            <p>
+              شروع استفاده از امکانات سامانه حساب نارسایی
+            </p>
+          </div>
+
+          <div class="career-card-arrow">←</div>
+        </button>
+
+        <button
+          class="career-guidance-card"
+          id="openDyscalculiaVideo"
+          type="button"
+        >
+          <div class="career-card-icon">🎥</div>
+
+          <div class="career-card-content">
+            <h3>فیلم آموزش استفاده از سامانه حساب نارسایی</h3>
+            <p>
+              مشاهده راهنمای ویدئویی استفاده از سامانه
+            </p>
+          </div>
+
+          <div class="career-card-arrow">←</div>
+        </button>
+
+      </div>
+
+      <button
+        class="career-back-button"
+        data-page="home"
+        type="button"
+        style="margin-top: 24px; width: 100%;"
+      >
+        ← بازگشت به داشبورد
+      </button>
+    </section>
+    `,
+    "dyscalculia",
+  );
+
+  document
+    .getElementById("openDyscalculiaSystem")
+    ?.addEventListener("click", () => {
+      if (!hasDyscalculiaAccess()) {
+        alert(
+          "برای استفاده از سامانه حساب نارسایی، اشتراک نقره‌ای یا طلایی فعال تهیه کنید.",
+        );
+
+        return subscription();
+      }
+
+      // ورود از مسیر کنترل‌شده سمت سرور
+      window.location.href = "/assessments/DyscalculiaV11.html";
+    });
+
+  document
+    .getElementById("openDyscalculiaVideo")
+    ?.addEventListener("click", () => {
+      dyscalculiaGuidanceVideo();
+    });
+}
+
+function dyscalculiaGuidanceVideo() {
+  shell(
+    `
+    <section class="dashboard-section">
+      <div class="dashboard-section-header">
+        <div>
+          <span class="section-eyebrow">راهنمای استفاده</span>
+          <h2>فیلم آموزش استفاده از سامانه حساب نارسایی</h2>
+          <p>
+            در این ویدئو با نحوه استفاده از سامانه حساب نارسایی آشنا می‌شوید.
+          </p>
+        </div>
+      </div>
+
+      <div class="career-video-container">
+        <div class="career-video-box">
+          <video
+            controls
+            playsinline
+            preload="metadata"
+            style="width: 100%; max-width: 100%; border-radius: 16px;"
+          >
+            <source
+              src="/assessments/videos/dyscalculia-tutorial.mp4"
+              type="video/mp4"
+            />
+            مرورگر شما از پخش ویدئو پشتیبانی نمی‌کند.
+          </video>
+        </div>
+      </div>
+
+      <button
+        class="career-back-button"
+        id="backToDyscalculiaGuidance"
+        type="button"
+      >
+        ← بازگشت به سامانه حساب نارسایی
+      </button>
+    </section>
+    `,
+    "dyscalculia",
+  );
+
+  document
+    .getElementById("backToDyscalculiaGuidance")
+    ?.addEventListener("click", () => {
+      dyscalculiaGuidance();
+    });
+}
+// ========================================
+// سامانه تکالیف شناختی
+// ========================================
+
+function cognitiveTasksPage() {
+  return cognitiveTasksGuidance();
+}
+
+function cognitiveTasksGuidance() {
+  shell(
+    `
+    <section class="dashboard-section">
+      <div class="dashboard-section-header">
+        <div>
+          <span class="section-eyebrow">سامانه آموزشی</span>
+          <h2>تکالیف شناختی</h2>
+          <p>
+            برای ورود به سامانه یا مشاهده فیلم آموزشی، یکی از گزینه‌های زیر را انتخاب کنید.
+          </p>
+        </div>
+      </div>
+
+      <div class="career-guidance-grid">
+
+        <button
+          class="career-guidance-card"
+          id="openCognitiveTasksSystem"
+          type="button"
+        >
+          <div class="career-card-icon">🧩</div>
+
+          <div class="career-card-content">
+            <h3>ورود به سامانه تکالیف شناختی</h3>
+            <p>
+              ورود به محیط انجام تکالیف شناختی
+            </p>
+          </div>
+
+          <div class="career-card-arrow">←</div>
+        </button>
+
+        <button
+          class="career-guidance-card"
+          id="openCognitiveTasksVideo"
+          type="button"
+        >
+          <div class="career-card-icon">🎥</div>
+
+          <div class="career-card-content">
+            <h3>فیلم آموزش استفاده از سامانه تکالیف شناختی</h3>
+            <p>
+              مشاهده راهنمای ویدئویی نحوه استفاده از سامانه
+            </p>
+          </div>
+
+          <div class="career-card-arrow">←</div>
+        </button>
+
+      </div>
+
+      <button
+        class="career-back-button"
+        data-page="home"
+        type="button"
+        style="margin-top: 24px; width: 100%;"
+      >
+        ← بازگشت به داشبورد
+      </button>
+    </section>
+    `,
+    "cognitive-tasks",
+  );
+
+  document
+    .getElementById("openCognitiveTasksSystem")
+    ?.addEventListener("click", () => {
+      // سامانه تکالیف شناختی برای همه کاربران مجاز است.
+      window.location.href = "/assessments/Tasks-Cognitive.html";
+    });
+
+  document
+    .getElementById("openCognitiveTasksVideo")
+    ?.addEventListener("click", () => {
+      cognitiveTasksGuidanceVideo();
+    });
+}
+
+function cognitiveTasksGuidanceVideo() {
+  shell(
+    `
+    <section class="dashboard-section">
+      <div class="dashboard-section-header">
+        <div>
+          <span class="section-eyebrow">راهنمای استفاده</span>
+          <h2>فیلم آموزش استفاده از سامانه تکالیف شناختی</h2>
+          <p>
+            در این ویدئو با نحوه استفاده از سامانه تکالیف شناختی آشنا می‌شوید.
+          </p>
+        </div>
+      </div>
+
+      <div class="career-video-container">
+        <div class="career-video-box">
+          <video
+            controls
+            playsinline
+            preload="metadata"
+            style="width: 100%; max-width: 100%; border-radius: 16px;"
+          >
+            <source
+              src="/assessments/videos/cognitive-tasks-tutorial.mp4"
+              type="video/mp4"
+            />
+            مرورگر شما از پخش ویدئو پشتیبانی نمی‌کند.
+          </video>
+        </div>
+      </div>
+
+      <button
+        class="career-back-button"
+        id="backToCognitiveTasksGuidance"
+        type="button"
+      >
+        ← بازگشت به تکالیف شناختی
+      </button>
+    </section>
+    `,
+    "cognitive-tasks",
+  );
+
+  document
+    .getElementById("backToCognitiveTasksGuidance")
+    ?.addEventListener("click", () => {
+      cognitiveTasksGuidance();
     });
 }
 async function logout() {

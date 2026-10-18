@@ -1,0 +1,4920 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
+    />
+    <title>غربالگری و ارزیابی عملکرد و مشکلات ریاضی</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js/dist/html-docx.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+        font-family: Tahoma, Arial, sans-serif;
+      }
+      body {
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 15px;
+        min-height: 100vh;
+      }
+
+      .main-layout {
+        display: flex;
+        gap: 15px;
+        max-width: 1300px;
+        margin: 0 auto;
+        align-items: flex-start;
+      }
+      .content-area {
+        flex: 1;
+        min-width: 0;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        padding: 20px;
+      }
+      .sidebar {
+        order: -1;
+        width: 260px;
+        flex-shrink: 0;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+        padding: 15px;
+        position: sticky;
+        top: 15px;
+        max-height: calc(100vh - 30px);
+        overflow-y: auto;
+      }
+
+      h1 {
+        text-align: center;
+        color: #2c3e50;
+        font-size: 1.4em;
+        margin: 0 0 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #27ae60;
+      }
+      h2 {
+        color: #2980b9;
+        font-size: 1.05em;
+        margin: 15px 0 10px;
+        padding-right: 8px;
+        border-right: 4px solid #3498db;
+      }
+
+      .form-container {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 2px solid #2980b9;
+      }
+      .form-container h3 {
+        margin: 0 0 12px;
+        text-align: center;
+        color: #2980b9;
+        font-size: 1em;
+        border-bottom: 1px solid #2980b9;
+        padding-bottom: 8px;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 3px;
+        font-weight: bold;
+        color: #2c3e50;
+        font-size: 0.8em;
+      }
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 7px;
+        border: 2px solid #bdc3c7;
+        border-radius: 6px;
+        font-size: 0.85em;
+        font-family: inherit;
+        background: #fff;
+      }
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #2980b9;
+      }
+      .form-actions {
+        text-align: center;
+        margin-top: 12px;
+      }
+      .btn-primary {
+        padding: 8px 20px;
+        background: #2980b9;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.9em;
+        font-weight: bold;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background 0.2s;
+      }
+      .btn-primary:hover {
+        background: #1a5276;
+      }
+
+      .sidebar h3 {
+        color: #2c3e50;
+        font-size: 1em;
+        margin: 0 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #27ae60;
+        text-align: center;
+      }
+      .sidebar-tests {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 15px;
+      }
+      .sidebar-test-btn {
+        padding: 8px 10px;
+        border: none;
+        border-radius: 6px;
+        background: linear-gradient(135deg, #3498db, #2980b9);
+        color: #fff;
+        cursor: pointer;
+        font-family: inherit;
+        text-align: right;
+        font-size: 0.8em;
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 5px;
+      }
+      .sidebar-test-btn:hover:not(:disabled) {
+        transform: translateX(-3px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+      }
+      .sidebar-test-btn.completed {
+        background: linear-gradient(135deg, #27ae60, #1e8449);
+      }
+      .sidebar-test-btn .check-icon {
+        font-size: 0.9em;
+      }
+
+      .sidebar-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #ecf0f1;
+      }
+      .btn-sidebar {
+        padding: 8px 10px;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.85em;
+        font-weight: bold;
+        cursor: pointer;
+        font-family: inherit;
+        transition: background 0.2s;
+      }
+      .btn-excel-sidebar {
+        background: #27ae60;
+        color: #fff;
+      }
+      .btn-excel-sidebar:hover {
+        background: #219150;
+      }
+      .btn-pdf-sidebar {
+        background: #2b579a;
+        color: #fff;
+      }
+      .btn-pdf-sidebar:hover {
+        background: #1e3f70;
+      }
+      .btn-reset-sidebar {
+        background: #7f8c8d;
+        color: #fff;
+      }
+      .btn-reset-sidebar:hover {
+        background: #5d6d7e;
+      }
+      .btn-excel-sidebar:disabled,
+      .btn-pdf-sidebar:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+
+      .test-display-area {
+        background: #fafbfc;
+        border: 2px dashed #bdc3c7;
+        border-radius: 10px;
+        padding: 40px 20px;
+        text-align: center;
+        min-height: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        color: #7f8c8d;
+      }
+      .test-display-area.active {
+        border-style: solid;
+        border-color: #2980b9;
+        background: #fff;
+        padding: 20px;
+        display: block;
+      }
+      .test-display-area h3 {
+        color: #2980b9;
+        margin: 0 0 10px;
+      }
+      .test-display-area p {
+        margin: 5px 0;
+        font-size: 0.9em;
+      }
+
+      .question-card {
+        background: #fafbfc;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 15px;
+        text-align: center;
+      }
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        background: #e0e0e0;
+        border-radius: 4px;
+        margin-bottom: 12px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        background: #27ae60;
+        width: 0%;
+        transition: width 0.3s;
+      }
+      .progress-text {
+        text-align: center;
+        font-size: 0.85em;
+        color: #555;
+        margin-bottom: 12px;
+      }
+
+      .btn-choice {
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: inherit;
+        background: #27ae60;
+        color: #fff;
+        min-width: 100px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      }
+      .btn-choice:hover:not(:disabled) {
+        background: #219150;
+        transform: translateY(-2px);
+      }
+      .btn-choice:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .number-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        width: 90px;
+        height: 65px;
+        border: 3px solid #2980b9;
+        border-radius: 10px;
+        background: #fff;
+        font-size: 1.6em;
+        font-weight: bold;
+        color: #2c3e50;
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+      }
+      .number-btn:hover {
+        background: #d4e6f1;
+        transform: scale(1.05);
+      }
+      .number-btn.selected-correct {
+        background: #27ae60;
+        color: #fff;
+        border-color: #1e8449;
+      }
+      .number-btn.selected-wrong {
+        background: #e74c3c;
+        color: #fff;
+        border-color: #c0392b;
+      }
+      .number-btn.disabled {
+        pointer-events: none;
+        opacity: 0.7;
+      }
+      .spatial-box {
+        width: 90px;
+        height: 90px;
+        border: 4px solid #7f8c8d;
+        border-radius: 10px;
+        background: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #d5d8dc;
+        cursor: pointer;
+        transition:
+          background 0.15s,
+          transform 0.15s,
+          border-color 0.15s;
+        user-select: none;
+        position: relative;
+      }
+      .spatial-box.active {
+        background: #e74c3c;
+        border-color: #c0392b;
+        transform: scale(1.08);
+        box-shadow: 0 0 20px rgba(231, 76, 60, 0.6);
+      }
+      .spatial-box.clickable:hover {
+        border-color: #2980b9;
+        transform: scale(1.05);
+      }
+      .spatial-mask {
+        width: 100%;
+        min-height: 180px;
+        background: #2c3e50;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #fff;
+        font-size: 2.5em;
+        margin: 15px 0;
+      }
+      .practice-badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 15px;
+        font-size: 0.8em;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .practice-badge.practice {
+        background: #f39c12;
+        color: #fff;
+      }
+      .practice-badge.main {
+        background: #27ae60;
+        color: #fff;
+      }
+
+      .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        font-size: 0.85em;
+      }
+      .results-table th {
+        background: #2980b9;
+        color: #fff;
+        padding: 8px 6px;
+        font-size: 0.85em;
+        text-align: center;
+      }
+      .results-table td {
+        padding: 8px 6px;
+        text-align: center;
+        border-bottom: 1px solid #e0e0e0;
+      }
+      .results-table tr:nth-child(even) {
+        background: #f9f9f9;
+      }
+
+      .profiles-panel {
+        display: none;
+        background: #f8fbff;
+        border: 2px solid #8ab6d6;
+        border-radius: 10px;
+        padding: 16px;
+        margin-top: 20px;
+      }
+      .profiles-panel h2 {
+        margin-top: 0;
+      }
+      .profile-card {
+        background: #fff;
+        border: 1px solid #d6e4ef;
+        border-right: 5px solid #2980b9;
+        border-radius: 8px;
+        padding: 12px;
+        margin: 10px 0;
+      }
+      .profile-card.match {
+        border-right-color: #27ae60;
+      }
+      .profile-card.pending {
+        border-right-color: #f39c12;
+      }
+      .profile-status {
+        font-weight: bold;
+        color: #1e8449;
+      }
+      .profile-status.pending {
+        color: #9a6700;
+      }
+      .profile-note {
+        font-size: 0.85em;
+        color: #566573;
+        line-height: 1.8;
+      }
+      .sidebar-feature-btn {
+        width: 100%;
+        padding: 10px;
+        border: 0;
+        border-radius: 7px;
+        cursor: pointer;
+        font:
+          bold 0.9em Tahoma,
+          Arial,
+          sans-serif;
+        margin-top: 7px;
+        color: #fff;
+      }
+      #showProfilesBtn {
+        background: #6c5ce7;
+      }
+      #showTasksBtn {
+        background: #0f9b8e;
+      }
+      .profile-chart-wrap {
+        background: #fff;
+        border: 1px solid #d6e4ef;
+        border-radius: 8px;
+        padding: 10px;
+        margin: 12px 0;
+        overflow-x: auto;
+      }
+      #profileChart {
+        display: block;
+        width: 100%;
+        max-width: 900px;
+        height: auto;
+        margin: 0 auto;
+      }
+      .tasks-panel {
+        display: none;
+        margin-top: 20px;
+        padding: 16px;
+        border: 2px solid #8fd5c9;
+        border-radius: 10px;
+        background: #f7fffd;
+      }
+      .tasks-table-wrap {
+        overflow-x: auto;
+      }
+      .tasks-table {
+        width: 100%;
+        min-width: 900px;
+        border-collapse: collapse;
+        background: #fff;
+        font-size: 0.86em;
+        line-height: 1.8;
+      }
+      .tasks-table th {
+        background: #087f8c;
+        color: #fff;
+        padding: 10px;
+      }
+      .tasks-table td {
+        border: 1px solid #d8e4e4;
+        padding: 10px;
+        vertical-align: top;
+      }
+      .tasks-table tr:nth-child(even) {
+        background: #f3fbfa;
+      }
+      .evidence-note {
+        font-size: 0.85em;
+        line-height: 1.8;
+        color: #4b5963;
+      }
+
+      .fullscreen-exam {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: #f0f2f5;
+        z-index: 9999;
+        overflow-y: auto;
+        padding: 20px;
+        display: none;
+      }
+      .fullscreen-exam.active {
+        display: block;
+      }
+      .fullscreen-inner {
+        max-width: 1000px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+      }
+      .fullscreen-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 12px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .fullscreen-header h2 {
+        margin: 0;
+        border-right: none;
+        background: none;
+        padding: 0;
+      }
+      .btn-exit {
+        padding: 6px 15px;
+        background: #e74c3c;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.9em;
+        font-weight: bold;
+        cursor: pointer;
+        font-family: inherit;
+      }
+
+      .test-instructions {
+        background: #f0f8ff;
+        border: 2px solid #2980b9;
+        border-radius: 12px;
+        padding: 25px;
+        margin: 15px 0;
+      }
+      .test-instructions h3 {
+        color: #2980b9;
+        margin-top: 0;
+        text-align: center;
+        font-size: 1.2em;
+      }
+      .test-instructions .inst-section {
+        background: #fff;
+        border-radius: 8px;
+        padding: 14px;
+        margin: 10px 0;
+        border: 1px solid #d6e4ef;
+      }
+      .test-instructions .inst-section h4 {
+        margin: 0 0 6px;
+        color: #1a5276;
+        font-size: 0.95em;
+      }
+      .test-instructions .inst-section p {
+        margin: 0;
+        font-size: 0.9em;
+        line-height: 1.9;
+        color: #34495e;
+      }
+      .test-instructions .inst-hint {
+        background: #fff8e1;
+        border: 1px solid #f1c40f;
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 0.87em;
+        color: #7d5a00;
+        margin-top: 10px;
+      }
+      .btn-start-test {
+        display: block;
+        margin: 20px auto 0;
+        padding: 12px 40px;
+        background: linear-gradient(135deg, #27ae60, #1e8449);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1em;
+        font-weight: bold;
+        cursor: pointer;
+        font-family: inherit;
+        box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+      }
+      .btn-start-test:hover {
+        transform: translateY(-2px);
+      }
+
+      .exclusion-checklist {
+        background: #fff5f5;
+        border: 2px solid #e74c3c;
+        border-radius: 10px;
+        padding: 14px;
+        margin-top: 8px;
+      }
+      .exclusion-checklist h3 {
+        color: #c0392b;
+        margin: 0 0 10px;
+        font-size: 1em;
+      }
+      .exclusion-checklist label {
+        display: block;
+        padding: 6px 0;
+        font-size: 0.88em;
+        color: #4b2020;
+      }
+      .exclusion-checklist input[type="checkbox"] {
+        margin-left: 6px;
+      }
+      .exclusion-warning {
+        display: none;
+        margin-top: 10px;
+        padding: 10px;
+        background: #fdecea;
+        border: 1px solid #e74c3c;
+        border-radius: 6px;
+        color: #922b21;
+        font-size: 0.85em;
+      }
+      .exclusion-warning.visible {
+        display: block;
+      }
+
+      @media (max-width: 800px) {
+        .main-layout {
+          flex-direction: column;
+        }
+        .sidebar {
+          width: 100%;
+          position: static;
+          max-height: none;
+        }
+        .sidebar-tests {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        }
+      }
+
+      /* =========================================
+   طراحی مدرن رابط کاربری روانیار ریاضی
+   فقط تغییرات ظاهری؛ بدون تغییر منطق آزمون
+========================================= */
+
+      :root {
+        --ui-primary: #5267e8;
+        --ui-primary-dark: #3e4fca;
+        --ui-primary-light: #eef1ff;
+        --ui-purple: #8065e8;
+        --ui-success: #16a780;
+        --ui-danger: #e45770;
+        --ui-warning: #d99a31;
+
+        --ui-text: #25304a;
+        --ui-muted: #778198;
+        --ui-border: #e7eaf2;
+        --ui-surface: #ffffff;
+        --ui-background: #f5f7fc;
+
+        --ui-radius: 18px;
+        --ui-radius-small: 12px;
+
+        --ui-shadow: 0 5px 22px rgba(38, 53, 98, 0.055);
+
+        --ui-shadow-hover: 0 14px 32px rgba(53, 69, 140, 0.12);
+
+        --ui-transition: 0.25s ease;
+      }
+
+      /* فونت سراسری */
+      *,
+      *::before,
+      *::after {
+        font-family: "Vazirmatn", Tahoma, sans-serif;
+      }
+
+      body {
+        background:
+          radial-gradient(
+            ellipse at 8% 5%,
+            rgba(128, 101, 232, 0.08),
+            transparent 34%
+          ),
+          radial-gradient(
+            ellipse at 92% 25%,
+            rgba(82, 103, 232, 0.07),
+            transparent 32%
+          ),
+          var(--ui-background);
+
+        color: var(--ui-text);
+        padding: 24px;
+        line-height: 1.8;
+      }
+
+      /* چینش اصلی */
+      .main-layout {
+        max-width: 1500px;
+        gap: 22px;
+        align-items: flex-start;
+      }
+
+      /* کارت محتوای اصلی */
+      .content-area {
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid rgba(231, 234, 242, 0.9);
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: var(--ui-shadow);
+        min-width: 0;
+      }
+
+      /* عنوان اصلی */
+      h1 {
+        color: var(--ui-text);
+        font-size: clamp(1.2rem, 2vw, 1.75rem);
+        font-weight: 800;
+        line-height: 1.9;
+        padding-bottom: 18px;
+        margin-bottom: 24px;
+        border-bottom: 0;
+        position: relative;
+      }
+
+      h1::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 100px;
+        height: 4px;
+        border-radius: 10px;
+        background: linear-gradient(90deg, var(--ui-primary), var(--ui-purple));
+      }
+
+      /* عنوان بخش‌ها */
+      h2 {
+        color: var(--ui-primary-dark);
+        font-size: 1.15rem;
+        font-weight: 800;
+        padding-right: 12px;
+        border-right: 4px solid var(--ui-primary);
+        margin: 25px 0 16px;
+        line-height: 1.9;
+      }
+
+      h3 {
+        line-height: 1.9;
+      }
+
+      /* پنل کناری */
+      .sidebar {
+        background: rgba(255, 255, 255, 0.97);
+        border: 1px solid var(--ui-border);
+        border-radius: 22px;
+        box-shadow: var(--ui-shadow);
+        padding: 20px;
+        top: 20px;
+        max-height: calc(100vh - 40px);
+        scrollbar-width: thin;
+        scrollbar-color: #c8cfee transparent;
+      }
+
+      .sidebar h3 {
+        color: var(--ui-text);
+        font-size: 1.1rem;
+        font-weight: 800;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--ui-border);
+      }
+
+      /* کارت مشخصات آزمودنی */
+      .form-container {
+        background: linear-gradient(145deg, #ffffff, #f8f9ff);
+        border: 1px solid #e2e6ff;
+        border-radius: var(--ui-radius);
+        padding: 22px;
+        margin-bottom: 24px;
+        box-shadow: 0 4px 18px rgba(82, 103, 232, 0.045);
+        transition:
+          box-shadow var(--ui-transition),
+          border-color var(--ui-transition);
+      }
+
+      .form-container:hover {
+        border-color: #cbd2ff;
+        box-shadow: var(--ui-shadow-hover);
+      }
+
+      .form-container h3 {
+        color: var(--ui-primary-dark);
+        font-size: 1.05rem;
+        font-weight: 800;
+        border-bottom: 1px solid var(--ui-border);
+        padding-bottom: 14px;
+        margin-bottom: 18px;
+      }
+
+      .form-grid {
+        gap: 16px;
+      }
+
+      .form-group label {
+        color: #46516b;
+        font-size: 0.87rem;
+        font-weight: 700;
+        margin-bottom: 7px;
+      }
+
+      /* ورودی‌های فرم */
+      .form-group input,
+      .form-group select {
+        min-height: 44px;
+        padding: 10px 12px;
+        background: #fff;
+        border: 1px solid #dfe4ef;
+        border-radius: var(--ui-radius-small);
+        color: var(--ui-text);
+        font-size: 0.9rem;
+        transition:
+          border-color var(--ui-transition),
+          box-shadow var(--ui-transition),
+          background var(--ui-transition);
+      }
+
+      .form-group input:hover,
+      .form-group select:hover {
+        border-color: #b7c2f4;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: var(--ui-primary);
+        background: #fff;
+        box-shadow: 0 0 0 4px rgba(82, 103, 232, 0.12);
+      }
+
+      .form-group input::placeholder {
+        color: #a2aabe;
+      }
+
+      /* استایل مشترک دکمه‌ها */
+      .btn-primary,
+      .btn-sidebar,
+      .sidebar-test-btn,
+      .sidebar-feature-btn,
+      .btn-choice,
+      .btn-exit,
+      .btn-start-test {
+        font-family: "Vazirmatn", Tahoma, sans-serif;
+        font-weight: 700;
+        border: 0;
+        border-radius: 12px;
+        transition:
+          background var(--ui-transition),
+          color var(--ui-transition),
+          transform var(--ui-transition),
+          box-shadow var(--ui-transition),
+          border-color var(--ui-transition);
+      }
+
+      .btn-primary,
+      .btn-sidebar,
+      .sidebar-feature-btn,
+      .btn-choice,
+      .btn-start-test,
+      .btn-exit {
+        cursor: pointer;
+      }
+
+      /* دکمه ذخیره */
+      .btn-primary {
+        padding: 11px 24px;
+        background: linear-gradient(
+          135deg,
+          var(--ui-primary),
+          var(--ui-purple)
+        );
+        color: #fff;
+        box-shadow: 0 5px 14px rgba(82, 103, 232, 0.2);
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, var(--ui-primary-dark), #7053d7);
+        transform: translateY(-2px);
+        box-shadow: 0 9px 20px rgba(82, 103, 232, 0.26);
+      }
+
+      .btn-primary:active,
+      .btn-sidebar:active,
+      .sidebar-feature-btn:active,
+      .btn-choice:active {
+        transform: scale(0.98);
+      }
+
+      /* فهرست آزمون‌ها */
+      .sidebar-tests {
+        gap: 9px;
+      }
+
+      .sidebar-test-btn {
+        position: relative;
+        padding: 12px 13px;
+        min-height: 46px;
+        border: 1px solid #e5e9ff;
+        background: linear-gradient(135deg, #f5f6ff, #edf0ff);
+        color: #4555ba;
+        text-align: right;
+        font-size: 0.84rem;
+        line-height: 1.8;
+        box-shadow: 0 2px 7px rgba(53, 69, 140, 0.035);
+      }
+
+      .sidebar-test-btn:hover:not(:disabled) {
+        transform: translateX(-3px);
+        background: linear-gradient(135deg, #e9edff, #dfe5ff);
+        border-color: #c8d0ff;
+        box-shadow: 0 7px 15px rgba(82, 103, 232, 0.12);
+      }
+
+      .sidebar-test-btn.completed {
+        background: linear-gradient(135deg, #e5f8f1, #d5f3e7);
+        border-color: #b8ead7;
+        color: #087e60;
+      }
+
+      .sidebar-test-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      /* دکمه‌های قابلیت‌های کناری */
+      .sidebar-feature-btn {
+        min-height: 45px;
+        padding: 10px 12px;
+        margin-top: 9px;
+        box-shadow: 0 3px 8px rgba(30, 40, 80, 0.07);
+      }
+
+      .sidebar-feature-btn:hover {
+        filter: brightness(0.95);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(30, 40, 80, 0.13);
+      }
+
+      #showProfilesBtn {
+        background: linear-gradient(135deg, #7964e8, #6351cf);
+      }
+
+      #showTasksBtn {
+        background: linear-gradient(135deg, #16ad9d, #0a8c81);
+      }
+
+      /* دکمه‌های خروجی و شروع مجدد */
+      .sidebar-actions {
+        gap: 10px;
+        margin-top: 20px;
+        padding-top: 18px;
+        border-top: 1px solid var(--ui-border);
+      }
+
+      .btn-sidebar {
+        padding: 11px 12px;
+        min-height: 44px;
+        font-size: 0.88rem;
+        box-shadow: 0 3px 9px rgba(30, 40, 80, 0.06);
+      }
+
+      .btn-sidebar:hover:not(:disabled) {
+        transform: translateY(-2px);
+        filter: brightness(0.95);
+        box-shadow: 0 8px 15px rgba(30, 40, 80, 0.12);
+      }
+
+      .btn-excel-sidebar {
+        background: linear-gradient(135deg, #17b486, #0d936c);
+      }
+
+      .btn-pdf-sidebar {
+        background: linear-gradient(135deg, #526fe2, #3c54b8);
+      }
+
+      .btn-reset-sidebar {
+        background: linear-gradient(135deg, #8993a8, #69758b);
+      }
+
+      .btn-sidebar:disabled {
+        opacity: 0.4;
+        box-shadow: none;
+        cursor: not-allowed;
+      }
+
+      /* محیط انتظار و نمایش آزمون */
+      .test-display-area {
+        min-height: 300px;
+        padding: 40px 24px;
+        border: 2px dashed #d5dcf0;
+        border-radius: var(--ui-radius);
+        background: linear-gradient(145deg, #fafbff, #f5f7ff);
+        color: var(--ui-muted);
+      }
+
+      .test-display-area h3 {
+        color: var(--ui-primary-dark);
+        font-weight: 800;
+        font-size: 1.1rem;
+      }
+
+      .test-display-area p {
+        line-height: 2;
+        max-width: 680px;
+      }
+
+      .test-display-area.active {
+        background: #fff;
+        border: 1px solid #dce2f5;
+        box-shadow: var(--ui-shadow);
+        padding: 22px;
+      }
+
+      /* کارت سؤال */
+      .question-card {
+        background: linear-gradient(145deg, #fff, #fafbff);
+        border: 1px solid var(--ui-border);
+        border-radius: 20px;
+        padding: 24px;
+        margin-bottom: 18px;
+        box-shadow: 0 5px 18px rgba(35, 50, 90, 0.045);
+      }
+
+      .question-card h3 {
+        color: var(--ui-text);
+        font-weight: 700;
+      }
+
+      /* نوار پیشرفت */
+      .progress-bar {
+        height: 10px;
+        background: #e9edf7;
+        border-radius: 99px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        background: linear-gradient(90deg, #16b68b, #36c9a4);
+        border-radius: 99px;
+        transition: width 0.35s ease;
+      }
+
+      .progress-text {
+        color: var(--ui-muted);
+        font-weight: 600;
+        line-height: 1.9;
+      }
+
+      /* دکمه‌های پاسخ */
+      .btn-choice {
+        min-height: 48px;
+        padding: 12px 28px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #19b487, #10956f);
+        box-shadow: 0 5px 12px rgba(16, 149, 111, 0.15);
+      }
+
+      .btn-choice:hover:not(:disabled) {
+        background: linear-gradient(135deg, #13a77b, #087c5d);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(16, 149, 111, 0.2);
+      }
+
+      .btn-choice:disabled {
+        opacity: 0.45;
+        box-shadow: none;
+        cursor: not-allowed;
+      }
+
+      /* دکمه‌های انتخاب عدد */
+      .number-btn {
+        border: 2px solid #d7defb;
+        border-radius: 15px;
+        background: #fff;
+        color: #39476b;
+        box-shadow: 0 3px 9px rgba(53, 69, 140, 0.06);
+        transition: all 0.2s ease;
+      }
+
+      .number-btn:hover:not(.disabled) {
+        background: #edf0ff;
+        border-color: var(--ui-primary);
+        color: var(--ui-primary-dark);
+        transform: translateY(-3px);
+        box-shadow: 0 8px 17px rgba(82, 103, 232, 0.14);
+      }
+
+      .number-btn.selected-correct {
+        background: #19ad80;
+        border-color: #0d9168;
+        color: #fff;
+      }
+
+      .number-btn.selected-wrong {
+        background: #e45770;
+        border-color: #d63b57;
+        color: #fff;
+      }
+
+      /* خانه‌های آزمون فضایی */
+      .spatial-box {
+        border-radius: 15px;
+        border-width: 3px;
+        border-color: #d0d7e7;
+        background: linear-gradient(145deg, #fff, #f5f7fc);
+        box-shadow: 0 3px 10px rgba(35, 50, 90, 0.05);
+      }
+
+      .spatial-box.clickable:hover {
+        border-color: var(--ui-primary);
+        background: #edf0ff;
+        transform: scale(1.04);
+      }
+
+      .spatial-box.active {
+        background: #e45770;
+        border-color: #cf3654;
+        box-shadow: 0 0 20px rgba(228, 87, 112, 0.24);
+      }
+
+      /* صفحه تمام‌صفحه آزمون */
+      .fullscreen-exam {
+        background: rgba(241, 244, 251, 0.98);
+        backdrop-filter: blur(10px);
+        padding: 24px;
+      }
+
+      .fullscreen-inner {
+        max-width: 1050px;
+        border: 1px solid #e5e9f3;
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: 0 20px 65px rgba(30, 43, 82, 0.13);
+      }
+
+      .fullscreen-header {
+        border-bottom: 1px solid var(--ui-border);
+        padding-bottom: 16px;
+        margin-bottom: 20px;
+      }
+
+      .fullscreen-header h2 {
+        color: var(--ui-text);
+        font-weight: 800;
+      }
+
+      .btn-exit {
+        padding: 9px 17px;
+        background: linear-gradient(135deg, #e85c70, #d94159);
+        box-shadow: 0 4px 12px rgba(217, 65, 89, 0.15);
+      }
+
+      .btn-exit:hover {
+        background: #c92f49;
+        transform: translateY(-2px);
+      }
+
+      /* راهنمای آزمون */
+      .test-instructions {
+        background: linear-gradient(145deg, #f2f5ff, #fafbff);
+        border: 1px solid #dce3ff;
+        border-radius: 20px;
+        padding: 22px;
+      }
+
+      .test-instructions h3 {
+        color: var(--ui-primary-dark);
+        font-weight: 800;
+      }
+
+      .test-instructions .inst-section {
+        border: 1px solid #e5e9f5;
+        border-radius: 14px;
+        padding: 16px;
+        margin: 12px 0;
+        box-shadow: 0 3px 10px rgba(35, 50, 90, 0.025);
+      }
+
+      .test-instructions .inst-section h4 {
+        color: #4555ba;
+        font-weight: 800;
+      }
+
+      .test-instructions .inst-section p {
+        line-height: 2;
+      }
+
+      .test-instructions .inst-hint {
+        border-radius: 12px;
+        line-height: 1.9;
+      }
+
+      /* شروع آزمون */
+      .btn-start-test {
+        min-height: 50px;
+        padding: 12px 34px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #18b487, #0b916c);
+        box-shadow: 0 7px 18px rgba(16, 149, 111, 0.2);
+      }
+
+      .btn-start-test:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 25px rgba(16, 149, 111, 0.24);
+      }
+
+      /* جداول نتایج */
+      .results-table,
+      .tasks-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        border: 1px solid var(--ui-border);
+        border-radius: 14px;
+        overflow: hidden;
+        background: #fff;
+        line-height: 1.9;
+      }
+
+      .results-table th,
+      .tasks-table th {
+        background: linear-gradient(135deg, #5368dc, #6857c8);
+        color: #fff;
+        font-weight: 700;
+        line-height: 1.9;
+        padding: 12px 10px;
+      }
+
+      .results-table td,
+      .tasks-table td {
+        padding: 11px 10px;
+        border-bottom: 1px solid #edf0f6;
+        line-height: 1.9;
+      }
+
+      .results-table tbody tr,
+      .tasks-table tbody tr {
+        transition: background var(--ui-transition);
+      }
+
+      .results-table tbody tr:hover,
+      .tasks-table tbody tr:hover {
+        background: #f3f5ff;
+      }
+
+      .results-table tr:nth-child(even) {
+        background: #fafbff;
+      }
+
+      /* پروفایل‌های شناختی */
+      .profiles-panel {
+        background: linear-gradient(145deg, #f7f9ff, #fff);
+        border: 1px solid #dce4fa;
+        border-radius: 20px;
+        padding: 20px;
+      }
+
+      .profile-card {
+        border: 1px solid #e1e7f3;
+        border-right: 5px solid var(--ui-primary);
+        border-radius: 15px;
+        padding: 16px;
+        margin: 12px 0;
+        box-shadow: 0 4px 12px rgba(35, 50, 90, 0.04);
+        transition:
+          transform var(--ui-transition),
+          box-shadow var(--ui-transition);
+      }
+
+      .profile-card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--ui-shadow-hover);
+      }
+
+      .profile-card.match {
+        border-right-color: var(--ui-success);
+      }
+
+      .profile-card.pending {
+        border-right-color: var(--ui-warning);
+      }
+
+      .profile-chart-wrap {
+        border: 1px solid var(--ui-border);
+        border-radius: 16px;
+        padding: 16px;
+      }
+
+      /* پنل تکالیف */
+      .tasks-panel {
+        background: #f7fffc;
+        border: 1px solid #cceee5;
+        border-radius: 20px;
+        padding: 20px;
+      }
+
+      .tasks-table-wrap {
+        overflow-x: auto;
+        border-radius: 12px;
+      }
+
+      /* چک‌لیست و هشدارها */
+      .exclusion-checklist {
+        border: 1px solid #f2c8cf;
+        border-radius: 15px;
+        background: #fff8f9;
+        padding: 15px;
+      }
+
+      .exclusion-checklist label {
+        line-height: 2;
+      }
+
+      .exclusion-warning {
+        border-radius: 12px;
+        line-height: 1.9;
+      }
+
+      .evidence-note {
+        line-height: 2;
+        color: #626e84;
+      }
+
+      /* اسکرول نرم */
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 20px;
+      }
+
+      /* دسترس‌پذیری: نمایش واضح فوکوس صفحه‌کلید */
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible {
+        outline: 3px solid rgba(82, 103, 232, 0.35);
+        outline-offset: 3px;
+      }
+
+      /* واکنش‌گرایی */
+      @media (max-width: 800px) {
+        body {
+          padding: 12px;
+        }
+
+        .main-layout {
+          gap: 14px;
+        }
+
+        .content-area {
+          padding: 18px;
+          border-radius: 18px;
+        }
+
+        .sidebar {
+          padding: 16px;
+          border-radius: 18px;
+        }
+
+        .form-container {
+          padding: 16px;
+        }
+
+        .fullscreen-exam {
+          padding: 10px;
+        }
+
+        .fullscreen-inner {
+          padding: 16px;
+          border-radius: 18px;
+        }
+
+        .question-card {
+          padding: 16px;
+        }
+
+        .number-btn {
+          max-width: 100%;
+        }
+      }
+
+      @media (max-width: 480px) {
+        body {
+          padding: 8px;
+        }
+
+        .content-area {
+          padding: 13px;
+        }
+
+        h1 {
+          font-size: 1.12rem;
+        }
+
+        h2 {
+          font-size: 1rem;
+        }
+
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .btn-primary,
+        .btn-choice,
+        .btn-start-test {
+          max-width: 100%;
+        }
+
+        .fullscreen-header {
+          align-items: flex-start;
+        }
+      }
+
+      /* احترام به تنظیم کاهش حرکت دستگاه */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+
+      /* =========================================
+   پنل حرفه‌ای آزمون‌ها
+========================================= */
+
+      .sidebar {
+        background: linear-gradient(165deg, #ffffff 0%, #f7f7ff 100%);
+        border: 1px solid #e6e6f2;
+        border-radius: 22px;
+        padding: 20px;
+        box-shadow: 0 12px 36px rgba(39, 42, 90, 0.07);
+      }
+
+      .sidebar h3 {
+        text-align: right;
+        border-bottom: 0;
+        padding: 0 0 14px;
+        margin-bottom: 16px;
+        font-size: 1.05rem;
+        color: #24264b;
+      }
+
+      .sidebar-tests {
+        gap: 10px;
+      }
+
+      .sidebar-test-btn {
+        position: relative;
+        overflow: hidden;
+        min-height: 62px;
+        padding: 13px 14px;
+        border: 1px solid #e6e8f4;
+        border-radius: 15px;
+        background: #fff;
+        color: #34365d;
+        font-family: inherit;
+        font-size: 0.88rem;
+        font-weight: 600;
+        text-align: right;
+        box-shadow: 0 3px 10px rgba(38, 40, 82, 0.035);
+        transition:
+          transform 0.22s ease,
+          box-shadow 0.22s ease,
+          border-color 0.22s ease,
+          background 0.22s ease;
+      }
+
+      .sidebar-test-btn::before {
+        content: "";
+        position: absolute;
+        right: 0;
+        top: 10px;
+        bottom: 10px;
+        width: 3px;
+        border-radius: 5px;
+        background: #8b83ef;
+        opacity: 0.65;
+        transition: width 0.2s ease;
+      }
+
+      .sidebar-test-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        background: #f8f7ff;
+        border-color: #c9c5fb;
+        color: #5146b8;
+        box-shadow: 0 8px 20px rgba(94, 83, 190, 0.11);
+      }
+
+      .sidebar-test-btn:hover::before {
+        width: 5px;
+      }
+
+      .sidebar-test-btn.completed {
+        color: #176b52;
+        background: linear-gradient(135deg, #f1fcf7, #ffffff);
+        border-color: #bcebd7;
+      }
+
+      .sidebar-test-btn.completed::before {
+        background: #20a779;
+        opacity: 1;
+      }
+
+      .sidebar-test-btn .check-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 28px;
+        height: 28px;
+        border-radius: 9px;
+        background: #f0efff;
+        color: #6558cb;
+        font-size: 0.85rem;
+      }
+
+      .sidebar-test-btn.completed .check-icon {
+        background: #d9f7e9;
+      }
+
+      .sidebar-feature-btn {
+        border-radius: 12px;
+        min-height: 43px;
+        transition:
+          transform 0.2s ease,
+          filter 0.2s ease;
+      }
+
+      .sidebar-feature-btn:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.06);
+      }
+
+      .sidebar-actions {
+        border-top-color: #e9e8f5;
+      }
+
+      /* =========================================
+   بخش نتایج ارزیابی
+========================================= */
+
+      #resultsSection {
+        margin-top: 26px;
+        padding: 22px;
+        border: 1px solid #e5e7f3;
+        border-radius: 22px;
+        background: linear-gradient(145deg, #ffffff, #fafaff);
+        box-shadow: 0 10px 30px rgba(39, 42, 90, 0.055);
+        animation: assessmentFadeIn 0.35s ease both;
+      }
+
+      #resultsSection > h2 {
+        margin: 0 0 20px;
+        padding: 0;
+        border: 0;
+        color: #292b53;
+        font-size: 1.2rem;
+      }
+
+      .results-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        overflow: hidden;
+        border: 1px solid #e8e9f4;
+        border-radius: 15px;
+        background: #fff;
+        font-size: 0.88rem;
+      }
+
+      .results-table thead th {
+        padding: 15px 10px;
+        background: #33345f;
+        color: #fff;
+        font-size: 0.84rem;
+        font-weight: 600;
+        line-height: 1.8;
+        border: 0;
+      }
+
+      .results-table tbody td {
+        padding: 14px 10px;
+        color: #454761;
+        border-bottom: 1px solid #eeeef6;
+        line-height: 1.8;
+        transition: background 0.18s ease;
+      }
+
+      .results-table tbody tr:nth-child(even) {
+        background: #f9f9fe;
+      }
+
+      .results-table tbody tr:hover td {
+        background: #f0efff;
+      }
+
+      .results-table tbody tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .evidence-note {
+        padding: 13px 15px;
+        border: 1px solid #e7e5fb;
+        border-radius: 12px;
+        background: #f8f7ff;
+        color: #5a5d78;
+        line-height: 2;
+      }
+
+      .profile-card {
+        padding: 18px;
+        border: 1px solid #e5e7f4;
+        border-right: 4px solid #8175e8;
+        border-radius: 15px;
+        box-shadow: 0 5px 16px rgba(40, 42, 86, 0.045);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .profile-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 22px rgba(40, 42, 86, 0.08);
+      }
+
+      .profile-card.match {
+        border-right-color: #24a779;
+      }
+
+      .profile-card.pending {
+        border-right-color: #e6a23c;
+      }
+
+      @keyframes assessmentFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 700px) {
+        #resultsSection {
+          padding: 14px;
+          border-radius: 16px;
+        }
+
+        #resultsSection .tasks-table-wrap {
+          overflow-x: auto;
+        }
+
+        .results-table {
+          min-width: 680px;
+        }
+      }
+
+      /* =========================================
+   محیط اجرای آزمون و نمایش سؤال
+========================================= */
+
+      .fullscreen-exam {
+        padding: clamp(12px, 3vw, 32px);
+        background:
+          radial-gradient(ellipse at top right, #eeecff 0%, transparent 42%),
+          radial-gradient(ellipse at bottom left, #e7f7f4 0%, transparent 38%),
+          #f6f7fc;
+      }
+
+      .fullscreen-inner {
+        max-width: 1050px;
+        min-height: 80vh;
+        padding: clamp(16px, 3vw, 32px);
+        border: 1px solid rgba(224, 225, 242, 0.9);
+        border-radius: 25px;
+        box-shadow: 0 22px 65px rgba(38, 39, 82, 0.12);
+      }
+
+      .fullscreen-header {
+        padding-bottom: 20px;
+        margin-bottom: 22px;
+        border-bottom: 1px solid #e9e9f3;
+      }
+
+      .fullscreen-header h2 {
+        color: #292b53;
+        font-size: clamp(1rem, 2vw, 1.35rem);
+        line-height: 1.8;
+      }
+
+      .btn-exit {
+        padding: 10px 17px;
+        border-radius: 11px;
+        background: #fff1f1;
+        border: 1px solid #ffd7d7;
+        color: #bd4141;
+        transition:
+          background 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      .btn-exit:hover {
+        background: #ffe3e3;
+        transform: translateY(-1px);
+      }
+
+      .progress-bar {
+        height: 10px;
+        border-radius: 999px;
+        background: #eeedf7;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        border-radius: inherit;
+        background: linear-gradient(90deg, #8275ee, #5b9be8, #35b995);
+        box-shadow: 0 0 12px rgba(111, 100, 222, 0.2);
+        transition: width 0.35s ease;
+      }
+
+      .progress-text {
+        margin: 13px 0 24px;
+        color: #666985;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      /* کارت هر سؤال */
+      .question-card {
+        position: relative;
+        margin: 0 auto 20px;
+        padding: clamp(20px, 4vw, 36px);
+        max-width: 900px;
+        border: 1px solid #e5e6f2;
+        border-radius: 22px;
+        background: linear-gradient(155deg, #ffffff 0%, #fcfcff 100%);
+        box-shadow: 0 12px 32px rgba(43, 45, 89, 0.06);
+        text-align: center;
+        animation: questionCardEnter 0.3s ease both;
+      }
+
+      .question-card > p {
+        color: #646783;
+        line-height: 2;
+      }
+
+      .question-card h3 {
+        color: #282a50;
+        font-size: clamp(1.15rem, 2.5vw, 1.65rem);
+        line-height: 2;
+        margin: 18px 0;
+      }
+
+      .practice-badge {
+        padding: 6px 13px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        letter-spacing: 0;
+      }
+
+      .practice-badge.main {
+        background: #e9e7ff;
+        color: #5b50b7;
+      }
+
+      .practice-badge.practice {
+        background: #fff2d9;
+        color: #96620c;
+      }
+
+      /* گزینه‌های پاسخ */
+      .btn-choice {
+        min-height: 52px;
+        padding: 12px 24px;
+        border: 1px solid #dfe1f1;
+        border-radius: 14px;
+        background: #f8f8ff;
+        color: #33355d;
+        box-shadow: 0 4px 10px rgba(43, 45, 89, 0.045);
+        font-family: inherit;
+        font-size: 1rem;
+        font-weight: 600;
+        transition:
+          transform 0.2s ease,
+          border-color 0.2s ease,
+          background 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .btn-choice:hover:not(:disabled) {
+        transform: translateY(-3px);
+        border-color: #a9a0f4;
+        background: #f0eeff;
+        color: #5549b8;
+        box-shadow: 0 9px 20px rgba(91, 80, 183, 0.12);
+      }
+
+      .btn-choice:focus-visible,
+      .number-btn:focus-visible,
+      .subitizing-num-btn:focus-visible {
+        outline: 3px solid #aaa2f6;
+        outline-offset: 3px;
+      }
+
+      .btn-choice:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+
+      /* دکمه‌های عددی */
+      .number-btn {
+        border: 2px solid #dcdff0;
+        border-radius: 17px;
+        background: #fff;
+        color: #34365e;
+        box-shadow: 0 6px 18px rgba(43, 45, 89, 0.06);
+        transition:
+          transform 0.2s ease,
+          background 0.2s ease,
+          border-color 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .number-btn:hover {
+        background: #f0efff;
+        border-color: #9b91ef;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 22px rgba(91, 80, 183, 0.12);
+      }
+
+      .number-btn.selected-correct {
+        background: #dff8eb;
+        border-color: #35ae7f;
+        color: #176b52;
+      }
+
+      .number-btn.selected-wrong {
+        background: #ffebeb;
+        border-color: #e66b6b;
+        color: #a83232;
+      }
+
+      /* صفحه راهنمای آزمون */
+      .test-instructions {
+        padding: clamp(18px, 3vw, 30px);
+        border: 1px solid #dfdef7;
+        border-radius: 22px;
+        background: linear-gradient(145deg, #f8f7ff, #ffffff);
+      }
+
+      .test-instructions h3 {
+        color: #35345f;
+        line-height: 1.9;
+      }
+
+      .test-instructions .inst-section {
+        padding: 17px;
+        border: 1px solid #e8e7f4;
+        border-radius: 14px;
+        box-shadow: 0 4px 12px rgba(43, 45, 89, 0.035);
+      }
+
+      .test-instructions .inst-section h4 {
+        color: #5c51b7;
+        line-height: 1.9;
+      }
+
+      .test-instructions .inst-section p {
+        color: #575a76;
+        line-height: 2;
+      }
+
+      .test-instructions .inst-hint {
+        border: 1px solid #f2dfaa;
+        border-radius: 13px;
+        background: #fff9e9;
+        line-height: 1.9;
+      }
+
+      .btn-start-test {
+        min-height: 52px;
+        padding: 13px 32px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #6f63d8, #5146b8);
+        box-shadow: 0 9px 22px rgba(91, 80, 183, 0.2);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease;
+      }
+
+      .btn-start-test:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 13px 28px rgba(91, 80, 183, 0.26);
+      }
+
+      @keyframes questionCardEnter {
+        from {
+          opacity: 0;
+          transform: translateY(7px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .fullscreen-exam {
+          padding: 8px;
+        }
+
+        .fullscreen-inner {
+          min-height: calc(100vh - 16px);
+          padding: 14px;
+          border-radius: 17px;
+        }
+
+        .question-card {
+          border-radius: 17px;
+        }
+
+        .btn-choice {
+          width: 100%;
+        }
+
+        .number-btn {
+          width: 76px;
+          height: 60px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .question-card,
+        .sidebar-test-btn,
+        .btn-choice,
+        .number-btn,
+        .btn-start-test {
+          animation: none;
+          transition: none;
+        }
+      }
+
+      /* راهنمای آزمون: متناسب با ارتفاع صفحه */
+      .fullscreen-exam.active {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        padding: 12px;
+        overflow: hidden;
+      }
+
+      .fullscreen-inner {
+        box-sizing: border-box;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+        padding: clamp(12px, 2vh, 22px);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .fullscreen-header {
+        flex-shrink: 0;
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+      }
+
+      #fsProgressText {
+        flex-shrink: 0;
+        margin: 8px 0 12px;
+      }
+
+      #fsQuestionArea {
+        min-height: 0;
+      }
+
+      /* فشرده‌تر کردن کارت راهنمای آزمون */
+      .test-instructions {
+        box-sizing: border-box;
+        margin: 0 auto;
+        padding: clamp(12px, 2vh, 22px);
+        width: 100%;
+      }
+
+      .test-instructions h3 {
+        margin-bottom: 12px;
+        font-size: 1.08rem;
+      }
+
+      .test-instructions .inst-section {
+        margin: 0;
+        padding: 10px 13px;
+      }
+
+      .test-instructions .inst-section p {
+        line-height: 1.7;
+      }
+
+      .test-instructions .inst-hint {
+        margin-top: 10px;
+        padding: 8px 12px;
+      }
+
+      .test-instructions .btn-start-test {
+        margin-top: 12px;
+        padding: 11px 30px;
+      }
+
+      /* چیدمان دو ستونه راهنما در نمایشگرهای بزرگ */
+      .test-instructions:has(.inst-section) {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .test-instructions > h3,
+      .test-instructions > .inst-hint,
+      .test-instructions > .btn-start-test {
+        grid-column: 1 / -1;
+      }
+
+      @media (max-height: 760px) {
+        .fullscreen-exam.active {
+          padding: 6px;
+        }
+
+        .fullscreen-inner {
+          padding: 10px;
+          border-radius: 14px;
+        }
+
+        .test-instructions {
+          padding: 10px;
+        }
+
+        .test-instructions h3 {
+          margin: 0 0 8px;
+        }
+
+        .test-instructions .inst-section {
+          padding: 8px 10px;
+        }
+
+        .test-instructions .inst-section p {
+          font-size: 0.84rem;
+          line-height: 1.6;
+        }
+
+        .test-instructions .btn-start-test {
+          margin-top: 8px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .test-instructions:has(.inst-section) {
+          grid-template-columns: 1fr;
+        }
+
+        .test-instructions > h3,
+        .test-instructions > .inst-hint,
+        .test-instructions > .btn-start-test {
+          grid-column: 1;
+        }
+      }
+      .assessment-welcome {
+        direction: rtl;
+        max-width: 760px;
+        margin: 28px auto;
+        padding: 28px;
+        background: linear-gradient(145deg, #ffffff, #faf9ff);
+        border: 1px solid #e8e5f7;
+        border-radius: 24px;
+        box-shadow: 0 12px 35px rgba(74, 58, 130, 0.07);
+        font-family: "Vazirmatn", sans-serif;
+        transition:
+          box-shadow 0.3s ease,
+          transform 0.3s ease;
+      }
+
+      .assessment-welcome:hover {
+        box-shadow: 0 18px 42px rgba(74, 58, 130, 0.11);
+        transform: translateY(-2px);
+      }
+
+      .welcome-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .welcome-icon {
+        flex-shrink: 0;
+        width: 58px;
+        height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        color: #7156d9;
+        background: linear-gradient(135deg, #eee9ff, #e7f0ff);
+      }
+
+      .welcome-icon .material-symbols-outlined {
+        font-size: 31px;
+      }
+
+      .welcome-header h2 {
+        margin: 0;
+        color: #51429a;
+        font-size: 20px;
+        font-weight: 800;
+        line-height: 1.8;
+      }
+
+      .welcome-header p,
+      .welcome-step p {
+        margin: 4px 0 0;
+        color: #778197;
+        font-size: 13px;
+        line-height: 2;
+      }
+
+      .welcome-divider {
+        height: 1px;
+        margin: 23px 0;
+        background: linear-gradient(90deg, transparent, #e5e0f7, transparent);
+      }
+
+      .welcome-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 13px;
+        padding: 13px 12px;
+        margin-top: 8px;
+        border-radius: 15px;
+        transition: background 0.25s ease;
+      }
+
+      .welcome-step:hover {
+        background: #f3f0ff;
+      }
+
+      .welcome-step-number {
+        flex-shrink: 0;
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        color: #7056d8;
+        background: #eee9ff;
+        font-size: 15px;
+        font-weight: 800;
+      }
+
+      .welcome-step-number.blue {
+        color: #3975c9;
+        background: #e7f1ff;
+      }
+
+      .welcome-step h3 {
+        margin: 0;
+        color: #30364a;
+        font-size: 14px;
+        font-weight: 750;
+        line-height: 1.9;
+      }
+
+      .welcome-tip {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-top: 18px;
+        padding: 12px 14px;
+        border-radius: 13px;
+        color: #6f659e;
+        background: #f4f1ff;
+        font-size: 12px;
+        line-height: 2;
+      }
+
+      .welcome-tip .material-symbols-outlined {
+        flex-shrink: 0;
+        font-size: 19px;
+        margin-top: 2px;
+      }
+
+      @media (max-width: 600px) {
+        .assessment-welcome {
+          margin: 18px 10px;
+          padding: 20px 16px;
+          border-radius: 19px;
+        }
+
+        .welcome-header {
+          gap: 12px;
+        }
+
+        .welcome-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 15px;
+        }
+
+        .welcome-header h2 {
+          font-size: 17px;
+        }
+
+        .welcome-header p,
+        .welcome-step p {
+          font-size: 12px;
+        }
+      }
+      .material-symbols-outlined {
+        font-family: "Material Symbols Outlined" !important;
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        direction: ltr;
+        word-wrap: normal;
+        font-feature-settings: "liga";
+        -webkit-font-feature-settings: "liga";
+        -webkit-font-smoothing: antialiased;
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      /* باکس راهنمای ارزیابی با گرادینت بنفش ملایم */
+      .assessment-welcome {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+
+        background: linear-gradient(
+          135deg,
+          #ffffff 0%,
+          #faf9ff 38%,
+          rgba(121, 100, 232, 0.09) 100%
+        );
+
+        border: 1px solid rgba(121, 100, 232, 0.22);
+        border-radius: 24px;
+
+        box-shadow:
+          0 10px 30px rgba(121, 100, 232, 0.07),
+          inset 0 1px 0 rgba(255, 255, 255, 0.9);
+
+        transition:
+          transform 0.4s ease,
+          box-shadow 0.4s ease,
+          border-color 0.4s ease;
+      }
+
+      /* لایه نور متحرک */
+      .assessment-welcome::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -75%;
+        width: 45%;
+        height: 200%;
+
+        background: linear-gradient(
+          110deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.05) 25%,
+          rgba(255, 255, 255, 0.8) 50%,
+          rgba(121, 100, 232, 0.08) 65%,
+          transparent 100%
+        );
+
+        transform: skewX(-22deg);
+        pointer-events: none;
+        z-index: 2;
+        opacity: 0;
+      }
+
+      /* حرکت شاین هنگام ورود ماوس */
+      .assessment-welcome:hover::before {
+        opacity: 1;
+        animation: welcomeShine 1.1s ease-in-out;
+      }
+
+      @keyframes welcomeShine {
+        0% {
+          left: -75%;
+          opacity: 0;
+        }
+
+        15% {
+          opacity: 1;
+        }
+
+        100% {
+          left: 135%;
+          opacity: 0;
+        }
+      }
+
+      /* درخشش نرم کل باکس هنگام هاور */
+      .assessment-welcome:hover {
+        transform: translateY(-4px);
+
+        border-color: rgba(121, 100, 232, 0.42);
+
+        box-shadow:
+          0 18px 42px rgba(121, 100, 232, 0.15),
+          0 0 22px rgba(121, 100, 232, 0.07),
+          inset 0 1px 0 rgba(255, 255, 255, 0.95);
+      }
+
+      /* هماهنگی آیکون با رنگ اصلی */
+      .welcome-icon {
+        background: linear-gradient(
+          135deg,
+          rgba(121, 100, 232, 0.18),
+          rgba(121, 100, 232, 0.06)
+        );
+
+        border: 1px solid rgba(121, 100, 232, 0.12);
+        transition:
+          transform 0.35s ease,
+          box-shadow 0.35s ease;
+      }
+
+      .assessment-welcome:hover .welcome-icon {
+        transform: scale(1.06);
+
+        box-shadow: 0 5px 16px rgba(121, 100, 232, 0.16);
+      }
+
+      /* حرکت نرم مراحل */
+      .welcome-step {
+        transition:
+          background 0.3s ease,
+          transform 0.3s ease;
+      }
+
+      .welcome-step:hover {
+        background: rgba(121, 100, 232, 0.07);
+        transform: translateX(-3px);
+      }
+
+      /* نوار راهنمای پایین کارت */
+      .welcome-tip {
+        background: linear-gradient(
+          110deg,
+          rgba(121, 100, 232, 0.06),
+          rgba(121, 100, 232, 0.13)
+        );
+
+        border: 1px solid rgba(121, 100, 232, 0.08);
+      }
+      /* باکس باید محل نمایش نور متحرک باشد */
+      .assessment-welcome {
+        position: relative;
+        overflow: hidden;
+        isolation: isolate;
+      }
+
+      /* نوار نور درخشان و کاملاً قابل مشاهده */
+      .assessment-welcome::after {
+        content: "";
+        position: absolute;
+
+        top: -50%;
+        left: -65%;
+
+        width: 42%;
+        height: 200%;
+
+        background: linear-gradient(
+          100deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.12) 20%,
+          rgba(255, 255, 255, 0.85) 42%,
+          #ffffff 50%,
+          rgba(194, 181, 255, 0.95) 57%,
+          rgba(121, 100, 232, 0.28) 70%,
+          transparent 100%
+        );
+
+        filter: blur(5px);
+        opacity: 0;
+        transform: skewX(-22deg);
+        pointer-events: none;
+        z-index: 5;
+
+        animation: visibleBoxShine 3.2s ease-in-out infinite;
+      }
+
+      /* عبور واضح نور، مکث، و تکرار */
+      @keyframes visibleBoxShine {
+        0% {
+          left: -65%;
+          opacity: 0;
+        }
+
+        8% {
+          opacity: 1;
+        }
+
+        38% {
+          opacity: 0.95;
+        }
+
+        58% {
+          left: 125%;
+          opacity: 0;
+        }
+
+        100% {
+          left: 125%;
+          opacity: 0;
+        }
+      }
+
+      /* در هاور نور شدیدتر شود */
+      .assessment-welcome:hover::after {
+        animation-duration: 1.5s;
+        filter: blur(3px) brightness(1.35);
+      }
+
+      /* محتوای کارت بالاتر از لایه نور باقی بماند */
+      .assessment-welcome > * {
+        position: relative;
+        z-index: 6;
+      }
+
+      /* حفظ دسترسی‌پذیری */
+      @media (prefers-reduced-motion: reduce) {
+        .assessment-welcome::after {
+          animation: none;
+        }
+      }
+      .assessment-welcome {
+        outline: 2px solid #7964e8 !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-layout">
+      <div class="content-area">
+        <h1>غربالگری و ارزیابی عملکرد و مشکلات ریاضی</h1>
+
+        <div class="form-container" id="subjectForm">
+          <h3>📋 مشخصات آزمودنی</h3>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>نام و نام خانوادگی:</label
+              ><input type="text" id="subjName" placeholder="مثال: علی محمدی" />
+            </div>
+            <div class="form-group">
+              <label>سن (سال):</label
+              ><input
+                type="number"
+                id="subjAge"
+                min="3"
+                max="18"
+                placeholder="۸"
+              />
+            </div>
+            <div class="form-group">
+              <label>جنسیت:</label>
+              <select id="subjGender">
+                <option value="">انتخاب...</option>
+                <option value="پسر">پسر</option>
+                <option value="دختر">دختر</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>مقطع:</label>
+              <select id="subjLevel">
+                <option value="">انتخاب...</option>
+                <option value="پیش‌دبستانی">پیش‌دبستانی</option>
+                <option value="دبستان">دبستان</option>
+                <option value="متوسطه اول">متوسطه اول</option>
+                <option value="متوسطه دوم">متوسطه دوم</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>پایه:</label
+              ><input type="text" id="subjGrade" placeholder="دوم" />
+            </div>
+            <div class="form-group">
+              <label>سال‌های تحصیل:</label
+              ><input
+                type="number"
+                id="subjYears"
+                min="0"
+                max="15"
+                placeholder="۲"
+              />
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-primary" id="saveSubjectBtn">
+              💾 ذخیره مشخصات
+            </button>
+          </div>
+        </div>
+
+        <div class="assessment-welcome">
+          <div class="welcome-header">
+            <div class="welcome-icon">
+              <span class="material-symbols-outlined"
+                >assignment_turned_in</span
+              >
+            </div>
+
+            <div>
+              <h2>آماده شروع ارزیابی هستید؟</h2>
+              <p>برای شروع، مراحل زیر را به‌ترتیب انجام دهید.</p>
+            </div>
+          </div>
+
+          <div class="welcome-divider"></div>
+
+          <div class="welcome-step">
+            <span class="welcome-step-number">۱</span>
+            <div>
+              <h3>ثبت مشخصات آزمودنی</h3>
+              <p>ابتدا اطلاعات موردنیاز را تکمیل و ذخیره کنید.</p>
+            </div>
+          </div>
+
+          <div class="welcome-step">
+            <span class="welcome-step-number blue">۲</span>
+            <div>
+              <h3>انتخاب آزمون از پنل کناری</h3>
+              <p>آزمون موردنظر را از فهرست سمت راست انتخاب کنید.</p>
+            </div>
+          </div>
+
+          <div class="welcome-tip">
+            <span class="material-symbols-outlined">info</span>
+            <span>پس از انتخاب آزمون، دستورالعمل‌های آن را مطالعه کنید.</span>
+          </div>
+        </div>
+
+        <div id="resultsSection" style="display: none">
+          <h2 style="margin-top: 20px">📊 نتایج آزمون‌ها</h2>
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th>آزمون</th>
+                <th>تعداد کوشش</th>
+                <th>پاسخ درست</th>
+                <th>پاسخ‌های نادرست</th>
+                <th>میانگین زمان پاسخ</th>
+                <th>شاخص اختصاصی / خطای محور</th>
+              </tr>
+            </thead>
+            <tbody id="mainResultsBody"></tbody>
+          </table>
+          <p class="evidence-note" style="margin-top: 10px">
+            <strong>توجه:</strong> «پاسخ‌های نادرست» مجموع خطاهای ارتکاب و حذف
+            را نشان می‌دهد. همه نمرات این جدول <strong>توصیفی</strong> هستند و
+            نقطه برش تشخیصی ندارند.
+          </p>
+        </div>
+
+        <div id="profilesSection" class="profiles-panel">
+          <h2>🧠 پروفایل‌های شناختی دانش‌آموز (توصیفی)</h2>
+          <div class="profile-chart-wrap">
+            <h3>نمودار میله‌ای شاخص عملکرد در پروفایل‌ها</h3>
+            <div id="profileChartArea">
+              <p>برای نمایش نمودار، آزمون‌ها را تکمیل کنید.</p>
+            </div>
+            <p class="profile-note">
+              نمودار شاخص عملکرد توصیفی است؛ این نمودار تشخیص یا نمره هنجاری
+              نیست.
+            </p>
+          </div>
+          <h3>نتایج آزمون‌های اجراشده</h3>
+          <div class="tasks-table-wrap">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th>آزمون</th>
+                  <th>تعداد کوشش</th>
+                  <th>پاسخ درست</th>
+                  <th>پاسخ‌های نادرست</th>
+                  <th>میانگین زمان (ثانیه)</th>
+                  <th>شاخص عملکرد / خطای جایابی</th>
+                </tr>
+              </thead>
+              <tbody id="profileTestResultsBody"></tbody>
+            </table>
+          </div>
+          <div id="profilesResults"></div>
+        </div>
+        <div id="tasksSection" class="tasks-panel">
+          <h2>📋 تکالیف پیشنهادی برای تمرین پروفایل‌های شناختی</h2>
+          <p class="evidence-note">
+            تکالیف زیر از الگوهای آموزشی بررسی‌شده در پژوهش‌های شناخت عددی،
+            شمارش، محور اعداد و حافظه کاری فضایی الهام گرفته‌اند و به‌صورت
+            برنامه تمرینی پیشنهادی تنظیم شده‌اند؛ این جدول یک پروتکل درمانی
+            اعتبارسنجی‌شده یا تضمین بهبود نیست. دشواری را با سن، پایه و تحمل
+            کودک تنظیم کنید.
+          </p>
+          <div id="noTasksMessage" class="evidence-note">
+            ابتدا آزمون‌های مربوط به پروفایل را تکمیل و «پروفایل شناختی» را باز
+            کنید. تکالیف فقط برای پروفایل‌های کامل‌شده‌ای نمایش داده می‌شوند که
+            دست‌کم یک پرچم تمرینی دارند.
+          </div>
+          <div class="tasks-table-wrap">
+            <table class="tasks-table" id="tasksTable">
+              <thead>
+                <tr>
+                  <th>ردیف</th>
+                  <th>پروفایل هدف</th>
+                  <th>شرح تکلیف با جزئیات دقیق</th>
+                  <th>لوازم و تجهیزات لازم</th>
+                  <th>مدت زمان لازم</th>
+                  <th>تکرار و افزایش دشواری</th>
+                </tr>
+              </thead>
+              <tbody id="tasksTableBody">
+                <tr data-profile="approx" style="display: none">
+                  <td>۱</td>
+                  <td>پردازش تقریبی تعداد</td>
+                  <td>
+                    دو مجموعه نقطه با اندازه و فاصله‌های متفاوت را هم‌زمان به
+                    مدت ۱ تا ۲ ثانیه نشان دهید. کودک باید بگوید کدام مجموعه نقطه
+                    بیشتری دارد؛ پاسخ را با لمس سمت راست/چپ ثبت کند. در هر نوبت
+                    ۲۰ کوشش اجرا شود و پس از هر پاسخ بازخورد «درست/دوباره بررسی
+                    کن» بدهید. تعدادها را از نسبت‌های آسان (مثلاً ۸ در برابر ۱۶)
+                    به نسبت‌های دشوارتر (مثلاً ۱۲ در برابر ۱۵) ببرید؛ اندازه کلی
+                    نقاط را بین کوشش‌ها تغییر دهید تا کودک فقط به مساحت کل تکیه
+                    نکند.
+                  </td>
+                  <td>
+                    کارت‌های نقاط یا اسلاید رایانه‌ای، زمان‌سنج، برگه ثبت پاسخ و
+                    دقت
+                  </td>
+                  <td>۸–۱۰ دقیقه</td>
+                  <td>
+                    ۳ جلسه در هفته؛ ابتدا نسبت‌های واضح، سپس تفاوت‌های کوچک‌تر؛
+                    توقف کوتاه در صورت خستگی
+                  </td>
+                </tr>
+                <tr data-profile="approx" style="display: none">
+                  <td>۲</td>
+                  <td>پردازش تقریبی تعداد</td>
+                  <td>
+                    مجموعه‌ای از نقاط را برای ۱ ثانیه نمایش دهید و سپس پنهان
+                    کنید. کودک تعداد تقریبی را از میان ۳ گزینه انتخاب کند (مثلاً
+                    ۱۰، ۱۵، ۲۰). ۱۵ تا ۲۰ کوشش انجام دهید؛ ابتدا دامنه‌های
+                    کوچک‌تر و سپس بزرگ‌تر. پاسخ دقیق را الزام نکنید؛ هدف تخمین
+                    متناسب و کاهش وابستگی به شمارش تک‌تک نقاط است. دقت و زمان
+                    پاسخ را ثبت کنید.
+                  </td>
+                  <td>
+                    کارت یا نمایشگر، پرده/برگه برای پوشاندن نقاط، گزینه‌های عددی
+                    و ثبت‌نامه
+                  </td>
+                  <td>۵–۸ دقیقه</td>
+                  <td>
+                    ۲–۳ بار در هفته؛ مدت نمایش را فقط وقتی دقت پایدار شد کاهش
+                    دهید
+                  </td>
+                </tr>
+                <tr data-profile="count" style="display: none">
+                  <td>۳</td>
+                  <td>کدگذاری تعداد و شمارش</td>
+                  <td>
+                    ۱۰ تا ۲۰ شیء را در آرایش‌های مختلف (ردیفی، دایره‌ای،
+                    پراکنده) قرار دهید. کودک اشیا را با اشاره و گفتن یک عدد برای
+                    هر شیء بشمارد، سپس بگوید «در مجموع چندتاست؟». پس از شمارش،
+                    از او بخواهید آخرین عدد گفته‌شده را به‌عنوان تعداد کل بیان
+                    کند. هر جلسه ۱۰ آرایش متفاوت؛ در مرحله بعد آرایش را عوض کنید
+                    و بررسی کنید که تعداد ثابت می‌ماند.
+                  </td>
+                  <td>مهره، مکعب یا دکمه بزرگ، سینی، کارت عدد و برگه ثبت</td>
+                  <td>۱۰ دقیقه</td>
+                  <td>
+                    ۴ بار در هفته؛ از ۵–۱۰ شیء به ۱۵–۲۰ شیء بروید و به شمارش
+                    یک‌به‌یک توجه کنید
+                  </td>
+                </tr>
+                <tr data-profile="count" style="display: none">
+                  <td>۴</td>
+                  <td>کدگذاری تعداد و شمارش</td>
+                  <td>
+                    یک کارت با عدد ۶ (یا سطح مناسب کودک) نشان دهید؛ کودک همان
+                    تعداد مهره را بردارد و کنار کارت بچیند. سپس آرایش مهره‌ها را
+                    تغییر دهید و بپرسید آیا تعداد عوض شده است. ۱۰ نوبت اجرا کنید
+                    و در پایان کودک عدد را با مقدار واقعی تطبیق دهد. اعداد را از
+                    ۱ تا ۵ شروع کنید و پس از تسلط به ۱۰ و سپس دامنه‌های بالاتر
+                    گسترش دهید.
+                  </td>
+                  <td>
+                    کارت اعداد، مهره/مکعب، سینی و کارت‌های «بیشتر/کمتر/برابر»
+                  </td>
+                  <td>۸–۱۰ دقیقه</td>
+                  <td>
+                    ۳–۴ بار در هفته؛ در هر جلسه فقط ۲–۳ عدد تازه اضافه کنید
+                  </td>
+                </tr>
+                <tr data-profile="symbolic" style="display: none">
+                  <td>۵</td>
+                  <td>پردازش نمادین و بازنمایی عددی</td>
+                  <td>
+                    دو کارت عددی را نشان دهید و کودک عدد بزرگ‌تر را انتخاب کند؛
+                    ابتدا اعداد با فاصله زیاد (۲ و ۸)، سپس فاصله کم (۶ و ۷) و در
+                    پایان اعداد دو رقمی. برای هر پاسخ از کودک بخواهید دلیل
+                    کوتاهی بگوید یا عددها را با مهره/نوار مقدار نشان دهد. ۱۵ تا
+                    ۲۰ جفت در هر جلسه اجرا و خطاها را بر اساس دامنه عدد ثبت
+                    کنید.
+                  </td>
+                  <td>کارت اعداد، محور اعداد یا مهره‌های شمارشی، برگه پاسخ</td>
+                  <td>۸–۱۲ دقیقه</td>
+                  <td>
+                    ۳ بار در هفته؛ از اعداد تک‌رقمی به دو رقمی و سپس سه‌رقمی پیش
+                    بروید
+                  </td>
+                </tr>
+                <tr data-profile="symbolic" style="display: none">
+                  <td>۶</td>
+                  <td>پردازش نمادین و بازنمایی عددی</td>
+                  <td>
+                    یک محور اعداد با دو سر مشخص (مثلاً ۰ و ۲۰) ارائه کنید. عددی
+                    را بخوانید و کودک محل عدد را روی محور اعداد علامت بزند؛ سپس
+                    فاصله محل انتخابی تا محل درست را با خط‌کش اندازه بگیرید و
+                    بازخورد بدهید. ۱۰ تا ۱۵ کوشش انجام دهید. وقتی عملکرد بهتر
+                    شد، از محور اعداد ۰ تا ۱۰۰ و سپس دامنه متناسب با برنامه درسی
+                    استفاده کنید.
+                  </td>
+                  <td>
+                    برگه محور اعداد با دو سر برچسب‌دار، مداد، خط‌کش و کارت عدد
+                  </td>
+                  <td>۱۵ دقیقه</td>
+                  <td>
+                    ۵ روز در هفته تا ۵ هفته؛ هر هفته دقت و میانگین خطا را ثبت
+                    کنید.
+                  </td>
+                </tr>
+                <tr data-profile="spatial" style="display: none">
+                  <td>۷</td>
+                  <td>حافظه کوتاه‌مدت فضایی</td>
+                  <td>
+                    روی صفحه یا تخته ۶ تا ۹ خانه بسازید. یک توالی از ۲ خانه را
+                    یکی‌یکی روشن/نشان دهید؛ کودک باید همان توالی را به همان
+                    ترتیب بازتولید کند. پس از دو پاسخ درست، توالی را یک خانه
+                    طولانی‌تر کنید؛ پس از دو خطا به طول قبلی برگردید. ۸ تا ۱۲
+                    توالی اجرا کنید و طول بیشینه بازتولید درست را ثبت کنید.
+                  </td>
+                  <td>
+                    صفحه ۳×۳ خانه‌ای، کارت/چراغ یا مهره رنگی، برگه ثبت طول توالی
+                  </td>
+                  <td>۸–۱۰ دقیقه</td>
+                  <td>
+                    ۳–۴ بار در هفته؛ افزایش دشواری تدریجی، بدون فشار زمانی
+                    غیرضروری
+                  </td>
+                </tr>
+                <tr data-profile="spatial" style="display: none">
+                  <td>۸</td>
+                  <td>حافظه کوتاه‌مدت فضایی</td>
+                  <td>
+                    چند شیء را روی یک شبکه ۳×۳ قرار دهید و ۵ ثانیه به کودک فرصت
+                    مشاهده بدهید. سپس اشیا را بپوشانید؛ کودک جای اشیا را روی
+                    شبکه خالی بازسازی کند. از ۲ شیء شروع کنید و تا ۵ شیء افزایش
+                    دهید. در مرحله بعد، جای دو شیء را جابه‌جا کنید و از کودک
+                    بخواهید تغییر را مشخص کند.
+                  </td>
+                  <td>شبکه ۳×۳، ۲ تا ۵ مهره/تصویر کوچک، پوشش مات و کارت ثبت</td>
+                  <td>۸–۱۰ دقیقه</td>
+                  <td>
+                    ۳ بار در هفته؛ ابتدا بازسازی مکان، سپس تشخیص تغییر و افزایش
+                    تعداد اشیا
+                  </td>
+                </tr>
+                <tr data-profile="combined" style="display: none">
+                  <td>۹</td>
+                  <td>عملکرد تحت بار شناختی اضافی (توصیفی)</td>
+                  <td>
+                    کارت‌های عددی را در خانه‌های شبکه قرار دهید؛ کودک ۳ تا ۵
+                    ثانیه توزیع را نگاه کند، سپس کارت‌ها پوشانده شوند و کودک هم
+                    جای کارت‌ها و هم عدد هر جایگاه را بازسازی کند. ابتدا ۲ کارت
+                    و سپس ۳–۴ کارت استفاده کنید. این تکلیف صرفاً برای مشاهده
+                    عملکرد تحت بار شناختی هم‌زمان است و برای استنباط «نقص
+                    ترکیبی» طراحی نشده است.
+                  </td>
+                  <td>
+                    شبکه ۳×۳، کارت اعداد، پوشش مات و برگه ثبت خطای مکان/عدد
+                  </td>
+                  <td>۸ دقیقه</td>
+                  <td>
+                    ۲–۳ بار در هفته؛ فقط پس از تسلط بر تکلیف ساده‌تر اضافه شود
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="evidence-note">
+            <strong>پشتوانه پژوهشی:</strong> تمرین محور اعداد در یک مطالعه کوچک
+            روی کودکان ۸ تا ۱۰ ساله بهبودهایی در بازنمایی محور اعداد نشان داد
+            (<a href="https://pubmed.ncbi.nlm.nih.gov/21295145/" target="_blank"
+              >Kucian et al., 2011</a
+            >). برنامه Calcularis در کارآزمایی ۶۷ کودک بهبودهایی در محاسبه و
+            برآورد نشان داد (<a
+              href="https://pubmed.ncbi.nlm.nih.gov/32760306/"
+              target="_blank"
+              >Kohn et al., 2020</a
+            >). فراتحلیل آموزش سامانه تقریبی تعداد، انتقال به حساب نمادین را
+            مفروض نمی‌داند (<a
+              href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6142874/"
+              target="_blank"
+              >Smets et al., 2018</a
+            >). تمرین حافظه فضایی مکمل است، نه درمان مستقل.
+          </p>
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <h3>🎯 آزمون‌ها</h3>
+        <div class="sidebar-tests" id="sidebarTests"></div>
+        <button class="sidebar-feature-btn" id="showProfilesBtn">
+          🧠 پروفایل شناختی
+        </button>
+        <button class="sidebar-feature-btn" id="showTasksBtn">📋 تکالیف</button>
+        <button
+          class="sidebar-feature-btn"
+          id="showCutoffsBtn"
+          style="background: #b7791f"
+        >
+          🚩 راهنمای نقاط برش
+        </button>
+        <button
+          class="sidebar-feature-btn"
+          id="showExclusionBtn"
+          style="background: #c0392b"
+        >
+          🚫 معیارهای رد
+        </button>
+
+        <div
+          id="exclusionPanel"
+          class="exclusion-checklist"
+          style="display: none"
+        >
+          <h3>🚫 چک‌لیست معیارهای رد</h3>
+          <p style="font-size: 0.85em; color: #566573; margin: 0 0 8px">
+            اگر هر یک از موارد زیر پاسخ «بله» بگیرد، نتایج تکالیف شناختی
+            نمی‌تواند به حساب‌نارسایی نسبت داده شود.
+          </p>
+          <label
+            ><input type="checkbox" class="exclusionItem" data-id="edu" /> فرصت
+            کافی برای آموزش ریاضی وجود نداشته است (محرومیت آموزشی)</label
+          >
+          <label
+            ><input type="checkbox" class="exclusionItem" data-id="attention" />
+            مشکلات توجه یا رفتار به‌طور جداگانه ارزیابی نشده‌اند</label
+          >
+          <label
+            ><input type="checkbox" class="exclusionItem" data-id="emotion" />
+            عوامل انگیزشی یا هیجانی می‌توانند عملکرد را توضیح دهند</label
+          >
+          <label
+            ><input type="checkbox" class="exclusionItem" data-id="sensory" />
+            مشکل بینایی یا شنوایی محتمل است</label
+          >
+          <label
+            ><input type="checkbox" class="exclusionItem" data-id="iq" /> هوش
+            عمومی ارزیابی نشده است</label
+          >
+          <div class="exclusion-warning" id="exclusionWarning">
+            ⚠️ پیش از تفسیر نتایج به‌عنوان «حساب‌نارسایی»، لازم است این عوامل
+            توسط متخصص بررسی و رد شوند.
+          </div>
+        </div>
+
+        <div
+          id="cutoffGuide"
+          class="evidence-note"
+          style="
+            display: none;
+            background: #fff8e7;
+            border: 1px solid #e8c66a;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 8px;
+          "
+        >
+          <strong>راهنمای تفسیر آستانه‌ها و شواهد</strong>
+          <p>
+            <strong>هشدار اصلی:</strong> هیچ‌یک از آستانه‌های این برنامه، نقطه
+            برش تشخیصی معتبر نیستند. همه آن‌ها قواعد عملیاتی اکتشافی برای
+            علامت‌گذاری «پرچم تمرینی» هستند.
+          </p>
+          <p>
+            <strong>مقایسه نمادین، شمارش، جایابی محور و حافظه فضایی:</strong>
+            برای نسخه‌های کوتاهِ ساخته‌شده در این برنامه، هنجار سنی/پایه و نقطه
+            برش معتبر منتشرشده در دسترس نیست؛ بنابراین هیچ درصد یا میانگینی را
+            به‌عنوان نقطه برش پژوهشی معرفی نمی‌کنیم.
+          </p>
+          <p>
+            <strong>تفسیر رنگ نمودار:</strong> قرمز به معنی «پرچم ضعف اکتشافی
+            برای بررسی/تمرین» است، نه تشخیص نقص. در آزمون‌های دقت‌محور، دقت کمتر
+            از ۷۰٪ و در جایابی محور اعداد، میانگین خطای بیش از ۱۵٪ دامنه
+            به‌عنوان قاعده عملیاتی موقت علامت‌گذاری می‌شود.
+          </p>
+        </div>
+
+        <div class="sidebar-actions">
+          <button
+            class="btn-sidebar btn-excel-sidebar"
+            id="exportExcelBtn"
+            disabled
+          >
+            📥 دانلود Excel
+          </button>
+          <button
+            class="btn-sidebar btn-pdf-sidebar"
+            id="exportPdfBtn"
+            disabled
+          >
+            📄 دانلود Word
+          </button>
+          <button class="btn-sidebar btn-reset-sidebar" id="resetBtn">
+            🔄 شروع مجدد (ریست)
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="fullscreen-exam" id="fullscreenExam">
+      <div class="fullscreen-inner">
+        <div class="fullscreen-header">
+          <h2 id="fullscreenTitle">آزمون</h2>
+          <button class="btn-exit" id="exitExamBtn">✕ خروج</button>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="fsProgressFill"></div>
+        </div>
+        <div class="progress-text" id="fsProgressText">آماده‌سازی...</div>
+        <div id="fsQuestionArea"></div>
+      </div>
+    </div>
+
+    <script>
+      // ============================================================
+      // ابزارهای کمکی
+      // ============================================================
+      function toPersianNum(num) {
+        const persianDigits = [
+          "۰",
+          "۱",
+          "۲",
+          "۳",
+          "۴",
+          "۵",
+          "۶",
+          "۷",
+          "۸",
+          "۹",
+        ];
+        return num.toString().replace(/\d/g, (d) => persianDigits[d]);
+      }
+      function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      // ============================================================
+      // وضعیت کلی
+      // ============================================================
+      let subjectInfo = null;
+      let completedTests = {};
+      let profilesGenerated = false;
+      const TEST_KEYS = ["math", "dot", "num", "count", "nl", "sub", "spatial"];
+      const TEST_NAMES = {
+        math: "پیشرفت ریاضی",
+        dot: "مقایسه تراکم نقاط",
+        num: "مقایسه عددی",
+        count: "شمارش نقاط",
+        nl: "جایابی عدد روی محور اعداد",
+        sub: "تخمین سریع تعداد نقطه‌ها",
+        spatial: "حافظه کوتاه‌مدت فضایی",
+      };
+
+      // ============================================================
+      // راهنمای آزمون‌ها
+      // ============================================================
+      const TEST_INSTRUCTIONS = {
+        math: {
+          title: "آزمون پیشرفت ریاضی",
+          sections: [
+            {
+              h: "هدف",
+              p: "سنجش توصیفی مهارت‌های پایه ریاضی در هفت حوزه: مفهوم عدد و مقایسه، ارزش مکانی، محاسبه، محاسبه چندرقمی، مسئله کلامی، الگو، و زمان/اندازه.",
+            },
+            {
+              h: "تکلیف آزمودنی",
+              p: "در هر سؤال، پاسخ درست را از میان گزینه‌ها انتخاب کنید. هر سؤال یک پاسخ درست دارد. لطفاً بدون استفاده از ماشین‌حساب و بدون کمک گرفتن پاسخ دهید.",
+            },
+            {
+              h: "تعداد سؤال",
+              p: "۳۵ سؤال در ۷ حوزه (۵ سؤال برای هر حوزه). زمان محدودیتی ندارد.",
+            },
+          ],
+        },
+        dot: {
+          title: "آزمون مقایسه تراکم نقاط",
+          sections: [
+            {
+              h: "هدف",
+              p: "سنجش ادراک تقریبی تعداد — توانایی تشخیص کدام مجموعه نقطه بیشتر است، بدون شمردن تک‌تک آن‌ها.",
+            },
+            {
+              h: "تکلیف آزمودنی",
+              p: "در هر کوشش، دو دایره حاوی نقاط آبی به شما نشان داده می‌شود؛ یکی در سمت راست و یکی در سمت چپ. باید سریع تصمیم بگیرید کدام دایره نقاط بیشتری دارد و دکمه مربوطه را بزنید. گزینه «مساوی» هم وجود دارد.",
+            },
+            {
+              h: "تعداد کوشش",
+              p: "۶۴ کوشش. سعی کنید در حد امکان سریع اما دقیق پاسخ دهید.",
+            },
+            {
+              h: "نکته مهم",
+              p: "نقاط را نشمارید؛ فقط به تعداد نقاط توجه کنید، نه مساحت کل.",
+            },
+          ],
+        },
+        num: {
+          title: "آزمون مقایسه عددی",
+          sections: [
+            {
+              h: "هدف",
+              p: "سنجش پردازش نمادین عدد — سرعت و دقت تشخیص بزرگ‌تر بودن یک عدد نسبت به عدد دیگر.",
+            },
+            {
+              h: "تکلیف آزمودنی",
+              p: "در هر کوشش، دو عدد روی صفحه ظاهر می‌شود؛ یکی سمت راست و یکی سمت چپ. باید روی عددی که بزرگ‌تر است کلیک کنید.",
+            },
+            {
+              h: "تعداد کوشش",
+              p: "۶۴ کوشش. سعی کنید سریع اما دقیق پاسخ دهید.",
+            },
+            { h: "نکته مهم", p: "عدد بزرگ‌تر را انتخاب کنید (نه کوچک‌تر)." },
+          ],
+        },
+        count: {
+          title: "آزمون شمارش نقاط",
+          sections: [
+            {
+              h: "هدف",
+              p: "سنجش توانایی پیوند دادن عدد نمادین به مقدار دقیق — تطبیق تعداد واقعی نقاط با عددی که نشان داده می‌شود.",
+            },
+            {
+              h: "تکلیف آزمودنی",
+              p: "در هر کوشش، یک جعبه سیاه حاوی چند نقطه سفید و یک عدد در کنار آن نمایش داده می‌شود. باید تصمیم بگیرید آیا تعداد نقاط داخل جعبه با عددی که نشان داده شده برابر است یا نه. اگر برابر است دکمه «درست» و اگر برابر نیست دکمه «نادرست» را بزنید.",
+            },
+            { h: "تعداد کوشش", p: "۴۵ کوشش. سعی کنید دقیق باشید." },
+          ],
+        },
+        nl: {
+          title: "آزمون جایابی عدد روی محور اعداد",
+          sections: [
+            {
+              h: "هدف",
+              p: "سنجش بازنمایی ذهنی محور اعداد — توانایی تخمین جایگاه یک عدد روی یک محور از ۰ تا ۱۰۰۰.",
+            },
+            {
+              h: "تکلیف آزمودنی",
+              p: "در هر کوشش، یک عدد در بالای صفحه نمایش داده می‌شود. یک محور اعداد از ۰ تا ۱۰۰۰ در پایین صفحه است. باید با کلیک روی محور، جای تقریبی آن عدد را مشخص کنید.",
+            },
+            {
+              h: "تعداد کوشش",
+              p: "۴۰ کوشش. هر پاسخ یک بار ثبت می‌شود؛ پس از کلیک نمی‌توانید تغییر دهید.",
+            },
+            { h: "نکته مهم", p: "هدف تخمین است، نه پاسخ دقیق." },
+          ],
+        },
+        sub: {
+          title: "آزمون تخمین سریع تعداد نقطه‌ها",
+          sections: [
+            {
+              h: "هدف",
+              p: "سنجش توانایی تخمین تقریبی تعداد — توانایی تشخیص سریع تعداد نقاط بدون شمارش تک‌تک آن‌ها.",
+            },
+            {
+              h: "تکلیف آزمودنی",
+              p: "در هر کوشش، ابتدا شمارش معکوس ۳-۲-۱ نمایش داده می‌شود. سپس مجموعه‌ای از نقاط سفید روی زمینه سیاه برای مدت کوتاه نمایش داده می‌شود و پنهان می‌شود. سپس باید تعداد تقریبی نقاط را از میان گزینه‌ها انتخاب کنید.",
+            },
+            { h: "تعداد کوشش", p: "۶۷ کوشش." },
+            { h: "نکته مهم", p: "نقاط را نشمارید؛ هدف تخمین سریع است." },
+          ],
+        },
+        spatial: {
+          title: "آزمون حافظه کوتاه‌مدت فضایی",
+          sections: [
+            {
+              h: "هدف",
+              p: "سنجش حافظه کاری فضایی — توانایی نگه‌داشتن و بازتولید ترتیب یک توالی مکانی.",
+            },
+            {
+              h: "تکلیف آزمودنی",
+              p: "در هر کوشش، چهار مربع خالی روی صفحه نمایش داده می‌شود. یک توالی از مربع‌ها یکی‌یکی روشن می‌شود (قرمز). پس از پایان نمایش، باید روی همان مربع‌ها به همان ترتیبی که روشن شدند کلیک کنید. تعداد مربع‌های روشن به تدریج از ۲ به ۶ افزایش می‌یابد.",
+            },
+            { h: "تعداد کوشش", p: "۳۰ کوشش با طول‌های مختلف (۲ تا ۶)." },
+            { h: "نکته مهم", p: "ترتیب مهم است، نه فقط مکان." },
+          ],
+        },
+      };
+
+      // ============================================================
+      // محاسبه معیارها
+      // ============================================================
+      function computeMetrics(results, testKey) {
+        let total = results.length;
+        let correct = 0,
+          omission = 0,
+          commission = 0,
+          times = [];
+        if (testKey === "nl") {
+          times = results.map((r) => r.reactionTime).filter(Number.isFinite);
+        } else if (testKey === "math") {
+          results.forEach((r) => {
+            if (r.correct) correct++;
+            else commission++;
+          });
+        } else if (testKey === "spatial") {
+          results.forEach((r) => {
+            if (r.wholeCorrect) correct++;
+            else if (r.correctPositions === 0) omission++;
+            else commission++;
+            times.push(r.reactionTime);
+          });
+        } else {
+          results.forEach((r) => {
+            if (r.correct) correct++;
+            else if (["dot", "num", "count"].includes(testKey)) commission++;
+            else if (
+              r.userAnswer === undefined ||
+              r.userAnswer === null ||
+              r.userAnswer === ""
+            )
+              omission++;
+            else commission++;
+            if (Number.isFinite(r.reactionTime)) times.push(r.reactionTime);
+          });
+          if (["dot", "num", "count"].includes(testKey)) omission = 0;
+        }
+        const avgTime =
+          times.length > 0
+            ? times.reduce((a, b) => a + b, 0) / times.length
+            : 0;
+        return {
+          total,
+          correct,
+          omission,
+          commission,
+          incorrect: omission + commission,
+          avgTime,
+        };
+      }
+
+      // ============================================================
+      // ذخیره مشخصات
+      // ============================================================
+      document
+        .getElementById("saveSubjectBtn")
+        .addEventListener("click", function () {
+          const name = document.getElementById("subjName").value.trim();
+          const age = document.getElementById("subjAge").value.trim();
+          const gender = document.getElementById("subjGender").value;
+          const level = document.getElementById("subjLevel").value;
+          const grade = document.getElementById("subjGrade").value.trim();
+          const years = document.getElementById("subjYears").value.trim();
+          if (!name || !age || !gender || !level || !grade || !years) {
+            alert("لطفاً همه فیلدها را پر کنید.");
+            return;
+          }
+          const exclusionFlags = {};
+          document.querySelectorAll(".exclusionItem").forEach((cb) => {
+            exclusionFlags[cb.dataset.id] = cb.checked;
+          });
+          subjectInfo = {
+            name,
+            age,
+            gender,
+            level,
+            grade,
+            years,
+            exclusionFlags,
+          };
+          this.textContent = "✅ مشخصات ذخیره شد";
+          this.style.background = "#27ae60";
+          setTimeout(() => {
+            this.textContent = "💾 ذخیره مشخصات";
+            this.style.background = "#2980b9";
+          }, 2000);
+        });
+
+      document.querySelectorAll(".exclusionItem").forEach((cb) => {
+        cb.addEventListener("change", function () {
+          const anyChecked = Array.from(
+            document.querySelectorAll(".exclusionItem"),
+          ).some((x) => x.checked);
+          document
+            .getElementById("exclusionWarning")
+            .classList.toggle("visible", anyChecked);
+        });
+      });
+
+      document
+        .getElementById("showExclusionBtn")
+        .addEventListener("click", function () {
+          const panel = document.getElementById("exclusionPanel");
+          const show = panel.style.display === "none" || !panel.style.display;
+          panel.style.display = show ? "block" : "none";
+        });
+
+      // ============================================================
+      // ریست
+      // ============================================================
+      document
+        .getElementById("resetBtn")
+        .addEventListener("click", function () {
+          if (confirm("آیا مطمئن هستید؟ همه داده‌های ثبت شده پاک می‌شوند.")) {
+            subjectInfo = null;
+            completedTests = {};
+            [
+              "subjName",
+              "subjAge",
+              "subjGender",
+              "subjLevel",
+              "subjGrade",
+              "subjYears",
+            ].forEach((id) => {
+              const el = document.getElementById(id);
+              if (el) el.value = "";
+            });
+            document.querySelectorAll(".exclusionItem").forEach((cb) => {
+              cb.checked = false;
+            });
+            document
+              .getElementById("exclusionWarning")
+              .classList.remove("visible");
+            document.getElementById("resultsSection").style.display = "none";
+            document.getElementById("profilesSection").style.display = "none";
+            document.getElementById("tasksSection").style.display = "none";
+            document.getElementById("profilesResults").innerHTML = "";
+            document.getElementById("profileTestResultsBody").innerHTML = "";
+            profilesGenerated = false;
+            document
+              .querySelectorAll("#tasksTableBody tr")
+              .forEach((row) => (row.style.display = "none"));
+            document.getElementById("noTasksMessage").style.display = "block";
+            document.getElementById("profileChartArea").innerHTML =
+              "<p>برای نمایش نمودار، آزمون‌ها را تکمیل کنید.</p>";
+            document.getElementById("testDisplayArea").className =
+              "test-display-area";
+            document.getElementById("testDisplayArea").innerHTML =
+              "<h3>👈 یک آزمون را از پنل کناری انتخاب کنید</h3><p>برای شروع، ابتدا مشخصات آزمودنی را ذخیره کنید و سپس روی یکی از آزمون‌های سمت راست کلیک کنید.</p>";
+            renderSidebar();
+            updateExportButtons();
+          }
+        });
+
+      function renderSidebar() {
+        const container = document.getElementById("sidebarTests");
+        container.innerHTML = "";
+        TEST_KEYS.forEach((key) => {
+          const btn = document.createElement("button");
+          btn.className = "sidebar-test-btn";
+          const isCompleted = !!completedTests[key];
+          if (isCompleted) btn.classList.add("completed");
+          btn.innerHTML = `<span>${TEST_NAMES[key]}</span><span class="check-icon">${isCompleted ? "✅" : "▶"}</span>`;
+          btn.addEventListener("click", () => startTest(key));
+          container.appendChild(btn);
+        });
+      }
+
+      function updateExportButtons() {
+        const hasResults = Object.keys(completedTests).length > 0;
+        document.getElementById("exportExcelBtn").disabled = !hasResults;
+        document.getElementById("exportPdfBtn").disabled = !hasResults;
+      }
+
+      // ============================================================
+      // شروع آزمون
+      // ============================================================
+      let currentTestKey = null;
+      let currentTestState = null;
+
+      function startTest(key) {
+        if (!subjectInfo) {
+          alert("لطفاً ابتدا مشخصات آزمودنی را ذخیره کنید.");
+          return;
+        }
+        currentTestKey = key;
+        currentTestState = { index: 0, questions: [], results: [] };
+        document.getElementById("fullscreenTitle").textContent =
+          TEST_NAMES[key];
+        document.getElementById("fullscreenExam").classList.add("active");
+        document.body.style.overflow = "hidden";
+        requestFullscreen();
+        showInstructions(key);
+      }
+
+      function showInstructions(key) {
+        const inst = TEST_INSTRUCTIONS[key];
+        const area = document.getElementById("fsQuestionArea");
+        document.getElementById("fsProgressText").textContent = "راهنمای آزمون";
+        document.getElementById("fsProgressFill").style.width = "0%";
+        let sectionsHtml = inst.sections
+          .map(
+            (s) =>
+              `<div class="inst-section"><h4>${s.h}</h4><p>${s.p}</p></div>`,
+          )
+          .join("");
+        area.innerHTML = `<div class="test-instructions"><h3>📖 راهنمای آزمون: ${inst.title}</h3>${sectionsHtml}<div class="inst-hint">آماده‌اید؟ با کلیک روی دکمه زیر، آزمون شروع می‌شود.</div><button class="btn-start-test" id="beginTestBtn">▶ شروع آزمون</button></div>`;
+        document.getElementById("beginTestBtn").onclick = function () {
+          generateQuestionsForTest(key);
+          renderCurrentQuestion();
+        };
+      }
+
+      function exitExam() {
+        document.getElementById("fullscreenExam").classList.remove("active");
+        document.body.style.overflow = "";
+        if (document.fullscreenElement)
+          document.exitFullscreen().catch(() => {});
+        currentTestKey = null;
+        currentTestState = null;
+      }
+      document
+        .getElementById("exitExamBtn")
+        .addEventListener("click", function () {
+          if (confirm("آیا مطمئن هستید که می‌خواهید از آزمون خارج شوید؟"))
+            exitExam();
+        });
+
+      function requestFullscreen() {
+        const el = document.getElementById("fullscreenExam");
+        if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        else if (el.msRequestFullscreen) el.msRequestFullscreen();
+      }
+
+      function generateQuestionsForTest(key) {
+        const state = currentTestState;
+        if (key === "math")
+          state.questions = generateMathAchievementQuestions();
+        else if (key === "dot") state.questions = generateDotQuestions();
+        else if (key === "num") state.questions = generateNumQuestions();
+        else if (key === "count") state.questions = generateCountQuestions();
+        else if (key === "nl") state.questions = generateNLQuestions();
+        else if (key === "sub") state.questions = generateSubQuestions();
+        else if (key === "spatial")
+          state.questions = generateSpatialQuestions();
+      }
+
+      function renderCurrentQuestion() {
+        const state = currentTestState;
+        const key = currentTestKey;
+        if (state.index >= state.questions.length) {
+          completedTests[key] = state.results;
+          exitExam();
+          renderSidebar();
+          updateResults();
+          updateExportButtons();
+          alert(`آزمون «${TEST_NAMES[key]}» به پایان رسید.`);
+          return;
+        }
+        const q = state.questions[state.index];
+        const progressText = document.getElementById("fsProgressText");
+        const progressFill = document.getElementById("fsProgressFill");
+        progressText.textContent = `سوال ${toPersianNum(state.index + 1)} از ${toPersianNum(state.questions.length)}`;
+        progressFill.style.width =
+          (state.index / state.questions.length) * 100 + "%";
+        const area = document.getElementById("fsQuestionArea");
+        if (key === "math") renderMathAchievement(q, area);
+        else if (key === "dot") renderDot(q, area);
+        else if (key === "num") renderNum(q, area);
+        else if (key === "count") renderCount(q, area);
+        else if (key === "nl") renderNL(q, area);
+        else if (key === "sub") renderSub(q, area);
+        else if (key === "spatial") renderSpatial(q, area);
+      }
+
+      function recordResult(data) {
+        currentTestState.results.push(data);
+        currentTestState.index++;
+        renderCurrentQuestion();
+      }
+
+      // ============================================================
+      // آزمون‌ها
+      // ============================================================
+      function generateMathAchievementQuestions() {
+        const bank = [
+          [
+            "مفهوم عدد و مقایسه",
+            "کدام عدد بزرگ‌تر است؟ ۸ یا ۵؟",
+            ["۸", "۵", "برابرند"],
+            0,
+          ],
+          [
+            "مفهوم عدد و مقایسه",
+            "کدام عدد کوچک‌تر است؟ ۱۴ یا ۱۷؟",
+            ["۱۴", "۱۷", "برابرند"],
+            0,
+          ],
+          ["مفهوم عدد و مقایسه", "عدد بعد از ۳۹ چیست؟", ["۳۸", "۴۰", "۴۹"], 1],
+          ["مفهوم عدد و مقایسه", "عدد قبل از ۷۰ چیست؟", ["۶۹", "۷۱", "۶۰"], 0],
+          [
+            "مفهوم عدد و مقایسه",
+            "کدام عدد بزرگ‌تر است؟ ۲۵ یا ۵۲؟",
+            ["۲۵", "۵۲", "برابرند"],
+            1,
+          ],
+          [
+            "ارزش مکانی",
+            "در عدد ۴۲، رقم ۴ چه ارزشی دارد؟",
+            ["۴ واحد", "۴ ده‌تایی", "۴ صدتایی"],
+            1,
+          ],
+          [
+            "ارزش مکانی",
+            "کدام عدد برابر با ۳ ده‌تایی و ۶ واحد است؟",
+            ["۳۰۶", "۳۶", "۶۳"],
+            1,
+          ],
+          [
+            "ارزش مکانی",
+            "در عدد ۵۰۷، رقم ۵ چه ارزشی دارد؟",
+            ["۵ واحد", "۵ ده‌تایی", "۵ صدتایی"],
+            2,
+          ],
+          [
+            "ارزش مکانی",
+            "کدام عدد از ۷ ده‌تایی و ۲ واحد ساخته شده است؟",
+            ["۲۷", "۷۲", "۷۰۲"],
+            1,
+          ],
+          [
+            "ارزش مکانی",
+            "در عدد ۳۸۴، رقم ۸ چه ارزشی دارد؟",
+            ["۸ واحد", "۸ ده‌تایی", "۸ صدتایی"],
+            1,
+          ],
+          ["محاسبه", "۳ + ۴ = ؟", ["۶", "۷", "۸"], 1],
+          ["محاسبه", "۹ − ۵ = ؟", ["۳", "۴", "۵"], 1],
+          ["محاسبه", "۸ + ۷ = ؟", ["۱۴", "۱۵", "۱۶"], 1],
+          ["محاسبه", "۱۵ − ۸ = ؟", ["۶", "۷", "۸"], 1],
+          ["محاسبه", "۶ × ۳ = ؟", ["۱۸", "۹", "۲۱"], 0],
+          ["محاسبه چندرقمی", "۲۳ + ۱۴ = ؟", ["۳۷", "۳۶", "۴۷"], 0],
+          ["محاسبه چندرقمی", "۵۲ − ۲۷ = ؟", ["۲۵", "۳۵", "۲۹"], 0],
+          ["محاسبه چندرقمی", "۱۲۴ + ۳۵ = ؟", ["۱۵۹", "۱۴۹", "۱۶۹"], 0],
+          ["محاسبه چندرقمی", "۸۳ − ۴۶ = ؟", ["۳۷", "۴۷", "۴۳"], 0],
+          ["محاسبه چندرقمی", "۲۴ × ۳ = ؟", ["۶۲", "۷۲", "۸۲"], 1],
+          [
+            "مسئله کلامی",
+            "سارا ۳ سیب دارد و ۲ سیب دیگر می‌گیرد. حالا چند سیب دارد؟",
+            ["۴", "۵", "۶"],
+            1,
+          ],
+          [
+            "مسئله کلامی",
+            "۱۲ مداد را بین ۳ کودک به طور مساوی تقسیم می‌کنیم. هر کودک چند مداد می‌گیرد؟",
+            ["۳", "۴", "۵"],
+            1,
+          ],
+          [
+            "مسئله کلامی",
+            "یک کتاب ۱۸ صفحه دارد. علی ۷ صفحه خوانده است. چند صفحه مانده؟",
+            ["۱۱", "۱۲", "۱۰"],
+            0,
+          ],
+          [
+            "مسئله کلامی",
+            "در هر بسته ۵ مهره است. ۴ بسته چند مهره دارد؟",
+            ["۹", "۲۰", "۲۵"],
+            1,
+          ],
+          [
+            "مسئله کلامی",
+            "۲۵ برچسب داشتیم و ۹ برچسب را دادیم. چند برچسب باقی مانده است؟",
+            ["۱۴", "۱۶", "۱۷"],
+            1,
+          ],
+          ["الگو", "الگو را ادامه دهید: ۲، ۴، ۶، ۸، ...", ["۹", "۱۰", "۱۲"], 1],
+          ["الگو", "الگو را ادامه دهید: ۵، ۱۰، ۱۵، ...", ["۱۸", "۲۰", "۲۵"], 1],
+          [
+            "الگو",
+            "الگو را ادامه دهید: ۳۰، ۲۷، ۲۴، ...",
+            ["۲۰", "۲۱", "۲۲"],
+            1,
+          ],
+          [
+            "الگو",
+            "الگو را ادامه دهید: قرمز، آبی، قرمز، آبی، ...",
+            ["آبی", "قرمز", "سبز"],
+            1,
+          ],
+          [
+            "الگو",
+            "الگو را ادامه دهید: ۱، ۲، ۴، ۸، ...",
+            ["۱۲", "۱۴", "۱۶"],
+            2,
+          ],
+          [
+            "زمان/اندازه",
+            "یک ساعت برابر چند دقیقه است؟",
+            ["۳۰", "۶۰", "۱۰۰"],
+            1,
+          ],
+          [
+            "زمان/اندازه",
+            "یک متر چند سانتی‌متر است؟",
+            ["۱۰", "۱۰۰", "۱۰۰۰"],
+            1,
+          ],
+          [
+            "زمان/اندازه",
+            "نیم کیلوگرم چند گرم است؟",
+            ["۱۰۰", "۵۰۰", "۱۰۰۰"],
+            1,
+          ],
+          [
+            "زمان/اندازه",
+            "اگر ساعت ۳:۰۰ باشد، ۳۰ دقیقه بعد چه ساعتی است؟",
+            ["۳:۳۰", "۴:۰۰", "۲:۳۰"],
+            0,
+          ],
+          [
+            "زمان/اندازه",
+            "یک لیتر برابر چند میلی‌لیتر است؟",
+            ["۱۰۰", "۵۰۰", "۱۰۰۰"],
+            2,
+          ],
+        ];
+        return shuffleArray(
+          bank.map((it, i) => ({
+            domain: it[0],
+            prompt: it[1],
+            options: it[2],
+            answer: it[3],
+            itemId: i + 1,
+          })),
+        );
+      }
+      function renderMathAchievement(q, area) {
+        area.innerHTML = `<div class="question-card"><div class="practice-badge main">آزمون پیشرفت ریاضی</div><p><strong>${q.domain}</strong></p><h3 style="color:#2c3e50;line-height:1.8">${q.prompt}</h3><div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px">${q.options.map((op, i) => `<button class="btn-choice" data-answer="${i}" style="min-width:120px">${op}</button>`).join("")}</div></div>`;
+        area.querySelectorAll("button[data-answer]").forEach((btn) =>
+          btn.addEventListener("click", () => {
+            const chosen = Number(btn.dataset.answer);
+            const correct = chosen === q.answer;
+            recordResult({
+              domain: q.domain,
+              prompt: q.prompt,
+              userAnswer: q.options[chosen],
+              actualAnswer: q.options[q.answer],
+              correct,
+              reactionTime: 0,
+              itemId: q.itemId,
+            });
+          }),
+        );
+      }
+
+      function generateDotQuestions() {
+        const RATIOS = [0.25, 0.33, 0.5, 0.66, 0.75];
+        const TOTAL = 64;
+        let all = [];
+        for (let i = 0; i < TOTAL; i++) {
+          const ratio = RATIOS[Math.floor(Math.random() * RATIOS.length)];
+          const useSmall = Math.random() < 0.5;
+          const min = useSmall ? 1 : 10;
+          const max = useSmall ? 9 : 39;
+          let first,
+            second,
+            attempts = 0;
+          do {
+            second = Math.floor(Math.random() * (max - min + 1)) + min;
+            first = Math.round(second * ratio);
+            attempts++;
+          } while (
+            (first < min || first > max || first === second) &&
+            attempts < 100
+          );
+          if (first < min || first > max || first === second) {
+            if (min === 1) {
+              second = 8;
+              first = 2;
+            } else {
+              second = 32;
+              first = 8;
+            }
+          }
+          all.push({ first, second });
+        }
+        return shuffleArray(all);
+      }
+
+      function renderDot(q, area) {
+        let leftDots, rightDots;
+        if (Math.random() < 0.5) {
+          rightDots = q.first;
+          leftDots = q.second;
+        } else {
+          rightDots = q.second;
+          leftDots = q.first;
+        }
+        let correct;
+        if (rightDots > leftDots) correct = "right";
+        else if (rightDots < leftDots) correct = "left";
+        else correct = "equal";
+
+        function createDotsInCircle(count, circleSize) {
+          const centerX = circleSize / 2,
+            centerY = circleSize / 2,
+            radius = circleSize / 2 - 8;
+          let dotSize =
+            count <= 4
+              ? 16
+              : count <= 9
+                ? 12
+                : count <= 19
+                  ? 9
+                  : count <= 29
+                    ? 7
+                    : 6;
+          const positions = [];
+          const minDist = dotSize + 3;
+          let attempts = 0;
+          while (positions.length < count && attempts < count * 100) {
+            const angle = Math.random() * Math.PI * 2;
+            const r = Math.random() * radius;
+            const x = centerX + r * Math.cos(angle) - dotSize / 2;
+            const y = centerY + r * Math.sin(angle) - dotSize / 2;
+            let overlap = false;
+            for (const p of positions) {
+              if (Math.sqrt((x - p.x) ** 2 + (y - p.y) ** 2) < minDist) {
+                overlap = true;
+                break;
+              }
+            }
+            if (!overlap) positions.push({ x, y });
+            attempts++;
+          }
+          if (positions.length < count) {
+            positions.length = 0;
+            for (let i = 0; i < count; i++) {
+              const angle = (i / count) * Math.PI * 2;
+              const r = radius * 0.7;
+              positions.push({
+                x: centerX + r * Math.cos(angle) - dotSize / 2,
+                y: centerY + r * Math.sin(angle) - dotSize / 2,
+              });
+            }
+          }
+          let html = "";
+          positions.forEach((p) => {
+            html += `<div style="position:absolute;left:${p.x}px;top:${p.y}px;width:${dotSize}px;height:${dotSize}px;background:#1a5276;border-radius:50%;"></div>`;
+          });
+          return html;
+        }
+
+        const cs = 190;
+        area.innerHTML = `
+            <div class="question-card" style="min-height:390px;box-sizing:border-box;">
+                <p style="color:#555;">کدام دایره نقاط بیشتری دارد؟</p>
+                <div style="display:flex;align-items:flex-start;justify-content:center;gap:40px;margin:20px auto;height:245px;flex-wrap:nowrap;max-width:520px;">
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                        <div style="position:relative;width:${cs}px;height:${cs}px;border:3px solid #2980b9;border-radius:50%;background:#e8f4f8;overflow:hidden;">${createDotsInCircle(rightDots, cs)}</div>
+                        <div style="font-weight:bold;margin-top:5px;">راست</div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;align-items:center;">
+                        <div style="position:relative;width:${cs}px;height:${cs}px;border:3px solid #2980b9;border-radius:50%;background:#e8f4f8;overflow:hidden;">${createDotsInCircle(leftDots, cs)}</div>
+                        <div style="font-weight:bold;margin-top:5px;">چپ</div>
+                    </div>
+                </div>
+                <div style="display:flex;justify-content:center;align-items:center;gap:15px;margin:20px auto 8px;height:48px;flex-wrap:nowrap;">
+                    <button class="btn-choice" id="dotR">راست</button>
+                    <button class="btn-choice" id="dotE">مساوی</button>
+                    <button class="btn-choice" id="dotL">چپ</button>
+                </div>
+            </div>`;
+        const start = performance.now();
+        function answer(sel) {
+          document
+            .querySelectorAll(".btn-choice")
+            .forEach((b) => (b.disabled = true));
+          recordResult({
+            correct: sel === correct,
+            reactionTime: (performance.now() - start) / 1000,
+            userAnswer: sel,
+            actualAnswer: correct,
+          });
+        }
+        document.getElementById("dotR").onclick = () => answer("right");
+        document.getElementById("dotE").onclick = () => answer("equal");
+        document.getElementById("dotL").onclick = () => answer("left");
+      }
+
+      function generateNumQuestions() {
+        const RATIOS = [0.25, 0.33, 0.5, 0.66, 0.75];
+        const TOTAL = 64;
+        let all = [];
+        for (let i = 0; i < TOTAL; i++) {
+          const ratio = RATIOS[Math.floor(Math.random() * RATIOS.length)];
+          let larger = Math.floor(Math.random() * 35) + 4;
+          let smaller = Math.round(larger * ratio);
+          if (smaller < 1) smaller = 1;
+          if (smaller >= larger) smaller = larger - 1;
+          if (smaller < 1) {
+            smaller = 1;
+            larger = 2;
+          }
+          if (Math.random() < 0.5) all.push({ a: larger, b: smaller });
+          else all.push({ a: smaller, b: larger });
+        }
+        return shuffleArray(all);
+      }
+
+      function renderNum(q, area) {
+        let leftNum, rightNum;
+        if (Math.random() < 0.5) {
+          leftNum = q.a;
+          rightNum = q.b;
+        } else {
+          leftNum = q.b;
+          rightNum = q.a;
+        }
+        const larger = Math.max(leftNum, rightNum);
+        area.innerHTML = `
+            <div class="question-card">
+                <p style="color:#555;">کدام عدد بزرگ‌تر است؟ روی آن کلیک کنید.</p>
+                <div style="display:flex;justify-content:center;gap:35px;margin:20px 0;flex-wrap:wrap;">
+                    <div class="number-btn" id="numR">${toPersianNum(rightNum)}</div>
+                    <div class="number-btn" id="numL">${toPersianNum(leftNum)}</div>
+                </div>
+            </div>`;
+        const start = performance.now();
+        function answer(btn, val) {
+          document.querySelectorAll(".number-btn").forEach((b) => {
+            b.style.pointerEvents = "none";
+            b.style.opacity = "0.7";
+          });
+          const isCorrect = val === larger;
+          if (isCorrect) btn.classList.add("selected-correct");
+          else btn.classList.add("selected-wrong");
+          recordResult({
+            correct: isCorrect,
+            reactionTime: (performance.now() - start) / 1000,
+            userAnswer: val,
+            actualAnswer: larger,
+          });
+        }
+        document.getElementById("numR").onclick = function () {
+          answer(this, rightNum);
+        };
+        document.getElementById("numL").onclick = function () {
+          answer(this, leftNum);
+        };
+      }
+
+      function generateCountQuestions() {
+        let questions = [];
+        const smallNums = [1, 2, 3];
+        for (let i = 0; i < 15; i++) {
+          const dc = smallNums[Math.floor(Math.random() * 3)];
+          let dn;
+          if (Math.random() < 0.5) dn = dc;
+          else {
+            do {
+              dn = Math.floor(Math.random() * 9) + 1;
+            } while (dn === dc);
+          }
+          questions.push({
+            dotCount: dc,
+            displayedNumber: dn,
+            isMatch: dc === dn,
+          });
+        }
+        const largeNums = [4, 5, 6, 7, 8, 9];
+        for (let i = 0; i < 30; i++) {
+          const dc = largeNums[Math.floor(Math.random() * 6)];
+          let dn;
+          if (Math.random() < 0.5) dn = dc;
+          else {
+            do {
+              dn = Math.floor(Math.random() * 9) + 1;
+            } while (dn === dc);
+          }
+          questions.push({
+            dotCount: dc,
+            displayedNumber: dn,
+            isMatch: dc === dn,
+          });
+        }
+        return shuffleArray(questions);
+      }
+
+      function renderCount(q, area) {
+        const ds = q.dotCount <= 3 ? 22 : q.dotCount <= 6 ? 18 : 15;
+        let dots = "";
+        for (let i = 0; i < q.dotCount; i++) {
+          const t = Math.random() * 20 - 10,
+            l = Math.random() * 20 - 10;
+          dots += `<span style="background:#fff;border-radius:50%;display:inline-block;flex-shrink:0;width:${ds}px;height:${ds}px;margin-top:${t}px;margin-left:${l}px;"></span>`;
+        }
+        area.innerHTML = `
+            <div class="question-card">
+                <p style="color:#555;">آیا تعداد نقاط با عدد برابر است؟</p>
+                <div style="display:flex;align-items:center;justify-content:center;gap:25px;margin:20px 0;flex-wrap:wrap;">
+                    <div style="width:150px;height:150px;background:#1a1a1a;border-radius:8px;display:flex;flex-wrap:wrap;justify-content:center;align-content:center;padding:10px;gap:5px;border:2px solid #333;overflow:hidden;">${dots}</div>
+                    <div style="font-size:2.2em;font-weight:bold;color:#2c3e50;min-width:60px;text-align:center;">${toPersianNum(q.displayedNumber)}</div>
+                </div>
+                <div style="display:flex;gap:15px;justify-content:center;margin-top:20px;">
+                    <button class="btn-choice" id="cY" style="background:#27ae60;">درست</button>
+                    <button class="btn-choice" id="cN" style="background:#e74c3c;">نادرست</button>
+                </div>
+            </div>`;
+        const start = performance.now();
+        function answer(userSays) {
+          document
+            .querySelectorAll(".btn-choice")
+            .forEach((b) => (b.disabled = true));
+          recordResult({
+            correct: userSays === q.isMatch,
+            reactionTime: (performance.now() - start) / 1000,
+            userAnswer: userSays ? "درست" : "نادرست",
+            actualAnswer: q.isMatch ? "درست" : "نادرست",
+          });
+        }
+        document.getElementById("cY").onclick = () => answer(true);
+        document.getElementById("cN").onclick = () => answer(false);
+      }
+
+      function generateNLQuestions() {
+        let qs = [];
+        for (let i = 0; i < 40; i++)
+          qs.push({ target: Math.floor(Math.random() * 1001) });
+        return qs;
+      }
+
+      function renderNL(q, area) {
+        area.innerHTML = `
+            <div class="question-card">
+                <p style="color:#555;">جای تقریبی این عدد را روی محور مشخص کنید:</p>
+                <div style="font-size:2.5em;font-weight:bold;color:#e74c3c;margin-bottom:30px;text-align:center;">${toPersianNum(q.target)}</div>
+                <div style="position:relative;width:100%;max-width:850px;margin:40px auto 30px;padding:0 30px;">
+                    <div style="position:relative;width:100%;height:80px;cursor:pointer;" id="nlW">
+                        <div style="position:absolute;top:50%;left:0;right:0;height:6px;background:#2c3e50;transform:translateY(-50%);border-radius:3px;"></div>
+                        ${[0, 25, 50, 75, 100].map((p) => `<div style="position:absolute;top:50%;left:${p}%;width:3px;height:30px;background:#2c3e50;transform:translateY(-50%);"></div>`).join("")}
+                        ${[0, 25, 50, 75, 100].map((p, i) => `<div style="position:absolute;top:100%;left:${p}%;font-size:0.9em;color:#2c3e50;font-weight:bold;transform:translateX(-50%);padding-top:8px;">${toPersianNum(i * 250)}</div>`).join("")}
+                        <div style="position:absolute;top:50%;width:20px;height:20px;background:#e74c3c;border:3px solid #c0392b;border-radius:50%;transform:translate(-50%,-50%);display:none;z-index:5;" id="nlI"></div>
+                    </div>
+                </div>
+            </div>`;
+        const w = document.getElementById("nlW"),
+          ind = document.getElementById("nlI");
+        const start = performance.now();
+        let done = false;
+        w.onclick = function (e) {
+          if (done) return;
+          done = true;
+          const r = w.getBoundingClientRect();
+          const ratio = Math.max(
+            0,
+            Math.min(1, (e.clientX - r.left) / r.width),
+          );
+          const est = Math.round(ratio * 1000);
+          ind.style.left = ratio * 100 + "%";
+          ind.style.display = "block";
+          const signed = est - q.target;
+          recordResult({
+            estimated: est,
+            target: q.target,
+            absoluteError: Math.abs(signed),
+            signedError: signed,
+            errorDirection:
+              signed > 0 ? "over" : signed < 0 ? "under" : "exact",
+            isExtremeError: Math.abs(signed) > 200,
+            reactionTime: (performance.now() - start) / 1000,
+            userAnswer: est,
+            actualAnswer: q.target,
+          });
+        };
+      }
+
+      function generateSubQuestions() {
+        const COUNTS = [1, 2, 3, 5, 7, 11, 16];
+        const TOTAL = 67;
+        let qs = [];
+        for (let i = 0; i < TOTAL; i++)
+          qs.push({ count: COUNTS[Math.floor(Math.random() * COUNTS.length)] });
+        return shuffleArray(qs);
+      }
+
+      function renderSub(q, area) {
+        area.innerHTML = `
+            <div style="text-align:center;padding:40px 20px;background:linear-gradient(135deg,#8e44ad,#6c3483);color:#fff;border-radius:12px;">
+                <h3>آماده باش!</h3>
+                <p style="font-size:2.5em;font-weight:bold;margin:20px 0;" id="subCD">${toPersianNum(3)}</p>
+            </div>`;
+        let cd = 3;
+        const iv = setInterval(() => {
+          cd--;
+          if (cd > 0)
+            document.getElementById("subCD").textContent = toPersianNum(cd);
+          else {
+            clearInterval(iv);
+            showSubDots(q, area);
+          }
+        }, 600);
+      }
+
+      function showSubDots(q, area) {
+        const w = area.clientWidth || 800,
+          h = 400;
+        const dots = [];
+        const r = q.count <= 3 ? 25 : q.count <= 7 ? 20 : 15;
+        const minD = r * 2 + 8;
+        let att = 0;
+        while (dots.length < q.count && att < 3000) {
+          const x = r + 10 + Math.random() * (w - 2 * (r + 10));
+          const y = r + 10 + Math.random() * (h - 2 * (r + 10));
+          let ov = false;
+          for (const d of dots) {
+            if (Math.sqrt((x - d.x) ** 2 + (y - d.y) ** 2) < minD) {
+              ov = true;
+              break;
+            }
+          }
+          if (!ov) dots.push({ x, y, r });
+          att++;
+        }
+        let html = "";
+        dots.forEach((d) => {
+          html += `<div style="position:absolute;background:#fff;border-radius:50%;box-shadow:0 0 10px rgba(255,255,255,0.5);width:${d.r * 2}px;height:${d.r * 2}px;left:${d.x}px;top:${d.y}px;"></div>`;
+        });
+        area.innerHTML = `<div style="position:relative;width:100%;height:400px;background:#000;border-radius:12px;overflow:hidden;margin:20px 0;">${html}</div>`;
+        setTimeout(() => showSubMask(q, area), 750);
+      }
+
+      function showSubMask(q, area) {
+        const w = area.clientWidth || 800,
+          h = 400;
+        let m = "";
+        for (let i = 0; i < 30; i++) {
+          const s = 10 + Math.random() * 30;
+          const x = Math.random() * (w - s),
+            y = Math.random() * (h - s);
+          const hue = Math.floor(Math.random() * 360);
+          m += `<div style="position:absolute;left:${x}px;top:${y}px;width:${s}px;height:${s}px;background:hsl(${hue},70%,60%);border-radius:${Math.random() > 0.5 ? "50%" : "4px"};opacity:0.8;"></div>`;
+        }
+        area.innerHTML = `<div style="position:relative;width:100%;height:400px;background:#f0f0f0;border-radius:12px;overflow:hidden;margin:20px 0;">${m}</div>`;
+        setTimeout(() => askSub(q, area), 500);
+      }
+
+      function askSub(q, area) {
+        const options = [
+          1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
+        ];
+        area.innerHTML = `
+            <div class="question-card" style="background:#fffbe6;border:2px solid #f1c40f;">
+                <div style="text-align:center;font-size:1.5em;color:#2c3e50;font-weight:bold;margin-bottom:15px;">چند نقطه دیدی؟</div>
+                <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin:20px 0;">
+                    ${options.map((n) => `<button class="subitizing-num-btn" data-num="${n}" style="width:65px;height:65px;border:none;border-radius:12px;font-size:1.4em;font-weight:bold;cursor:pointer;background:linear-gradient(135deg,#3498db,#2980b9);color:#fff;font-family:inherit;box-shadow:0 4px 8px rgba(0,0,0,0.2);">${toPersianNum(n)}</button>`).join("")}
+                </div>
+            </div>`;
+        const start = performance.now();
+        document.querySelectorAll(".subitizing-num-btn").forEach((btn) => {
+          btn.onclick = function () {
+            document.querySelectorAll(".subitizing-num-btn").forEach((b) => {
+              b.disabled = true;
+              b.style.opacity = "0.5";
+            });
+            const ua = parseInt(this.dataset.num);
+            recordResult({
+              correct: ua === q.count,
+              reactionTime: (performance.now() - start) / 1000,
+              userAnswer: ua,
+              actualAnswer: q.count,
+            });
+          };
+        });
+      }
+
+      function generateSpatialQuestions() {
+        const lens = [
+          2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6,
+          6, 6, 6, 6, 6, 6, 6,
+        ];
+        let qs = [];
+        for (let i = 0; i < 30; i++) qs.push({ length: lens[i] });
+        return shuffleArray(qs);
+      }
+
+      function generateSpatialSeq(len) {
+        const s = [];
+        let last = -1;
+        for (let i = 0; i < len; i++) {
+          let b,
+            att = 0;
+          do {
+            b = Math.floor(Math.random() * 4) + 1;
+            att++;
+          } while (b === last && att < 50);
+          s.push(b);
+          last = b;
+        }
+        return s;
+      }
+
+      function renderSpatial(q, area) {
+        const seq = generateSpatialSeq(q.length);
+        area.innerHTML = `
+            <div style="text-align:center;padding:40px 20px;background:linear-gradient(135deg,#8e44ad,#6c3483);color:#fff;border-radius:12px;">
+                <h3>آماده باش!</h3>
+                <p style="font-size:2.5em;font-weight:bold;margin:20px 0;" id="spCD">${toPersianNum(3)}</p>
+            </div>`;
+        let cd = 3;
+        const iv = setInterval(() => {
+          cd--;
+          if (cd > 0)
+            document.getElementById("spCD").textContent = toPersianNum(cd);
+          else {
+            clearInterval(iv);
+            showSpatialSeq(q, area, seq);
+          }
+        }, 600);
+      }
+
+      function showSpatialSeq(q, area, seq) {
+        area.innerHTML = `
+            <div class="question-card">
+                <div style="text-align:center;font-weight:bold;margin:10px 0;">به مربع‌ها دقت کن...</div>
+                <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;padding:25px 10px;background:#f8f9fa;border-radius:12px;margin:15px 0;">
+                    ${[1, 2, 3, 4].map((n) => `<div class="spatial-box" id="spB${n}"></div>`).join("")}
+                </div>
+            </div>`;
+        let i = 0;
+        function next() {
+          if (i >= seq.length) {
+            setTimeout(() => showSpatialMask(q, area, seq), 250);
+            return;
+          }
+          const b = seq[i];
+          const el = document.getElementById(`spB${b}`);
+          if (el) {
+            el.classList.add("active");
+            el.style.background = "#e74c3c";
+            el.style.borderColor = "#c0392b";
+          }
+          setTimeout(() => {
+            if (el) {
+              el.classList.remove("active");
+              el.style.background = "#fff";
+              el.style.borderColor = "#7f8c8d";
+            }
+            i++;
+            setTimeout(next, 250);
+          }, 1000);
+        }
+        setTimeout(next, 800);
+      }
+
+      function showSpatialMask(q, area, seq) {
+        area.innerHTML = `
+            <div class="question-card">
+                <div style="text-align:center;font-weight:bold;">لطفاً صبر کن...</div>
+                <div class="spatial-mask">🎭</div>
+            </div>`;
+        setTimeout(() => allowSpatial(q, area, seq), 500);
+      }
+
+      function allowSpatial(q, area, seq) {
+        area.innerHTML = `
+            <div class="question-card">
+                <div style="text-align:center;font-weight:bold;margin:10px 0;">حالا روی مربع‌ها به همان ترتیب کلیک کن:</div>
+                <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;padding:25px 10px;background:#f8f9fa;border-radius:12px;margin:15px 0;">
+                    ${[1, 2, 3, 4].map((n) => `<div class="spatial-box clickable" data-b="${n}" id="spB${n}"></div>`).join("")}
+                </div>
+            </div>`;
+        const user = [];
+        const start = performance.now();
+        document.querySelectorAll(".spatial-box.clickable").forEach((box) => {
+          box.onclick = function () {
+            const b = parseInt(this.dataset.b);
+            user.push(b);
+            this.style.background = "#3498db";
+            this.style.borderColor = "#2980b9";
+            const old = this.querySelector(".order-badge");
+            if (old) old.remove();
+            const bg = document.createElement("div");
+            bg.className = "order-badge";
+            bg.textContent = toPersianNum(user.length);
+            bg.style.cssText =
+              "position:absolute;top:-10px;right:-10px;width:26px;height:26px;background:#27ae60;color:#fff;border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:0.75em;font-weight:bold;border:2px solid #fff;z-index:10;";
+            this.appendChild(bg);
+            setTimeout(() => {
+              this.style.background = "#fff";
+              this.style.borderColor = "#7f8c8d";
+            }, 300);
+            if (user.length === q.length) {
+              document.querySelectorAll(".spatial-box").forEach((b) => {
+                b.style.pointerEvents = "none";
+              });
+              let cp = 0;
+              for (let i = 0; i < q.length; i++) if (user[i] === seq[i]) cp++;
+              recordResult({
+                correct: cp === q.length,
+                correctPositions: cp,
+                wholeCorrect: cp === q.length,
+                actualSequence: seq,
+                userSequence: user,
+                sequenceLength: q.length,
+                reactionTime: (performance.now() - start) / 1000,
+                userAnswer: user.join("-"),
+                actualAnswer: seq.join("-"),
+              });
+            }
+          };
+        });
+      }
+
+      // ============================================================
+      // پروفایل‌ها
+      // ============================================================
+      function getProfileMetrics(key) {
+        const rs = completedTests[key];
+        if (!rs || !rs.length) return null;
+        if (key === "nl") {
+          const errors = rs
+            .filter((r) => Number.isFinite(r.absoluteError))
+            .map((r) => r.absoluteError);
+          if (!errors.length) return null;
+          const over = rs.filter((r) => r.errorDirection === "over").length;
+          const under = rs.filter((r) => r.errorDirection === "under").length;
+          const extreme = rs.filter((r) => r.isExtremeError).length;
+          const meanErr = errors.reduce((a, b) => a + b, 0) / errors.length;
+          const bias =
+            over > under * 2
+              ? "بیش‌برآورد"
+              : under > over * 2
+                ? "کم‌برآورد"
+                : "بدون سوگیری یک‌طرفه";
+          return {
+            value: meanErr / 1000,
+            label: "میانگین خطای مطلق محور اعداد",
+            weak: meanErr / 1000 > 0.15,
+            display:
+              meanErr.toFixed(1) +
+              " واحد از ۱۰۰۰ | سوگیری: " +
+              bias +
+              " | خطای شدید: " +
+              extreme,
+          };
+        }
+        if (key === "spatial") {
+          let possible = 0,
+            correct = 0;
+          rs.forEach((r) => {
+            possible += r.sequenceLength || 0;
+            correct += r.correctPositions || 0;
+          });
+          if (!possible) return null;
+          const acc = correct / possible;
+          return {
+            value: acc,
+            label: "درصد جایگاه‌های فضایی درست",
+            weak: acc < 0.7,
+            display: (acc * 100).toFixed(1) + "٪",
+          };
+        }
+        const valid = rs.filter((r) => typeof r.correct === "boolean");
+        if (!valid.length) return null;
+        const acc = valid.filter((r) => r.correct).length / valid.length;
+        return {
+          value: acc,
+          label: "دقت پاسخ",
+          weak: acc < 0.7,
+          display: (acc * 100).toFixed(1) + "٪",
+        };
+      }
+
+      function getProfilePercent(keys) {
+        const metrics = keys.map((key) => getProfileMetrics(key));
+        if (metrics.some((m) => !m)) return null;
+        const values = keys.map((key, i) => {
+          const m = metrics[i];
+          if (key === "nl")
+            return Math.max(0, Math.min(100, (1 - m.value) * 100));
+          return Math.max(0, Math.min(100, m.value * 100));
+        });
+        return values.length
+          ? values.reduce((a, b) => a + b, 0) / values.length
+          : null;
+      }
+
+      function profileHasExploratoryFlag(def) {
+        const metrics = def.keys.map((key) => getProfileMetrics(key));
+        return metrics.every(Boolean) && metrics.some((m) => m.weak);
+      }
+
+      function renderProfileChart(defs) {
+        const area = document.getElementById("profileChartArea");
+        const vals = defs.map((d) => ({
+          title: d.title,
+          value: getProfilePercent(d.keys),
+        }));
+        if (!vals.some((v) => v.value !== null)) {
+          area.innerHTML =
+            "<p>برای نمایش نمودار، دست‌کم یکی از آزمون‌های مربوط به پروفایل‌ها را تکمیل کنید.</p>";
+          return;
+        }
+        const W = 920,
+          H = 500,
+          L = 76,
+          R = 28,
+          T = 38,
+          B = 145,
+          plotH = H - T - B,
+          plotW = W - L - R;
+        const y = (v) => T + plotH * (1 - v / 100);
+        const centers = vals.map(
+          (v, i) => L + plotW * ((i + 0.5) / vals.length),
+        );
+        const labelLines = [
+          ["پردازش تقریبی", "تعداد"],
+          ["کدگذاری تعداد", "و شمارش"],
+          ["پردازش نمادین", "و بازنمایی عددی"],
+          ["حافظه کوتاه‌مدت", "فضایی"],
+        ];
+        let svg = `<svg id="profileChart" viewBox="0 0 ${W} ${H}" role="img" aria-label="نمودار میله‌ای">`;
+        [0, 20, 40, 60, 80, 100].forEach((t) => {
+          const yy = y(t);
+          svg += `<line x1="${L}" y1="${yy}" x2="${W - R}" y2="${yy}" stroke="#e4e8ec" stroke-width="1"/>`;
+          svg += `<text x="${L - 12}" y="${yy + 5}" text-anchor="end" font-size="13" fill="#59636e">${t}%</text>`;
+        });
+        vals.forEach((v, i) => {
+          const cx = centers[i],
+            bw = 76;
+          if (v.value === null) {
+            svg += `<text x="${cx}" y="${T + plotH - 12}" text-anchor="middle" font-size="12" fill="#777">بدون داده</text>`;
+          } else {
+            const yy = y(v.value),
+              hh = T + plotH - yy,
+              flagged = profileHasExploratoryFlag(defs[i]);
+            svg += `<rect x="${cx - bw / 2}" y="${yy}" width="${bw}" height="${Math.max(0, hh)}" rx="4" fill="${flagged ? "#e53935" : "#2980b9"}"/>`;
+            svg += `<text x="${cx}" y="${Math.max(T + 15, yy - 9)}" text-anchor="middle" font-size="14" font-weight="bold" fill="${flagged ? "#c62828" : "#24516b"}">${v.value.toFixed(1)}٪</text>`;
+            if (flagged)
+              svg += `<text x="${cx}" y="${Math.max(T + 31, yy - 26)}" text-anchor="middle" font-size="11" fill="#c62828">پرچم تمرینی</text>`;
+          }
+          const lines = labelLines[i];
+          svg += `<text x="${cx}" y="${H - B + 28}" text-anchor="middle" font-size="14" fill="#34495e">`;
+          lines.forEach((line, j) => {
+            svg += `<tspan x="${cx}" dy="${j === 0 ? 0 : 21}">${line}</tspan>`;
+          });
+          svg += `</text>`;
+        });
+        svg += `<text x="${L + plotW / 2}" y="${H - 37}" text-anchor="middle" font-size="13" fill="#59636e">شاخص عملکرد توصیفی (%) — نه نمره هنجاری</text>`;
+        svg += `<rect x="${W - 290}" y="${H - 23}" width="12" height="12" fill="#e53935"/><text x="${W - 292}" y="${H - 13}" font-size="12" fill="#59636e">پرچم تمرینی (اکتشافی)</text>`;
+        svg += `<rect x="${W - 105}" y="${H - 23}" width="12" height="12" fill="#2980b9"/><text x="${W - 107}" y="${H - 13}" font-size="12" fill="#59636e">بدون پرچم</text>`;
+        svg += "</svg>";
+        area.innerHTML = svg;
+      }
+
+      const PROFILE_DEFS = [
+        {
+          id: "approx",
+          short: "تقریبی",
+          title: "۱. پردازش تقریبی تعداد",
+          desc: "مقایسه تراکم نقاط و تخمین سریع تعداد نقطه‌ها.",
+          keys: ["dot", "sub"],
+        },
+        {
+          id: "count",
+          short: "شمارش",
+          title: "۲. کدگذاری تعداد و شمارش",
+          desc: "شمارش و پیوند دادن عدد به مقدار دقیق.",
+          keys: ["count"],
+        },
+        {
+          id: "symbolic",
+          short: "نمادین",
+          title: "۳. پردازش نمادین و بازنمایی عددی",
+          desc: "مقایسه اعداد نمادین و جایابی اعداد روی محور.",
+          keys: ["num", "nl"],
+        },
+        {
+          id: "spatial",
+          short: "حافظه فضایی",
+          title: "۴. حافظه کوتاه‌مدت فضایی",
+          desc: "حافظه فضایی؛ ممکن است با ضعف‌های عددی هم‌زمان باشد.",
+          keys: ["spatial"],
+        },
+      ];
+
+      function updateProfiles() {
+        const output = document.getElementById("profilesResults");
+        const defs = PROFILE_DEFS;
+        renderProfileChart(defs);
+        const testBody = document.getElementById("profileTestResultsBody");
+        testBody.innerHTML = "";
+        TEST_KEYS.forEach((key) => {
+          if (!completedTests[key]) return;
+          const m = computeMetrics(completedTests[key], key);
+          const pm = getProfileMetrics(key);
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${TEST_NAMES[key]}</td><td>${toPersianNum(m.total)}</td><td>${key === "nl" ? "—" : toPersianNum(m.correct)}</td><td>${key === "nl" ? "—" : toPersianNum(m.incorrect)}</td><td>${key === "math" ? "—" : toPersianNum(m.avgTime.toFixed(2))}</td><td>${pm ? pm.display : "قابل محاسبه نیست"}</td>`;
+          testBody.appendChild(tr);
+        });
+        output.innerHTML = "";
+        defs.forEach((d) => {
+          const metrics = d.keys.map((k) => ({
+            key: k,
+            name: TEST_NAMES[k],
+            metric: getProfileMetrics(k),
+          }));
+          const available = metrics.filter((x) => x.metric);
+          const missing = metrics.filter((x) => !x.metric);
+          let status, cls, detail;
+          if (!available.length) {
+            status = "داده کافی نیست";
+            cls = "pending";
+            detail =
+              "برای بررسی این پروفایل، آزمون مربوط باید اجرا و تکمیل شود.";
+          } else {
+            const weak = available.filter((x) => x.metric.weak);
+            if (missing.length) {
+              status = "ارزیابی ناقص";
+              cls = "pending";
+            } else if (weak.length) {
+              status = "پرچم تمرینی: نیازمند بررسی (اکتشافی، نه تشخیصی)";
+              cls = "match";
+            } else {
+              status = "پرچم تمرینی فعال نشده";
+              cls = "";
+            }
+            detail = metrics
+              .map(
+                (x) =>
+                  x.name +
+                  ": " +
+                  (x.metric
+                    ? x.metric.display +
+                      (x.metric.weak ? " (پرچم تمرینی اکتشافی)" : "")
+                    : "اجرا نشده"),
+              )
+              .join("؛ ");
+            if (
+              (d.id === "approx" || d.id === "symbolic") &&
+              available.length < 2
+            )
+              detail += " — برای ارزیابی کامل هر دو آزمون لازم‌اند.";
+          }
+          const percent = getProfilePercent(d.keys);
+          const card = document.createElement("div");
+          card.className = "profile-card " + cls;
+          card.innerHTML = `<strong>${d.title}</strong><div>${d.desc}</div><div class="profile-status ${cls === "pending" ? "pending" : ""}">${status}${percent === null ? "" : " — شاخص عملکرد توصیفی: " + percent.toFixed(1) + "٪"}</div><div class="profile-note">${detail}</div>`;
+          output.appendChild(card);
+        });
+      }
+
+      document
+        .getElementById("showProfilesBtn")
+        .addEventListener("click", function () {
+          const section = document.getElementById("profilesSection");
+          const willShow =
+            section.style.display === "none" || !section.style.display;
+          if (willShow) {
+            updateProfiles();
+            profilesGenerated = true;
+            refreshTasksForProfile();
+            section.style.display = "block";
+            section.scrollIntoView({ behavior: "smooth", block: "start" });
+          } else section.style.display = "none";
+        });
+
+      function refreshTasksForProfile() {
+        const rows = Array.from(
+          document.querySelectorAll("#tasksTableBody tr"),
+        );
+        rows.forEach((row) => {
+          const profile = row.dataset.profile;
+          const def = PROFILE_DEFS.find((d) => d.id === profile);
+          let show = false;
+          if (profile === "combined") {
+            const numM = getProfileMetrics("num"),
+              nlM = getProfileMetrics("nl"),
+              spatialM = getProfileMetrics("spatial");
+            show = !!(
+              numM &&
+              nlM &&
+              spatialM &&
+              (numM.weak || nlM.weak) &&
+              spatialM.weak
+            );
+          } else if (def) {
+            const completeProfile = def.keys.every(
+              (k) => getProfileMetrics(k) !== null,
+            );
+            show =
+              completeProfile &&
+              def.keys.some((k) => {
+                const mm = getProfileMetrics(k);
+                return mm && mm.weak;
+              });
+          }
+          row.style.display = show ? "" : "none";
+        });
+        const any = rows.some((row) => row.style.display !== "none");
+        document.getElementById("noTasksMessage").style.display = any
+          ? "none"
+          : "block";
+      }
+
+      document
+        .getElementById("showCutoffsBtn")
+        .addEventListener("click", function () {
+          const panel = document.getElementById("cutoffGuide");
+          const show = panel.style.display === "none" || !panel.style.display;
+          panel.style.display = show ? "block" : "none";
+        });
+
+      document
+        .getElementById("showTasksBtn")
+        .addEventListener("click", function () {
+          const section = document.getElementById("tasksSection");
+          if (!profilesGenerated) {
+            alert(
+              "ابتدا آزمون‌ها را اجرا کنید و روی «پروفایل شناختی» کلیک کنید.",
+            );
+            return;
+          }
+          const willShow =
+            section.style.display === "none" || !section.style.display;
+          if (willShow) refreshTasksForProfile();
+          section.style.display = willShow ? "block" : "none";
+          if (willShow)
+            section.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+      function updateResults() {
+        const section = document.getElementById("resultsSection");
+        const body = document.getElementById("mainResultsBody");
+        if (Object.keys(completedTests).length === 0) {
+          section.style.display = "none";
+          updateProfiles();
+          return;
+        }
+        section.style.display = "block";
+        body.innerHTML = "";
+        TEST_KEYS.forEach((key) => {
+          if (!completedTests[key]) return;
+          const m = computeMetrics(completedTests[key], key);
+          const tr = document.createElement("tr");
+          let extra = "—";
+          if (key === "nl") {
+            const recs = completedTests.nl || [];
+            const errs = recs
+              .map((r) => r.absoluteError)
+              .filter(Number.isFinite);
+            const mean = errs.length
+              ? errs.reduce((a, b) => a + b, 0) / errs.length
+              : null;
+            const over = recs.filter((r) => r.errorDirection === "over").length;
+            const under = recs.filter(
+              (r) => r.errorDirection === "under",
+            ).length;
+            const extreme = recs.filter((r) => r.isExtremeError).length;
+            const bias =
+              over > under * 2
+                ? "بیش‌برآورد"
+                : under > over * 2
+                  ? "کم‌برآورد"
+                  : "بدون سوگیری یک‌طرفه";
+            extra =
+              mean === null
+                ? "ثبت نشده"
+                : `میانگین خطا: ${toPersianNum(mean.toFixed(1))} از ۱۰۰۰ | سوگیری: ${bias} | خطای شدید: ${toPersianNum(extreme)}`;
+          } else if (key === "spatial") {
+            extra = `${toPersianNum(m.correct)} توالی کاملاً درست از ${toPersianNum(m.total)}`;
+          } else if (key === "math") {
+            const domainCounts = {};
+            completedTests.math.forEach((r) => {
+              if (!domainCounts[r.domain])
+                domainCounts[r.domain] = { correct: 0, total: 0 };
+              domainCounts[r.domain].total++;
+              if (r.correct) domainCounts[r.domain].correct++;
+            });
+            extra = Object.entries(domainCounts)
+              .map(
+                ([d, v]) =>
+                  `${d}: ${toPersianNum(v.correct)}/${toPersianNum(v.total)}`,
+              )
+              .join(" | ");
+          }
+          tr.innerHTML = `<td>${TEST_NAMES[key]}</td><td>${toPersianNum(m.total)}</td><td>${key === "nl" ? "—" : toPersianNum(m.correct)}</td><td>${key === "nl" ? "—" : toPersianNum(m.incorrect)}</td><td>${key === "math" ? "—" : toPersianNum(m.avgTime.toFixed(2))}</td><td style="font-size:.8em;text-align:right;">${extra}</td>`;
+          body.appendChild(tr);
+        });
+        updateProfiles();
+      }
+
+      // ============================================================
+      // Excel export
+      // ============================================================
+      document
+        .getElementById("exportExcelBtn")
+        .addEventListener("click", function () {
+          if (!subjectInfo) {
+            alert("مشخصات آزمودنی ثبت نشده است.");
+            return;
+          }
+          const wb = XLSX.utils.book_new();
+          const exclusionSummary = subjectInfo.exclusionFlags
+            ? Object.entries(subjectInfo.exclusionFlags).map(([k, v]) => [
+                k,
+                v ? "بله" : "خیر",
+              ])
+            : [];
+          const subjData = [
+            ["نام و نام خانوادگی", subjectInfo.name],
+            ["سن", subjectInfo.age],
+            ["جنسیت", subjectInfo.gender],
+            ["مقطع تحصیلی", subjectInfo.level],
+            ["پایه تحصیلی", subjectInfo.grade],
+            ["سال‌های تحصیل", subjectInfo.years],
+            ["معیارهای رد", ""],
+            ...exclusionSummary,
+          ];
+          XLSX.utils.book_append_sheet(
+            wb,
+            XLSX.utils.aoa_to_sheet([["مشخصه", "مقدار"], ...subjData]),
+            "مشخصات",
+          );
+          const summary = [
+            [
+              "آزمون",
+              "تعداد کوشش",
+              "پاسخ درست",
+              "پاسخ‌های نادرست",
+              "میانگین زمان",
+              "شاخص",
+            ],
+          ];
+          TEST_KEYS.forEach((key) => {
+            if (!completedTests[key]) return;
+            const m = computeMetrics(completedTests[key], key);
+            let extra = "—";
+            if (key === "nl") {
+              const es = completedTests.nl
+                .map((r) => r.absoluteError)
+                .filter(Number.isFinite);
+              extra = es.length
+                ? `میانگین خطا: ${(es.reduce((a, b) => a + b, 0) / es.length).toFixed(1)}`
+                : "";
+            }
+            summary.push([
+              TEST_NAMES[key],
+              m.total,
+              key === "nl" ? "—" : m.correct,
+              key === "nl" ? "—" : m.incorrect,
+              key === "math" ? "—" : parseFloat(m.avgTime.toFixed(2)),
+              extra,
+            ]);
+          });
+          XLSX.utils.book_append_sheet(
+            wb,
+            XLSX.utils.aoa_to_sheet(summary),
+            "خلاصه نتایج",
+          );
+          const profileRows = [["پروفایل", "وضعیت", "توضیح"]];
+          document
+            .querySelectorAll("#profilesResults .profile-card")
+            .forEach((card) => {
+              profileRows.push([
+                card.querySelector("strong")?.textContent || "",
+                card.querySelector(".profile-status")?.textContent || "",
+                card.querySelector(".profile-note")?.textContent || "",
+              ]);
+            });
+          if (profileRows.length > 1)
+            XLSX.utils.book_append_sheet(
+              wb,
+              XLSX.utils.aoa_to_sheet(profileRows),
+              "پروفایل‌ها",
+            );
+          TEST_KEYS.forEach((key) => {
+            if (!completedTests[key]) return;
+            const data = [
+              ["کوشش", "پاسخ کاربر", "پاسخ/هدف", "درست/غلط", "زمان", "جزئیات"],
+            ];
+            completedTests[key].forEach((r, i) => {
+              data.push([
+                i + 1,
+                r.userAnswer ?? "-",
+                r.actualAnswer ?? r.target ?? "-",
+                r.correct === true
+                  ? "درست"
+                  : r.correct === false
+                    ? "غلط"
+                    : r.wholeCorrect !== undefined
+                      ? r.wholeCorrect
+                        ? "درست"
+                        : "غلط"
+                      : "-",
+                r.reactionTime ? Number(r.reactionTime.toFixed(2)) : "",
+                JSON.stringify(
+                  Object.fromEntries(
+                    Object.entries(r).filter(
+                      ([k]) =>
+                        ![
+                          "userAnswer",
+                          "actualAnswer",
+                          "correct",
+                          "reactionTime",
+                        ].includes(k),
+                    ),
+                  ),
+                ),
+              ]);
+            });
+            XLSX.utils.book_append_sheet(
+              wb,
+              XLSX.utils.aoa_to_sheet(data),
+              TEST_NAMES[key].substring(0, 30),
+            );
+          });
+          XLSX.writeFile(
+            wb,
+            `نتایج_${subjectInfo.name}_${new Date().toISOString().slice(0, 10)}.xlsx`,
+          );
+        });
+
+      // ============================================================
+      // Word Export (تولید فایل .docx)
+      // ============================================================
+      document
+        .getElementById("exportPdfBtn")
+        .addEventListener("click", function () {
+          if (!subjectInfo) {
+            alert("مشخصات آزمودنی ثبت نشده است.");
+            return;
+          }
+          openWordSelection();
+        });
+
+      function openWordSelection() {
+        const selWin = window.open("", "_blank");
+        selWin.document.write(`
+            <!DOCTYPE html>
+            <html lang="fa" dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <title>انتخاب بخش‌های Word</title>
+                <style>
+                    body { font-family: Tahoma, Arial, sans-serif; padding: 40px; direction: rtl; background:#f5f6f8; margin:0; }
+                    .card { max-width: 520px; margin: 0 auto; background:#fff; border-radius:12px; padding:24px; box-shadow:0 4px 20px rgba(0,0,0,0.1); }
+                    h2 { color:#2b579a; margin-top:0; text-align:center; }
+                    label { display:flex; align-items:center; gap:10px; padding:12px; border:2px solid #e0e0e0; border-radius:8px; margin:8px 0; cursor:pointer; font-size:1em; transition: all .15s; }
+                    label:hover { border-color:#2b579a; background:#f0f4fb; }
+                    label input { width:18px; height:18px; }
+                    button { width:100%; padding:12px; background:#2b579a; color:#fff; border:none; border-radius:8px; font-size:1.1em; font-weight:bold; cursor:pointer; margin-top:16px; font-family:inherit; }
+                    button:hover { background:#1e3f70; }
+                    .cancel { background:#95a5a6; margin-top:8px; }
+                    .cancel:hover { background:#7f8c8d; }
+                </style>
+            </head>
+            <body>
+                <div class="card">
+                    <h2>📄 انتخاب بخش‌های فایل Word</h2>
+                    <p style="color:#666;font-size:.9em;">بخش‌هایی که می‌خواهید در فایل Word گنجانده شوند را انتخاب کنید:</p>
+                    <label><input type="checkbox" id="chkSpec" checked> مشخصات آزمودنی</label>
+                    <label><input type="checkbox" id="chkResults" checked> جدول نتایج آزمون‌ها</label>
+                    <label><input type="checkbox" id="chkProfile" checked> پروفایل شناختی</label>
+                    <label><input type="checkbox" id="chkTasks" checked> تکالیف پیشنهادی</label>
+                    <button id="doExportBtn">تولید فایل Word</button>
+                    <button class="cancel" id="cancelBtn">انصراف</button>
+                </div>
+                <script>
+                    document.getElementById('doExportBtn').onclick = function() {
+                        const opts = {
+                            spec: document.getElementById('chkSpec').checked,
+                            results: document.getElementById('chkResults').checked,
+                            profile: document.getElementById('chkProfile').checked,
+                            tasks: document.getElementById('chkTasks').checked
+                        };
+                        if (window.opener) {
+                            window.opener.postMessage({ type: 'doGenerateWord', options: opts }, '*');
+                        }
+                        window.close();
+                    };
+                    document.getElementById('cancelBtn').onclick = function() { window.close(); };
+                <\/script>
+            </body>
+            </html>
+        `);
+        selWin.document.close();
+      }
+
+      window.addEventListener("message", function (event) {
+        if (!event.data || event.data.type !== "doGenerateWord") return;
+        generateWord(event.data.options);
+      });
+
+      function generateWord(opts) {
+        const date = new Date().toLocaleDateString("fa-IR");
+        let contentHtml = `<h1 style="text-align:center;color:#2c3e50;border-bottom:3px solid #2980b9;padding-bottom:15px;font-family:Tahoma;">گزارش غربالگری و ارزیابی عملکرد و مشکلات ریاضی</h1>`;
+
+        if (opts.spec) {
+          contentHtml += `<h2 style="color:#2980b9;font-family:Tahoma;">مشخصات آزمودنی</h2>
+            <table style="width:100%;border-collapse:collapse;direction:rtl;font-family:Tahoma;font-size:11pt;">
+                <tr>
+                    <td style="border:1px solid #2980b9;padding:8px;background:#f0f4fb;"><b>نام:</b> ${subjectInfo.name}</td>
+                    <td style="border:1px solid #2980b9;padding:8px;background:#f0f4fb;"><b>سن:</b> ${subjectInfo.age} سال</td>
+                    <td style="border:1px solid #2980b9;padding:8px;background:#f0f4fb;"><b>جنسیت:</b> ${subjectInfo.gender}</td>
+                </tr>
+                <tr>
+                    <td style="border:1px solid #2980b9;padding:8px;background:#f0f4fb;"><b>مقطع:</b> ${subjectInfo.level}</td>
+                    <td style="border:1px solid #2980b9;padding:8px;background:#f0f4fb;"><b>پایه:</b> ${subjectInfo.grade}</td>
+                    <td style="border:1px solid #2980b9;padding:8px;background:#f0f4fb;"><b>سال‌های تحصیل:</b> ${subjectInfo.years}</td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="border:1px solid #2980b9;padding:8px;background:#f0f4fb;text-align:center;"><b>تاریخ گزارش:</b> ${date}</td>
+                </tr>
+            </table>`;
+        }
+
+        if (opts.results) {
+          contentHtml += `<h2 style="color:#2980b9;font-family:Tahoma;">نتایج کلی آزمون‌ها</h2>
+            <table style="width:100%;border-collapse:collapse;direction:rtl;font-family:Tahoma;font-size:10pt;">
+                <thead><tr style="background:#2980b9;color:#fff;">
+                    <th style="border:1px solid #1a5276;padding:8px;">آزمون</th>
+                    <th style="border:1px solid #1a5276;padding:8px;">تعداد کوشش</th>
+                    <th style="border:1px solid #1a5276;padding:8px;">پاسخ درست</th>
+                    <th style="border:1px solid #1a5276;padding:8px;">پاسخ‌های نادرست</th>
+                    <th style="border:1px solid #1a5276;padding:8px;">میانگین زمان (ثانیه)</th>
+                </tr></thead><tbody>`;
+          TEST_KEYS.forEach((key) => {
+            if (!completedTests[key]) return;
+            const m = computeMetrics(completedTests[key], key);
+            contentHtml += `<tr>
+                    <td style="border:1px solid #bdc3c7;padding:6px;text-align:center;">${TEST_NAMES[key]}</td>
+                    <td style="border:1px solid #bdc3c7;padding:6px;text-align:center;">${toPersianNum(m.total)}</td>
+                    <td style="border:1px solid #bdc3c7;padding:6px;text-align:center;">${key === "nl" ? "—" : toPersianNum(m.correct)}</td>
+                    <td style="border:1px solid #bdc3c7;padding:6px;text-align:center;">${key === "nl" ? "—" : toPersianNum(m.incorrect)}</td>
+                    <td style="border:1px solid #bdc3c7;padding:6px;text-align:center;">${key === "math" ? "—" : toPersianNum(m.avgTime.toFixed(2))}</td>
+                </tr>`;
+          });
+          contentHtml += `</tbody></table>`;
+        }
+
+        if (opts.profile) {
+          contentHtml += `<h2 style="color:#2980b9;font-family:Tahoma;">پروفایل‌های شناختی (توصیفی)</h2>`;
+          const cards = document.querySelectorAll(
+            "#profilesResults .profile-card",
+          );
+          if (cards.length === 0) {
+            contentHtml += `<p style="font-family:Tahoma;color:#777;">پروفایلی ثبت نشده است.</p>`;
+          } else {
+            cards.forEach((card) => {
+              contentHtml += `<div style="border:1px solid #d6e4ef;border-right:5px solid #2980b9;padding:10px;margin:8px 0;background:#fbfdff;font-family:Tahoma;direction:rtl;">
+                        <p style="margin:4px 0;"><b>${card.querySelector("strong")?.textContent || ""}</b></p>
+                        <p style="margin:4px 0;">${card.querySelector(".profile-status")?.textContent || ""}</p>
+                        <p style="margin:4px 0;font-size:10pt;color:#566573;">${card.querySelector(".profile-note")?.textContent || ""}</p>
+                    </div>`;
+            });
+          }
+        }
+
+        if (opts.tasks) {
+          contentHtml += `<h2 style="color:#2980b9;font-family:Tahoma;">تکالیف پیشنهادی</h2>`;
+          const rows = Array.from(
+            document.querySelectorAll("#tasksTableBody tr"),
+          ).filter((r) => r.style.display !== "none");
+          if (rows.length === 0) {
+            contentHtml += `<p style="font-family:Tahoma;color:#777;">تکلیف پیشنهادی برای پروفایل‌های دارای پرچم تمرینی یافت نشد.</p>`;
+          } else {
+            contentHtml += `<table style="width:100%;border-collapse:collapse;direction:rtl;font-family:Tahoma;font-size:9pt;">
+                    <thead><tr style="background:#087f8c;color:#fff;">
+                        <th style="border:1px solid #056670;padding:6px;">ردیف</th>
+                        <th style="border:1px solid #056670;padding:6px;">پروفایل</th>
+                        <th style="border:1px solid #056670;padding:6px;">شرح تکلیف</th>
+                        <th style="border:1px solid #056670;padding:6px;">لوازم</th>
+                        <th style="border:1px solid #056670;padding:6px;">مدت</th>
+                        <th style="border:1px solid #056670;padding:6px;">تکرار</th>
+                    </tr></thead><tbody>`;
+            rows.forEach((row) => {
+              const cells = Array.from(row.querySelectorAll("td"));
+              contentHtml += `<tr>${cells.map((c) => `<td style="border:1px solid #bdc3c7;padding:5px;vertical-align:top;">${c.textContent}</td>`).join("")}</tr>`;
+            });
+            contentHtml += `</tbody></table>`;
+          }
+        }
+
+        contentHtml += `<p style="text-align:center;font-size:9pt;color:#7f8c8d;border-top:1px solid #e0e0e0;padding-top:10px;margin-top:20px;font-family:Tahoma;">گزارش تولیدشده توسط «غربالگری و ارزیابی عملکرد و مشکلات ریاضی» — ${date}</p>`;
+
+        const fullHtml = `<!DOCTYPE html><html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="UTF-8"><title>گزارش</title>
+            <style>@page { size: A4; margin: 2cm; } body { direction: rtl; font-family: Tahoma, Arial, sans-serif; } table { width:100%; border-collapse:collapse; }</style>
+            </head><body>${contentHtml}</body></html>`;
+
+        const filename = `گزارش_${subjectInfo.name}_${new Date().toISOString().slice(0, 10)}.doc`;
+
+        if (window.htmlDocx && typeof window.htmlDocx.asBlob === "function") {
+          try {
+            const blob = window.htmlDocx.asBlob(fullHtml);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 3000);
+          } catch (err) {
+            console.error("خطا در تولید Word:", err);
+            fallbackDownloadHtml(fullHtml, filename);
+          }
+        } else {
+          fallbackDownloadHtml(fullHtml, filename);
+        }
+      }
+
+      function fallbackDownloadHtml(html, filename) {
+        const blob = new Blob(["\ufeff", html], { type: "application/msword" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+      }
+
+      // ============================================================
+      // شروع
+      // ============================================================
+      document.addEventListener("DOMContentLoaded", function () {
+        renderSidebar();
+        updateExportButtons();
+      });
+    </script>
+  </body>
+</html>

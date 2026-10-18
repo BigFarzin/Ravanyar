@@ -1,0 +1,2219 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>تکالیف شناختی</title>
+
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap");
+
+    :root {
+      --primary: #6857d9;
+      --primary-dark: #5141bd;
+      --primary-light: #f0edff;
+      --ink: #202544;
+      --muted: #78819b;
+      --border: #e7e9f3;
+      --surface: #ffffff;
+      --background: #f7f8fd;
+      --success: #16a583;
+      --radius: 20px;
+      --shadow: 0 8px 28px rgba(43, 48, 91, 0.055);
+      --shadow-hover: 0 14px 32px rgba(76, 64, 160, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Vazirmatn", Tahoma, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(
+          ellipse at 95% 0%,
+          rgba(191, 181, 255, 0.17),
+          transparent 35%
+        ),
+        radial-gradient(
+          ellipse at 0% 40%,
+          rgba(190, 222, 255, 0.14),
+          transparent 35%
+        ),
+        var(--background);
+      font-size: 14px;
+      line-height: 1.8;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Header */
+    header {
+      position: relative;
+      overflow: hidden;
+      padding: 25px max(5vw, 20px);
+      color: white;
+      background: linear-gradient(
+        120deg,
+        #29234f 0%,
+        #5141a4 55%,
+        #7667df 100%
+      );
+      box-shadow: 0 8px 30px rgba(55, 43, 120, 0.15);
+    }
+
+    header::after {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 50%;
+      left: 8%;
+      top: -145px;
+      box-shadow:
+        0 0 0 25px rgba(255, 255, 255, 0.035),
+        0 0 0 55px rgba(255, 255, 255, 0.025);
+      pointer-events: none;
+    }
+
+    header h2 {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-size: clamp(21px, 3vw, 29px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    /* Main layout */
+    main {
+      width: min(1440px, 100%);
+      margin: 30px auto;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: minmax(275px, 320px) minmax(0, 1fr);
+      align-items: start;
+      gap: 24px;
+    }
+
+    .panel {
+      min-width: 0;
+      padding: 25px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid rgba(226, 229, 243, 0.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      transition:
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+    }
+
+    .panel h3 {
+      margin: 0 0 17px;
+      font-size: 17px;
+      font-weight: 800;
+      color: #29294d;
+    }
+
+    aside.panel h3:not(:first-child) {
+      margin-top: 22px;
+    }
+
+    hr {
+      height: 1px;
+      margin: 23px 0;
+      border: 0;
+      background: var(--border);
+    }
+
+    /* Form labels */
+    label {
+      display: block;
+      margin: 15px 0 7px;
+      color: #454c69;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 44px;
+      padding: 10px 13px;
+      color: var(--ink);
+      background: #fbfbfe;
+      border: 1px solid #e0e3f0;
+      border-radius: 11px;
+      outline: none;
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+    }
+
+    input:hover,
+    select:hover {
+      border-color: #c5bdf5;
+      background: #fff;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--primary);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(104, 87, 217, 0.11);
+    }
+
+    input[type="range"] {
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* Buttons */
+    button {
+      min-height: 42px;
+      padding: 10px 17px;
+      color: white;
+      background: linear-gradient(135deg, #7463e5, #5949c7);
+      border: 1px solid transparent;
+      border-radius: 11px;
+      font-weight: 600;
+      font-size: 13px;
+      line-height: 1.7;
+      box-shadow: 0 4px 10px rgba(93, 76, 195, 0.13);
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(93, 76, 195, 0.2);
+    }
+
+    button:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: 0 2px 5px rgba(93, 76, 195, 0.12);
+    }
+
+    button:focus-visible {
+      outline: 3px solid rgba(104, 87, 217, 0.35);
+      outline-offset: 3px;
+    }
+
+    button.secondary {
+      color: #5145a2;
+      background: #f0eeff;
+      border-color: #e7e2ff;
+      box-shadow: none;
+    }
+
+    button.secondary:hover {
+      color: #40348f;
+      background: #e6e1ff;
+      box-shadow: 0 5px 13px rgba(93, 76, 195, 0.1);
+    }
+
+    #start {
+      min-height: 50px;
+      padding: 13px 35px !important;
+      border-radius: 14px;
+      font-size: 15px !important;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(93, 76, 195, 0.22);
+    }
+
+    #save {
+      background: linear-gradient(135deg, #1bb795, #119a7a);
+      box-shadow: 0 5px 14px rgba(22, 165, 131, 0.17);
+    }
+
+    #save:hover {
+      box-shadow: 0 8px 20px rgba(22, 165, 131, 0.25);
+    }
+
+    /* Help section */
+    .guide {
+      margin: 18px 0;
+    }
+
+    .guide-toggle {
+      width: 100%;
+      text-align: right;
+      color: #50439c;
+      background: #f1efff;
+      border: 1px solid #e7e2ff;
+      box-shadow: none;
+    }
+
+    .guide-toggle:hover {
+      background: #e8e4ff;
+      box-shadow: none;
+    }
+
+    .guide-content {
+      display: none;
+      margin-top: 10px;
+      padding: 15px;
+      color: #515975;
+      background: #f8f7ff;
+      border: 1px solid #ebe7ff;
+      border-right: 4px solid var(--primary);
+      border-radius: 12px;
+      font-size: 12px;
+      line-height: 2.2;
+    }
+
+    .guide-content ol {
+      margin: 0;
+      padding-right: 20px;
+    }
+
+    .guide-content li {
+      margin: 5px 0;
+    }
+
+    /* Text */
+    .muted {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 2;
+    }
+
+    .big {
+      font-size: clamp(27px, 4vw, 38px);
+      font-weight: 800;
+      line-height: 1.5;
+      color: #342d72;
+    }
+
+    .question {
+      margin: 0 0 12px;
+      font-size: clamp(15px, 2vw, 18px);
+      font-weight: 700;
+      line-height: 1.9;
+      color: #302d54;
+    }
+
+    /* Test stage */
+    #stage {
+      min-height: 390px;
+      margin: 22px 0 18px;
+      padding: 28px 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      text-align: center;
+      background: linear-gradient(145deg, #fcfcff, #f8f7ff);
+      border: 1px solid #ecebfa;
+      border-radius: 17px;
+    }
+
+    #stage > .muted {
+      max-width: 440px;
+    }
+
+    #feedback:not([style*="display: none"]) {
+      margin: 12px 0;
+      padding: 12px 15px;
+      border-radius: 12px;
+      background: #f1efff;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Answer choices */
+    .choice {
+      min-width: 90px;
+      min-height: 48px;
+      padding: 12px 20px;
+      color: #4d438f;
+      background: linear-gradient(145deg, #fff, #f3f1ff);
+      border: 1px solid #dcd6ff;
+      border-radius: 13px;
+      box-shadow: 0 3px 9px rgba(75, 64, 140, 0.055);
+    }
+
+    .choice:hover {
+      color: #fff;
+      background: linear-gradient(135deg, #7766e6, #5b4ac5);
+      border-color: transparent;
+    }
+
+    /* Stimulus cards */
+    .stimulus-row {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      direction: ltr;
+      align-items: stretch;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+
+    .stimulus-box {
+      flex: 1 1 220px;
+      min-width: 0;
+      min-height: 180px;
+      padding: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border: 1px solid #e4e2f6;
+      border-radius: 16px;
+      box-shadow: 0 4px 14px rgba(42, 42, 85, 0.035);
+    }
+
+    .estimate-box {
+      width: min(620px, 100%);
+      min-height: 230px;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border: 1px solid #e4e2f6;
+      border-radius: 16px;
+    }
+
+    .dots {
+      max-width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .dot {
+      display: inline-block;
+      flex-shrink: 0;
+      background: #5145a5;
+      border-radius: 50%;
+    }
+
+    /* Number axis */
+    .number-axis {
+      width: min(760px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .axis-line {
+      position: relative;
+      width: 100%;
+      height: 25px;
+    }
+
+    .axis-line:before {
+      content: "";
+      position: absolute;
+      top: 11px;
+      right: 0;
+      left: 0;
+      border-top: 3px solid #c9c4ed;
+    }
+
+    .axis-labels {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      color: #615b87;
+    }
+
+    .axis-range {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      z-index: 2;
+    }
+
+    /* Memory grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(55px, 72px));
+      gap: 9px;
+    }
+
+    .cell {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #5145a5;
+      background: #f4f2ff;
+      border: 1px solid #ddd8fa;
+      border-radius: 13px;
+      box-shadow: none;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .cell:hover {
+      color: #5145a5;
+      background: #eae6ff;
+      border-color: #bcb1f4;
+      box-shadow: none;
+    }
+
+    .lit {
+      color: #4c3a00 !important;
+      background: #ffe39b !important;
+      border-color: #f0c95c !important;
+    }
+
+    .sel {
+      color: #075f4a !important;
+      background: #a8ebd4 !important;
+      border-color: #69cfb0 !important;
+    }
+
+    .memory-input {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      padding: 0;
+      text-align: center;
+      font-size: 17px;
+      font-weight: 700;
+      background: transparent;
+      border: 0;
+      border-radius: 10px;
+      box-shadow: none;
+    }
+
+    .memory-input:focus {
+      background: #fff;
+      border: 2px solid var(--primary);
+      box-shadow: 0 0 0 3px rgba(104, 87, 217, 0.1);
+    }
+
+    .cell.input-cell {
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Session status */
+    .status {
+      padding: 9px 13px;
+      color: #565078;
+      background: #f3f1ff;
+      border: 1px solid #e8e3ff;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    #actions {
+      gap: 10px;
+    }
+
+    /* Saved sessions */
+    .session {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 9px;
+      margin: 9px 0;
+      padding: 13px;
+      color: #4d536d;
+      background: #fbfbff;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      font-size: 12px;
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .session:hover {
+      background: #f7f5ff;
+      border-color: #d8d0ff;
+    }
+
+    .session span {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      flex: 1 1 100%;
+    }
+
+    .session button {
+      min-height: 35px;
+      padding: 6px 12px;
+      font-size: 11px;
+    }
+
+    #allcsv {
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    /* Footer */
+    footer {
+      padding: 0 24px 25px !important;
+      color: #8b91a7;
+      font-size: 11px;
+      line-height: 2;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+        margin-top: 20px;
+        padding: 0 18px;
+      }
+
+      main > aside {
+        order: 1;
+      }
+
+      main > section {
+        order: 0;
+      }
+
+      .panel {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 20px;
+      }
+
+      main {
+        padding: 0 12px;
+        margin: 14px auto;
+        gap: 13px;
+      }
+
+      .panel {
+        padding: 15px;
+        border-radius: 16px;
+      }
+
+      #stage {
+        min-height: 340px;
+        padding: 20px 10px;
+      }
+
+      .stimulus-row {
+        gap: 10px;
+      }
+
+      .stimulus-box {
+        min-height: 145px;
+        padding: 10px;
+      }
+
+      .estimate-box {
+        padding: 12px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(3, minmax(50px, 65px));
+        gap: 7px;
+      }
+
+      .row {
+        gap: 8px;
+      }
+
+      .row button {
+        max-width: 100%;
+      }
+
+      .status {
+        flex: 1 1 auto;
+        text-align: center;
+      }
+
+      .session {
+        justify-content: flex-start;
+      }
+    }
+
+    /* Respect accessibility preferences */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+      }
+    }
+    .app-subtitle {
+      margin: 8px 0 0;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 0.92rem;
+      line-height: 1.9;
+    }
+
+    /* ===== تکمیل طراحی مدرن سامانه ===== */
+
+    /* تیترها و فاصله‌گذاری */
+    header h2 {
+      margin: 0;
+      font-size: clamp(1.35rem, 3vw, 1.9rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    .panel h3 {
+      font-size: 1.08rem;
+      font-weight: 800;
+      margin: 0 0 16px;
+      padding-bottom: 11px;
+      border-bottom: 1px solid #e9e7f5;
+    }
+
+    /* کارت‌های اصلی */
+    .panel {
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 8px 28px rgba(45, 35, 90, 0.055);
+      transition:
+        box-shadow 220ms ease,
+        border-color 220ms ease;
+    }
+
+    .panel:hover {
+      border-color: #d8cff8;
+      box-shadow: 0 12px 34px rgba(76, 52, 150, 0.09);
+    }
+
+    /* ورودی‌ها و فهرست‌ها */
+    input,
+    select {
+      min-height: 44px;
+      transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        background 180ms ease;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #8b70e8;
+      box-shadow: 0 0 0 4px rgba(139, 112, 232, 0.13);
+    }
+
+    /* دکمه‌ها */
+    button {
+      font-weight: 700;
+      transition:
+        transform 160ms ease,
+        box-shadow 180ms ease,
+        background-color 180ms ease,
+        border-color 180ms ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 7px 16px rgba(69, 49, 135, 0.14);
+    }
+
+    button:active {
+      transform: translateY(0) scale(0.98);
+      box-shadow: none;
+    }
+
+    button:focus-visible {
+      outline: 3px solid rgba(139, 112, 232, 0.55);
+      outline-offset: 3px;
+    }
+
+    /* دکمه اصلی شروع آزمون */
+    #start {
+      min-width: 190px;
+      border: 0;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #7555d9, #5940b5);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(91, 64, 181, 0.23);
+    }
+
+    #start:hover {
+      background: linear-gradient(135deg, #8467e5, #654ac7);
+      box-shadow: 0 12px 25px rgba(91, 64, 181, 0.29);
+    }
+
+    /* دکمه‌های ثانویه */
+    button.secondary,
+    .guide-toggle {
+      border: 1px solid #e1dcf3;
+      border-radius: 11px;
+      background: #f6f4fc;
+      color: #51417f;
+    }
+
+    button.secondary:hover,
+    .guide-toggle:hover {
+      background: #eee9fc;
+      border-color: #cfc3f4;
+    }
+
+    /* انتخاب‌های پاسخ */
+    .choice {
+      min-height: 48px;
+      border-radius: 13px;
+      border-width: 1.5px;
+      background: #f7f6fd;
+      border-color: #dcd6f0;
+      color: #342957;
+    }
+
+    .choice:hover {
+      background: #eee9ff;
+      border-color: #8b70e8;
+      color: #4f36a1;
+    }
+
+    /* محیط نمایش محرک‌ها */
+    .stimulus-box,
+    .estimate-box {
+      border-color: #e0daf4;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #fff, #faf8ff);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    /* شبکه‌های حافظه */
+    .cell {
+      border-radius: 12px;
+      border-color: #ded8f0;
+      background: #f6f4fc;
+      transition:
+        background-color 150ms ease,
+        border-color 150ms ease,
+        transform 150ms ease;
+    }
+
+    .cell:hover {
+      border-color: #9b85e8;
+    }
+
+    .cell.lit,
+    .lit {
+      background: #ffe5a3 !important;
+      border-color: #edbd50 !important;
+    }
+
+    .cell.sel,
+    .sel {
+      background: #c9f2df !important;
+      border-color: #66c79b !important;
+    }
+
+    /* وضعیت کوشش، امتیاز و سطح دشواری */
+    .status {
+      border: 1px solid #e7e2f4;
+      border-radius: 999px;
+      background: #f7f5fc;
+      color: #51417f;
+      padding: 8px 13px;
+      font-weight: 700;
+    }
+
+    /* راهنما */
+    .guide-content {
+      border-right-color: #8468df;
+      background: #f8f6ff;
+      color: #4b4264;
+      line-height: 2.1;
+    }
+
+    /* جلسات ذخیره‌شده */
+    .session {
+      border-color: #e8e3f3;
+      border-radius: 12px;
+      padding: 11px;
+      background: #fff;
+      transition:
+        background-color 180ms ease,
+        border-color 180ms ease;
+    }
+
+    .session:hover {
+      background: #faf8ff;
+      border-color: #cfc3f4;
+    }
+
+    /* پیام بازخورد */
+    #feedback {
+      margin: 14px 0;
+      padding: 12px 16px;
+      border-radius: 13px;
+      line-height: 1.9;
+    }
+
+    /* جداکننده‌ها */
+    hr {
+      border: 0;
+      border-top: 1px solid #ece8f5;
+      margin: 22px 0;
+    }
+
+    /* نمایش در موبایل */
+    @media (max-width: 760px) {
+      main {
+        gap: 14px;
+        margin-top: 14px;
+      }
+
+      .panel {
+        padding: 15px;
+        border-radius: 17px;
+      }
+
+      #stage {
+        min-height: 300px;
+        gap: 16px;
+      }
+
+      .stimulus-row {
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .stimulus-box {
+        min-width: 0;
+        width: 100%;
+      }
+
+      .status {
+        font-size: 0.8rem;
+      }
+    }
+
+    /* احترام به تنظیم کاهش حرکت دستگاه */
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    /* دکمه حذف همه جلسات */
+    button.danger {
+      display: block;
+      width: 100%;
+      margin-top: 12px;
+      padding: 11px 14px;
+      background: #dc3545;
+      color: #fff;
+      border: 1px solid #dc3545;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      box-shadow: none;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    button.danger:hover {
+      background: #bb2d3b;
+      border-color: #bb2d3b;
+    }
+
+    button.danger:focus-visible {
+      outline: 3px solid rgba(220, 53, 69, 0.25);
+      outline-offset: 2px;
+    }
+    /* داشبورد عملکرد */
+    #performance {
+      grid-column: 1 / -1;
+      margin-top: 2px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .metric-card {
+      background: #f7faff;
+      border: 1px solid #d9e2ec;
+      border-radius: 12px;
+      padding: 15px;
+      min-width: 0;
+    }
+
+    .metric-label {
+      color: #627d98;
+      font-size: 0.85rem;
+    }
+
+    .metric-value {
+      color: #243b53;
+      font-size: 1.55rem;
+      font-weight: bold;
+      margin-top: 8px;
+      overflow-wrap: anywhere;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .chart-card {
+      border: 1px solid #d9e2ec;
+      border-radius: 12px;
+      background: #fff;
+      padding: 16px;
+      min-width: 0;
+    }
+
+    .chart-card h4 {
+      margin: 0 0 12px;
+      color: #243b53;
+    }
+
+    .chart-area {
+      min-height: 190px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .chart-area svg {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .chart-empty {
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #627d98;
+      font-size: 0.9rem;
+      padding: 12px;
+    }
+
+    .chart-filter {
+      max-width: 280px;
+      margin-bottom: 14px;
+    }
+
+    .chart-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .chart-bar-row {
+      display: grid;
+      grid-template-columns: minmax(90px, 130px) minmax(40px, 1fr) 45px;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.82rem;
+    }
+
+    .chart-bar-label {
+      overflow-wrap: anywhere;
+    }
+
+    .chart-bar-track {
+      height: 12px;
+      background: #edf2f7;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .chart-bar-fill {
+      height: 100%;
+      background: #3977b8;
+      border-radius: 10px;
+    }
+
+    .chart-bar-value {
+      text-align: left;
+      font-weight: bold;
+      direction: ltr;
+    }
+
+    @media (max-width: 760px) {
+      .dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .chart-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .chart-bar-row {
+        grid-template-columns: 95px minmax(30px, 1fr) 40px;
+      }
+
+      .metric-value {
+        font-size: 1.3rem;
+      }
+    }
+  </style>
+
+  <header class="app-header">
+    <h2>سامانه تکالیف شناختی</h2>
+    <p class="app-subtitle">
+      محیط اجرای تمرین‌ها، ثبت عملکرد و پیگیری پیشرفت جلسات
+    </p>
+  </header>
+  <main>
+    <aside class="panel">
+      <h3>تنظیمات</h3>
+      <label>شناسه ناشناس</label><input id="pid" value="P001" /><label
+        >شماره جلسه</label
+      ><input id="sid" value="1" /><label>تکلیف</label
+      ><select id="task">
+        <option value="1">۱ — مقایسه تقریبی تعداد</option>
+        <option value="2">۲ — تخمین تعداد</option>
+        <option value="3">۳ — شمارش اشیا</option>
+        <option value="4">۴ — تطبیق عدد و مقدار</option>
+        <option value="5">۵ — مقایسه اعداد</option>
+        <option value="6">۶ — محور اعداد</option>
+        <option value="7">۷ — حافظه توالی فضایی</option>
+        <option value="8">۸ — حافظه مکان اشیا</option>
+        <option value="9">۹ — حافظه عدد و مکان</option></select
+      ><label>سطح دشواری</label
+      ><select id="difficultyMode">
+        <option value="easy">آسان</option>
+        <option value="medium" selected>متوسط</option>
+        <option value="hard">سخت</option>
+      </select>
+      <div class="guide">
+        <button type="button" id="guideToggle" class="guide-toggle">
+          راهنما ▼
+        </button>
+        <div id="guideContent" class="guide-content">
+          <ol>
+            <li>
+              این تکالیف برای جبران نقائص شناختی کاربران طراحی شده است. ابتدا در
+              هر تکلیف سطح دشواری را آسان تنظیم کنید. سپس سطح دشواری را به تدریج
+              افزایش دهید.
+            </li>
+            <li>تعداد کوشش ها نیز توسط کاربر قابل تنظیم است.</li>
+            <li>
+              نتایج هر جلسه را می توانید ذخیره کنید و با مقایسه جلسات اول و آخر
+              از میزان پیشرفت آگاه شوید.
+            </li>
+          </ol>
+        </div>
+      </div>
+      <label>تعداد کوشش</label
+      ><input id="ntrials" type="number" min="1" max="30" value="10" /><label
+        >مدت نمایش محرک (ms)</label
+      ><input
+        id="duration"
+        type="number"
+        min="50"
+        max="5000"
+        step="50"
+        value="1500"
+      />
+      <p class="muted">
+        ذخیره‌سازی در همین مرورگر است؛ بعد از هر جلسه خروجی بگیرید.
+      </p>
+      <hr />
+      <h3>جلسات ذخیره‌شده</h3>
+      <div id="sessions"></div>
+
+      <button type="button" id="clearSessions" class="danger">
+        🗑 حذف همه جلسات
+      </button>
+
+      <button class="secondary" id="allcsv">خروجی همه جلسات Excel</button>
+    </aside>
+    <section class="panel">
+      <h3 id="title">مقایسه تقریبی تعداد</h3>
+      <div id="desc" class="muted">برای شروع، دکمه زیر را بزنید.</div>
+      <div id="stage">
+        <div class="big">آماده</div>
+        <div class="muted">برای فعال‌شدن آزمون، دکمه زیر را بزنید.</div>
+        <button id="start" style="font-size: 1.1rem; padding: 13px 35px">
+          شروع آزمون
+        </button>
+      </div>
+      <div id="feedback" style="display: none"></div>
+      <div class="row">
+        <span id="progress" class="status">کوشش: ۰ / ۰</span
+        ><span id="score" class="status">پاسخ صحیح: ۰</span
+        ><span id="level" class="status">سطح دشواری: متوسط</span>
+      </div>
+      <div class="row" id="actions" style="margin-top: 12px; display: none">
+        <button id="save">ذخیره جلسه</button
+        ><button class="secondary" id="thiscsv">خروجی این جلسه</button
+        ><button class="secondary" id="ready">بازگشت به آماده</button>
+      </div>
+      <p id="note" class="muted"></p>
+    </section>
+  </main>
+  <section id="performance" class="panel">
+    <h3>داشبورد عملکرد شناختی</h3>
+    <p class="muted">تحلیل دقت پاسخ‌ها، زمان واکنش و عملکرد در تکالیف شناختی</p>
+
+    <label for="chartTask">نمایش اطلاعات کدام تکلیف؟</label>
+    <select id="chartTask" class="chart-filter">
+      <option value="all">همه کوشش‌های داده‌های جاری</option>
+      <option value="1">مقایسه تقریبی تعداد</option>
+      <option value="2">تخمین تعداد</option>
+      <option value="3">شمارش اشیا</option>
+      <option value="4">تطبیق عدد و مقدار</option>
+      <option value="5">مقایسه اعداد</option>
+      <option value="6">محور اعداد</option>
+      <option value="7">حافظه توالی فضایی</option>
+      <option value="8">حافظه مکان اشیا</option>
+      <option value="9">حافظه عدد و مکان</option>
+    </select>
+
+    <div class="dashboard-grid">
+      <div class="metric-card">
+        <div class="metric-label">دقت پاسخ‌ها</div>
+        <div id="metricAccuracy" class="metric-value">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">پاسخ‌های صحیح</div>
+        <div id="metricCorrect" class="metric-value">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">میانگین زمان واکنش</div>
+        <div id="metricRT" class="metric-value">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">تعداد کوشش‌ها</div>
+        <div id="metricTrials" class="metric-value">—</div>
+      </div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-card">
+        <h4>روند دقت در کوشش‌ها</h4>
+        <div id="accuracyChart" class="chart-area"></div>
+      </div>
+
+      <div class="chart-card">
+        <h4>زمان واکنش در کوشش‌ها</h4>
+        <div id="reactionChart" class="chart-area"></div>
+      </div>
+
+      <div class="chart-card">
+        <h4>مقایسه دقت ۹ تکلیف</h4>
+        <p class="muted">بر اساس جلسات ذخیره‌شده در همین مرورگر</p>
+        <div id="taskChart" class="chart-area"></div>
+      </div>
+
+      <div class="chart-card">
+        <h4>دقت بر اساس سطح دشواری</h4>
+        <div id="difficultyChart" class="chart-area"></div>
+      </div>
+    </div>
+  </section>
+  <script>
+    const $ = (x) => document.getElementById(x),
+      names = {
+        1: "مقایسه تقریبی تعداد",
+        2: "تخمین تعداد",
+        3: "شمارش اشیا",
+        4: "تطبیق عدد و مقدار",
+        5: "مقایسه اعداد",
+        6: "محور اعداد",
+        7: "حافظه توالی فضایی",
+        8: "حافظه مکان اشیا",
+        9: "حافظه عدد و مکان",
+      };
+    let sessions = JSON.parse(localStorage.getItem("cog_v6_sessions") || "[]"),
+      rows = [],
+      task = 1,
+      taskIndex = 0,
+      trial = 0,
+      total = 10,
+      score = 0,
+      level = 1,
+      correctStreak = 0,
+      wrongStreak = 0,
+      running = false,
+      token = 0,
+      target = null,
+      td = {},
+      seq = [],
+      selected = [],
+      objects = [],
+      onset = 0,
+      sessionKey = "";
+    const guideToggle = $("guideToggle"),
+      guideContent = $("guideContent");
+    guideToggle.onclick = () => {
+      const open = guideContent.style.display !== "none";
+      guideContent.style.display = open ? "none" : "block";
+      guideToggle.textContent = open ? "راهنما ▼" : "راهنما ▲";
+    };
+    function saveLocal() {
+      localStorage.setItem("cog_v6_sessions", JSON.stringify(sessions));
+      drawSessions();
+    }
+    function drawSessions() {
+      let h = $("sessions");
+      h.innerHTML = "";
+      if (!sessions.length) {
+        h.textContent = "هنوز جلسه‌ای ذخیره نشده است.";
+        h.className = "muted";
+        return;
+      }
+      sessions
+        .slice()
+        .reverse()
+        .forEach((s) => {
+          let d = document.createElement("div");
+          d.className = "session";
+          let t = document.createElement("span");
+          t.textContent = `${s.pid} · ${s.task_label || "همه آزمون‌ها"} · جلسه ${s.sid} · ${s.rows.length} کوشش`;
+          let b = document.createElement("button");
+          b.textContent = "بارگذاری";
+          b.onclick = () => load(s.key);
+          let del = document.createElement("button");
+          del.textContent = "حذف";
+          del.className = "secondary";
+          del.onclick = () => deleteSession(s.key);
+          d.append(t, b, del);
+          h.append(d);
+        });
+    }
+    $("clearSessions").onclick = () => {
+      if (sessions.length === 0) {
+        alert("هیچ جلسه ذخیره‌شده‌ای برای حذف وجود ندارد.");
+        return;
+      }
+
+      const confirmed = confirm(
+        `آیا مطمئن هستید که می‌خواهید همه ${sessions.length} جلسه ذخیره‌شده را حذف کنید؟\nاین عملیات قابل بازگشت نیست.`,
+      );
+
+      if (!confirmed) return;
+
+      sessions = [];
+      saveLocal();
+
+      alert("همه جلسات ذخیره‌شده حذف شدند.");
+    };
+    function difficultyLabel() {
+      return (
+        { easy: "آسان", medium: "متوسط", hard: "سخت" }[
+          $("difficultyMode").value
+        ] || "متوسط"
+      );
+    }
+    function modeBounds() {
+      const m = $("difficultyMode").value;
+      return m === "easy" ? [1, 2] : m === "hard" ? [4, 5] : [3, 3];
+    }
+    function initialLevel() {
+      return modeBounds()[0];
+    }
+    function status() {
+      $("progress").textContent = `کوشش: ${Math.min(trial, total)} / ${total}`;
+      $("score").textContent = `پاسخ صحیح: ${score}`;
+      $("level").textContent = `سطح دشواری: ${difficultyLabel()}`;
+    }
+    function setTitle() {
+      task = +$("task").value;
+      $("title").textContent = names[task];
+    }
+    $("task").onchange = () => {
+      if (!running) setTitle();
+    };
+    $("difficultyMode").onchange = () => {
+      if (!running) {
+        level = initialLevel();
+        status();
+      }
+    };
+    setTitle();
+    function setTitle() {
+      task = +$("task").value;
+      $("title").textContent = names[task];
+    }
+    $("task").onchange = () => {
+      if (!running) setTitle();
+    };
+    setTitle();
+    function dots(n) {
+      let d = document.createElement("div");
+      d.className = "dots";
+      for (let i = 0; i < n; i++) {
+        let p = document.createElement("i");
+        p.className = "dot";
+        let s = 7 + Math.random() * 9;
+        p.style.width = s + "px";
+        p.style.height = s + "px";
+        d.append(p);
+      }
+      return d;
+    }
+    function quantityDots(n) {
+      let d = dots(n);
+      if (n > 5) {
+        d.style.display = "grid";
+        d.style.gridTemplateColumns = `repeat(${Math.ceil(n / 2)}, 1fr)`;
+        d.style.gridTemplateRows = "repeat(2, 1fr)";
+        d.style.gap = "4px";
+        d.style.justifyItems = "center";
+        d.style.alignItems = "center";
+      }
+      return d;
+    }
+    function btn(t, fn) {
+      let b = document.createElement("button");
+      b.className = "choice";
+      b.textContent = t;
+      b.onclick = fn;
+      return b;
+    }
+    function choices(vals, fn) {
+      let r = document.createElement("div");
+      r.className = "row";
+      vals.forEach((v) => r.append(btn(v, () => fn(v))));
+      $("stage").append(r);
+    }
+    function begin() {
+      const pid = $("pid").value.trim();
+      if (!pid) return alert("شناسه ناشناس را وارد کنید.");
+      task = +$("task").value;
+      taskIndex = task - 1;
+      total = Math.max(1, Math.min(30, +$("ntrials").value || 10));
+      trial = 0;
+      score = 0;
+      const bounds = modeBounds();
+      level = bounds[0];
+      correctStreak = wrongStreak = 0;
+      rows = [];
+      running = true;
+      sessionKey = "S" + Date.now();
+      setTitle();
+      $("actions").style.display = "none";
+      next();
+    }
+    $("start").onclick = begin;
+    function next() {
+      if (!running) return;
+      if (trial >= total) return finish();
+      trial++;
+      token++;
+      let my = token;
+      selected = [];
+      target = null;
+      td = { level, difficulty_mode: $("difficultyMode").value };
+      $("stage").innerHTML = "";
+      $("feedback").textContent = "";
+      status();
+      onset = performance.now();
+      const later = (ms, fn) =>
+        setTimeout(() => {
+          if (running && my === token) fn();
+        }, ms);
+      const q = (t) => {
+        let p = document.createElement("p");
+        p.className = "question";
+        p.textContent = t;
+        $("stage").append(p);
+        return p;
+      };
+      if (task === 1) {
+        let p = [
+            [8, 16],
+            [6, 12],
+            [10, 15],
+            [12, 15],
+            [9, 14],
+          ],
+          pair = p[Math.min(level - 1, 4)],
+          a = Math.random() < 0.5 ? pair[0] : pair[1],
+          b = a === pair[0] ? pair[1] : pair[0];
+        if (Math.random() < 0.5) [a, b] = [b, a];
+        target = a > b ? "چپ" : "راست";
+        td.left_n = a;
+        td.right_n = b;
+        q("کدام سمت شکل‌های بیشتری دارد؟");
+        let wrap = document.createElement("div");
+        wrap.className = "stimulus-row";
+        let left = document.createElement("div"),
+          right = document.createElement("div");
+        left.className = right.className = "stimulus-box";
+        left.append(dots(a));
+        right.append(dots(b));
+        wrap.append(left, right);
+        $("stage").append(wrap);
+        let r = document.createElement("div");
+        r.className = "row";
+        r.style.marginTop = "12px";
+        ["راست", "چپ"].forEach((v) =>
+          r.append(btn(v, () => answer(v, v === target))),
+        );
+        $("stage").append(r);
+        onset = performance.now();
+      } else if (task === 2) {
+        let n =
+            level === 1
+              ? rand(5, 9)
+              : level === 2
+                ? rand(9, 14)
+                : level === 3
+                  ? rand(12, 18)
+                  : level === 4
+                    ? rand(16, 24)
+                    : rand(22, 32),
+          opts = [Math.max(1, n - (level + 2)), n, n + (level + 3)].sort(
+            () => Math.random() - 0.5,
+          );
+        target = "" + n;
+        td.actual = n;
+        q("تقریبا چند دایره می بینی؟");
+        let box = document.createElement("div");
+        box.className = "estimate-box";
+        let inner = document.createElement("div");
+        inner.style.width = "100%";
+        inner.append(dots(n));
+        let r = document.createElement("div");
+        r.className = "row";
+        r.style.marginTop = "18px";
+        opts.forEach((v) =>
+          r.append(
+            btn(String(v), () => answer(String(v), String(v) === target)),
+          ),
+        );
+        inner.append(r);
+        box.append(inner);
+        $("stage").append(box);
+        onset = performance.now();
+      } else if (task === 3) {
+        let n =
+          level === 1
+            ? rand(4, 7)
+            : level === 2
+              ? rand(7, 10)
+              : level === 3
+                ? rand(10, 14)
+                : level === 4
+                  ? rand(13, 17)
+                  : rand(16, 20);
+        target = "" + n;
+        td.target = n;
+        q("تعداد دقیق دایره ها را بشمار");
+        $("stage").append(dots(n));
+        choices(
+          [...new Set([Math.max(1, n - 1), n, n + 1])]
+            .sort(() => Math.random() - 0.5)
+            .map(String),
+          (v) => answer(v, v === target),
+        );
+      } else if (task === 4) {
+        let n =
+          level === 1
+            ? rand(2, 5)
+            : level === 2
+              ? rand(4, 7)
+              : level === 3
+                ? rand(6, 9)
+                : level === 4
+                  ? rand(8, 11)
+                  : rand(10, 12);
+        target = "" + n;
+        td.target = n;
+        let targetEl = document.createElement("div");
+        targetEl.className = "big";
+        targetEl.textContent = n;
+        $("stage").append(targetEl);
+        q("کدام مجموعه دقیقاً به اندازه عدد هدف، شیء دارد؟");
+        let vals = [n, Math.max(1, n - 1), n + 1, Math.max(1, n - 2)]
+          .filter((v, i, a) => a.indexOf(v) === i)
+          .sort(() => Math.random() - 0.5);
+        let wrap = document.createElement("div");
+        wrap.className = "row";
+        vals.forEach((v) => {
+          let b = document.createElement("button");
+          b.className = "choice";
+          b.style.minWidth = "120px";
+          b.style.minHeight = "125px";
+          b.style.padding = "6px";
+          let d = quantityDots(v);
+          d.style.width = "90px";
+          d.style.minHeight = "80px";
+          d.style.border = "0";
+          b.append(d);
+          b.onclick = () => answer(String(v), v === n);
+          wrap.append(b);
+        });
+        $("stage").append(wrap);
+        td.options = vals.join(",");
+      } else if (task === 5) {
+        let gap =
+            level <= 1
+              ? rand(5, 8)
+              : level === 2
+                ? rand(3, 4)
+                : level === 3
+                  ? rand(2, 3)
+                  : 1,
+          a = rand(1, 20 - gap),
+          b = a + gap;
+        if (Math.random() < 0.5) [a, b] = [b, a];
+        target = "" + Math.max(a, b);
+        td.a = a;
+        td.b = b;
+        q("کدام عدد بزرگ‌تر است؟");
+        $("stage").insertAdjacentHTML(
+          "beforeend",
+          `<div class="big">${a}　　${b}</div>`,
+        );
+        choices([a, b].map(String), (v) => answer(v, v === target));
+      } else if (task === 6) {
+        let max = level <= 2 ? 20 : level === 3 ? 100 : 1000,
+          n = rand(1, max - 1);
+        target = "" + n;
+        td.target = n;
+        td.max = max;
+        q(`عدد ${n} را روی محور قرار دهید.`);
+        let axis = document.createElement("div");
+        axis.className = "number-axis";
+        axis.innerHTML = `<div class="axis-line"><input id="range" class="axis-range" type="range" min="0" max="${max}" value="${max / 2}" aria-label="محل روی محور"></div><div class="axis-labels"><span>۰</span><span>${max}</span></div>`;
+        $("stage").append(axis);
+        let rg = $("range");
+        rg.onclick = () => {
+          let v = +rg.value;
+          td.response = v;
+          td.absolute_error = Math.abs(v - n);
+          answer("" + v, v === n);
+        };
+        rg.onchange = rg.onclick;
+        rg.oninput = () => {
+          if (!td.done) {
+            let v = +rg.value;
+            td.response = v;
+            td.absolute_error = Math.abs(v - n);
+          }
+        };
+      } else if (task === 7) {
+        let len =
+          level <= 1
+            ? 2
+            : level === 2
+              ? 3
+              : level === 3
+                ? 4
+                : level === 4
+                  ? 6
+                  : 8;
+        seq = Array.from({ length: len }, () => rand(0, 8));
+        td.sequence = seq.join("-");
+        td.length = len;
+        let g = document.createElement("div");
+        g.className = "grid";
+        for (let i = 0; i < 9; i++) {
+          let b = btn("", () => {});
+          b.className = "cell";
+          b.id = "c" + i;
+          g.append(b);
+        }
+        $("stage").append(g);
+        q("توالی را به خاطر بسپارید و سپس همان توالی را انتخاب کنید.");
+        let i = 0;
+        function flash() {
+          if (!running || my !== token) return;
+          if (i >= seq.length) {
+            selected = [];
+            onset = performance.now();
+            return;
+          }
+          $("c" + seq[i]).classList.add("lit");
+          setTimeout(() => {
+            $("c" + seq[i]).classList.remove("lit");
+            i++;
+            setTimeout(flash, 200);
+          }, 400);
+        }
+        flash();
+        g.querySelectorAll("button").forEach(
+          (b, i) =>
+            (b.onclick = () => {
+              selected.push(i);
+              b.classList.add("sel");
+              if (selected.length === seq.length)
+                answer(
+                  selected.join("-"),
+                  selected.join("-") === seq.join("-"),
+                );
+            }),
+        );
+      } else if (task === 8 || task === 9) {
+        let n =
+            task === 8
+              ? level <= 2
+                ? 2
+                : level === 3
+                  ? 3
+                  : level === 4
+                    ? 4
+                    : 5
+              : level <= 2
+                ? 2
+                : level === 3
+                  ? 3
+                  : level === 4
+                    ? 4
+                    : 4,
+          loc = shuffle([0, 1, 2, 3, 4, 5, 6, 7, 8]).slice(0, n);
+        objects = loc.map((x) => ({ loc: x, num: rand(1, 20) }));
+        td.objects = JSON.stringify(objects);
+        let g = document.createElement("div");
+        g.className = "grid";
+        for (let i = 0; i < 9; i++) {
+          let b = btn("", () => {});
+          b.className = "cell";
+          b.id = "c" + i;
+          let o = objects.find((x) => x.loc === i);
+          if (o) b.textContent = task === 8 ? "●" : o.num;
+          g.append(b);
+        }
+        $("stage").append(g);
+        q(
+          task === 8
+            ? "مکان اشیا را به خاطر بسپارید. پس از ناپدیدشدن، محل اشیا را انتخاب کنید."
+            : "عدد و مکان هر شیء را به خاطر بسپارید. پس از ناپدیدشدن، عدد را مستقیماً روی همان خانه وارد کنید.",
+        );
+        later(task === 8 ? 5000 : 4000, () => {
+          onset = performance.now();
+          g.querySelectorAll("button").forEach((b) => {
+            b.textContent = "";
+            b.onclick = () => {
+              let idx = +b.id.slice(1);
+              if (task === 8) {
+                if (b.classList.contains("sel")) {
+                  b.classList.remove("sel");
+                  selected = selected.filter((x) => x !== idx);
+                } else {
+                  b.classList.add("sel");
+                  selected.push(idx);
+                }
+                if (selected.length === objects.length) {
+                  selected.sort((a, b) => a - b);
+                  let ok = objects.every((o) => selected.includes(o.loc));
+                  answer(JSON.stringify(selected), ok);
+                }
+              } else {
+                let o = objects.find((x) => x.loc === idx);
+                if (!o || b.querySelector("input")) return;
+                let inp = document.createElement("input");
+                inp.className = "memory-input";
+                inp.type = "number";
+                inp.inputMode = "numeric";
+                inp.min = "0";
+                inp.max = "99";
+                inp.autocomplete = "off";
+                b.classList.add("input-cell");
+                b.append(inp);
+                inp.focus();
+                td.responses = td.responses || {};
+                inp.onchange = () => {
+                  let v = inp.value.trim();
+
+                  if (v !== "") {
+                    td.responses[idx] = v;
+                  } else {
+                    delete td.responses[idx];
+                  }
+
+                  let done = objects.every((o) =>
+                    Object.prototype.hasOwnProperty.call(td.responses, o.loc),
+                  );
+
+                  if (done) {
+                    let ok = objects.every(
+                      (o) => String(td.responses[o.loc]) === String(o.num),
+                    );
+
+                    answer(JSON.stringify(td.responses), ok);
+                  }
+                };
+              }
+            };
+          });
+        });
+      }
+    }
+
+    function rand(a, b) {
+      return Math.floor(Math.random() * (b - a + 1)) + a;
+    }
+    function shuffle(a) {
+      return a.sort(() => Math.random() - 0.5);
+    }
+    function answer(resp, ok) {
+      if (!running || td.done) return;
+      td.done = true;
+      let rt = Math.round(performance.now() - onset);
+      if (ok) {
+        score++;
+        correctStreak++;
+        wrongStreak = 0;
+      } else {
+        wrongStreak++;
+        correctStreak = 0;
+      }
+      const [lo, hi] = modeBounds();
+      if (correctStreak >= 2) {
+        level = Math.min(hi, level + 1);
+        correctStreak = 0;
+      } else if (wrongStreak >= 2) {
+        level = Math.max(lo, level - 1);
+        wrongStreak = 0;
+      }
+      rows.push({
+        participant_id: $("pid").value,
+        session_id: $("sid").value,
+        task_id: task,
+        trial_number: trial,
+        stimulus_parameters: JSON.stringify(td),
+        difficulty_level: difficultyLabel(),
+        correct_response: target,
+        child_response: resp,
+        accuracy: ok ? 1 : 0,
+        response_status: ok ? "درست" : "نادرست",
+        reaction_time_ms: rt,
+        timestamp: new Date().toISOString(),
+      });
+      localStorage.setItem(
+        "cog_v6_active",
+        JSON.stringify({
+          pid: $("pid").value,
+          sid: $("sid").value,
+          task,
+          rows,
+          score,
+          sessionKey,
+          difficulty_mode: $("difficultyMode").value,
+        }),
+      );
+      status();
+      renderDashboard();
+      setTimeout(next, 250);
+    }
+    function persistSession() {
+      if (!rows.length) return null;
+      let s = {
+        key: sessionKey || "S" + Date.now(),
+        pid: $("pid").value,
+        sid: $("sid").value,
+        task: task,
+        task_label: names[task],
+        difficulty_mode: $("difficultyMode").value,
+        difficulty_label: difficultyLabel(),
+        rows: rows.slice(),
+        saved: new Date().toISOString(),
+        correct: score,
+      };
+      let i = sessions.findIndex((x) => x.key === s.key);
+      if (i >= 0) sessions[i] = s;
+      else sessions.push(s);
+      localStorage.setItem("cog_v6_sessions", JSON.stringify(sessions));
+      drawSessions();
+      return s;
+    }
+    function finish() {
+      running = false;
+      const s = persistSession();
+      $("stage").innerHTML =
+        `<div class="big">پایان تکلیف</div><p>تکلیف «${names[task]}» برای این آزمودنی اجرا شد.</p><p>تعداد کوشش‌ها: ${rows.length} | پاسخ صحیح: ${score} | درصد صحت: ${Math.round((score / Math.max(1, rows.length)) * 100)}٪</p><button id="finishExcel">دریافت Excel این تکلیف</button>`;
+      $("finishExcel").onclick = () =>
+        excel(
+          rows,
+          "task_" + task + "_" + $("pid").value + "_" + $("sid").value + ".xls",
+        );
+      $("actions").style.display = "flex";
+      $("note").textContent = "داده‌های این تکلیف برای آزمودنی ذخیره شد.";
+    }
+
+    function saveSession() {
+      if (!rows.length) return alert("داده‌ای برای ذخیره وجود ندارد.");
+      persistSession();
+      alert("جلسه این تکلیف در همین مرورگر ذخیره شد.");
+    }
+    const CSV_COLUMNS = [
+      "participant_id",
+      "session_id",
+      "task_id",
+      "trial_number",
+      "stimulus_parameters",
+      "difficulty_level",
+      "correct_response",
+      "child_response",
+      "accuracy",
+      "response_status",
+      "reaction_time_ms",
+      "timestamp",
+    ];
+    function csv(data) {
+      let e = (x) => '"' + String(x ?? "").replaceAll('"', '""') + '"';
+      return (
+        "\ufeff" +
+        [
+          CSV_COLUMNS.map(e).join(","),
+          ...data.map((r) => CSV_COLUMNS.map((k) => e(r[k])).join(",")),
+        ].join("\r\n")
+      );
+    }
+    function download(n, c, t) {
+      let a = document.createElement("a"),
+        u = URL.createObjectURL(new Blob([c], { type: t }));
+      a.href = u;
+      a.download = n;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(u), 1000);
+    }
+    function deleteSession(k) {
+      const s = sessions.find((x) => x.key === k);
+      if (!s) return;
+      if (!confirm(`جلسه ${s.sid} مربوط به ${s.pid} حذف شود؟`)) return;
+      sessions = sessions.filter((x) => x.key !== k);
+      saveLocal();
+    }
+    function excel(data, filename) {
+      if (!data.length) return alert("داده‌ای برای خروجی وجود ندارد.");
+      const e = (x) =>
+        String(x ?? "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;");
+      let html = `<html><head><meta charset="utf-8"></head><body><table><thead><tr>${CSV_COLUMNS.map((k) => `<th>${e(k)}</th>`).join("")}</tr></thead><tbody>${data.map((r) => `<tr>${CSV_COLUMNS.map((k) => `<td>${e(r[k])}</td>`).join("")}</tr>`).join("")}</tbody></table></body></html>`;
+      download(filename, html, "application/vnd.ms-excel;charset=utf-8");
+    }
+    function load(k) {
+      let s = sessions.find((x) => x.key === k);
+      if (!s) return;
+      $("pid").value = s.pid;
+      $("sid").value = s.sid;
+      $("task").value = String(s.task || 1);
+      $("difficultyMode").value = s.difficulty_mode || "medium";
+      setTitle();
+      rows = s.rows || [];
+      task = +$("task").value;
+      taskIndex = task - 1;
+      trial = rows.length;
+      score = s.correct || 0;
+      level = initialLevel();
+      running = false;
+
+      $("stage").innerHTML = `
+  <div class="big">جلسه بارگذاری شد</div>
+  <p>شرکت‌کننده ${s.pid} — ${s.task_label || names[task]} — ${rows.length} کوشش ذخیره‌شده</p>
+  <div class="row" style="flex-direction:column; align-items:center; width:100%; margin-top:12px;">
+    <button id="dlone">دریافت Excel این جلسه</button>
+    <button id="backToReady" class="secondary">بازگشت به آماده</button>
+  </div>
+`;
+
+      $("dlone").onclick = () =>
+        excel(s.rows, "session_" + s.pid + "_" + s.sid + ".xls");
+
+      $("backToReady").onclick = () => {
+        running = false;
+        token++;
+        rows = [];
+        trial = 0;
+        score = 0;
+        level = initialLevel();
+        setTitle();
+        status();
+
+        $("stage").innerHTML = `
+    <div class="big">آماده</div>
+    <div class="muted">برای فعال‌شدن آزمون، دکمه زیر را بزنید.</div>
+    <button id="start" style="font-size:1.1rem; padding:13px 35px">
+      شروع آزمون
+    </button>
+  `;
+
+        $("start").onclick = begin;
+        $("actions").style.display = "none";
+        $("note").textContent = "";
+        $("feedback").textContent = "";
+        renderDashboard();
+      };
+
+      $("actions").style.display = "none";
+      $("note").textContent =
+        "جلسه قبلی برای مشاهده/خروجی بارگذاری شده است؛ شروع آزمون، جلسه جدیدی ایجاد می‌کند.";
+      status();
+      renderDashboard();
+    }
+
+    $("save").onclick = saveSession;
+    $("thiscsv").textContent = "خروجی Excel این جلسه";
+    $("thiscsv").onclick = () => excel(rows, "current_session.xls");
+    $("ready").onclick = () => {
+      level = initialLevel();
+      status();
+      $("stage").innerHTML =
+        '<div class="big">آماده</div><div class="muted">برای فعال‌شدن آزمون، دکمه زیر را بزنید.</div><button id="start" style="font-size:1.1rem;padding:13px 35px">شروع آزمون</button>';
+      $("start").onclick = begin;
+      $("actions").style.display = "none";
+      $("note").textContent = "";
+    };
+    $("allcsv").onclick = () => {
+      let a = sessions.flatMap((s) => s.rows);
+      if (a.length) excel(a, "all_sessions.xls");
+      else alert("جلسه ذخیره‌شده‌ای وجود ندارد.");
+    };
+    function renderDashboard() {
+      const selectedTask = $("chartTask").value;
+
+      // داده‌های جاری؛ در صورت نبود داده جاری، جلسات ذخیره‌شده نمایش داده می‌شوند.
+      let sourceRows = rows.length
+        ? rows.slice()
+        : sessions.flatMap((s) => s.rows || []);
+
+      if (selectedTask !== "all") {
+        sourceRows = sourceRows.filter(
+          (r) => String(r.task_id) === selectedTask,
+        );
+      }
+
+      const validRT = sourceRows
+        .map((r) => Number(r.reaction_time_ms))
+        .filter((n) => Number.isFinite(n) && n >= 0);
+
+      const correct = sourceRows.filter((r) => Number(r.accuracy) === 1).length;
+      const accuracy = sourceRows.length
+        ? Math.round((correct / sourceRows.length) * 100)
+        : null;
+      const avgRT = validRT.length
+        ? Math.round(validRT.reduce((a, b) => a + b, 0) / validRT.length)
+        : null;
+
+      $("metricAccuracy").textContent =
+        accuracy === null ? "—" : accuracy + "٪";
+      $("metricCorrect").textContent = String(correct);
+      $("metricRT").textContent = avgRT === null ? "—" : avgRT + " ms";
+      $("metricTrials").textContent = String(sourceRows.length);
+
+      drawLineChart(
+        "accuracyChart",
+        sourceRows.map((r) => Number(r.accuracy) * 100),
+        "دقت",
+        "%",
+        100,
+      );
+
+      drawLineChart(
+        "reactionChart",
+        sourceRows.map((r) => Number(r.reaction_time_ms)),
+        "زمان واکنش",
+        " ms",
+        null,
+      );
+
+      // مقایسه تکالیف بر اساس جلسات ذخیره‌شده
+      const comparisonRows = sessions.flatMap((s) => s.rows || []);
+      const taskRows = comparisonRows.length ? comparisonRows : rows;
+      const taskStats = [];
+
+      for (let i = 1; i <= 9; i++) {
+        const data = taskRows.filter((r) => Number(r.task_id) === i);
+        if (!data.length) continue;
+
+        const acc =
+          (data.filter((r) => Number(r.accuracy) === 1).length / data.length) *
+          100;
+
+        taskStats.push({
+          label: names[i],
+          value: Math.round(acc),
+        });
+      }
+
+      drawBarChart("taskChart", taskStats, "٪");
+
+      // دقت بر اساس سطح دشواری
+      const difficultyNames = ["آسان", "متوسط", "سخت"];
+      const difficultyStats = difficultyNames
+        .map((name) => {
+          const data = sourceRows.filter((r) =>
+            String(r.difficulty_level || "").includes(name),
+          );
+
+          return {
+            label: name,
+            value: data.length
+              ? Math.round(
+                  (data.filter((r) => Number(r.accuracy) === 1).length /
+                    data.length) *
+                    100,
+                )
+              : null,
+          };
+        })
+        .filter((x) => x.value !== null);
+
+      drawBarChart("difficultyChart", difficultyStats, "٪");
+    }
+
+    function drawLineChart(id, values, label, suffix, fixedMax) {
+      const el = $(id);
+      const valid = values
+        .map((v, i) => ({ v, i }))
+        .filter((x) => Number.isFinite(x.v) && x.v >= 0)
+        .slice(-30);
+
+      if (!valid.length) {
+        el.innerHTML =
+          '<div class="chart-empty">پس از ثبت پاسخ‌ها، نمودار نمایش داده می‌شود.</div>';
+        return;
+      }
+
+      const W = 600,
+        H = 200;
+      const left = 48,
+        right = 16,
+        top = 18,
+        bottom = 34;
+      const plotW = W - left - right;
+      const plotH = H - top - bottom;
+      const maxValue = fixedMax || Math.max(1, ...valid.map((x) => x.v)) * 1.15;
+
+      const points = valid.map((x, i) => {
+        const px =
+          left +
+          (valid.length === 1 ? plotW / 2 : (i / (valid.length - 1)) * plotW);
+        const py = top + plotH - (Math.min(x.v, maxValue) / maxValue) * plotH;
+        return { x: px, y: py, value: x.v, trial: x.i + 1 };
+      });
+
+      const grid = [0, 0.25, 0.5, 0.75, 1]
+        .map((fraction) => {
+          const y = top + plotH * (1 - fraction);
+          const val = Math.round(maxValue * fraction);
+          return `
+        <line x1="${left}" y1="${y}" x2="${W - right}" y2="${y}"
+          stroke="#e5edf5" stroke-width="1"/>
+        <text x="${left - 8}" y="${y + 4}" text-anchor="end"
+          font-size="11" fill="#627d98">${val}</text>`;
+        })
+        .join("");
+
+      const polyline = points.map((p) => `${p.x},${p.y}`).join(" ");
+      const circles = points
+        .map(
+          (p) => `
+    <circle cx="${p.x}" cy="${p.y}" r="3.5" fill="#3977b8">
+      <title>کوشش ${p.trial}: ${p.value}${suffix}</title>
+    </circle>`,
+        )
+        .join("");
+
+      const firstLabel = valid[0].i + 1;
+      const lastLabel = valid[valid.length - 1].i + 1;
+
+      el.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" role="img"
+      aria-label="${label} در کوشش‌های آزمون">
+      ${grid}
+      <polyline points="${polyline}" fill="none" stroke="#3977b8"
+        stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+      ${circles}
+      <text x="${left}" y="${H - 8}" font-size="11" fill="#627d98">
+        کوشش ${firstLabel}
+      </text>
+      <text x="${W - right}" y="${H - 8}" text-anchor="end"
+        font-size="11" fill="#627d98">کوشش ${lastLabel}</text>
+    </svg>`;
+    }
+
+    function drawBarChart(id, items, suffix) {
+      const el = $(id);
+
+      if (!items.length) {
+        el.innerHTML =
+          '<div class="chart-empty">برای نمایش این نمودار، ابتدا داده‌های مربوطه را ثبت و ذخیره کنید.</div>';
+        return;
+      }
+
+      el.innerHTML = `
+    <div class="chart-bars">
+      ${items
+        .map((item) => {
+          const value = Math.max(0, Math.min(100, item.value));
+          return `
+          <div class="chart-bar-row">
+            <div class="chart-bar-label">${item.label}</div>
+            <div class="chart-bar-track">
+              <div class="chart-bar-fill" style="width:${value}%"></div>
+            </div>
+            <div class="chart-bar-value">${value}${suffix}</div>
+          </div>`;
+        })
+        .join("")}
+    </div>`;
+    }
+
+    $("chartTask").addEventListener("change", renderDashboard);
+    drawSessions();
+    status();
+    renderDashboard();
+  </script>
+</html>

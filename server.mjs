@@ -358,7 +358,12 @@ async function setup() {
     [hash(process.env.ADMIN_PASSWORD || "admin123")],
   );
   const planSeeds = [
-    ["normal", "عادی", 0, ["دسترسی به امکانات پایه"]],
+    [
+      "normal",
+      "عادی",
+      0,
+      ["دسترسی به امکانات پایه", "دسترسی به سامانه تکالیف شناختی"],
+    ],
     [
       "silver",
       "نقره‌ای",
@@ -367,6 +372,7 @@ async function setup() {
         "مدت اشتراک: ۳۰ روز",
         "۱۵۰ تحلیل مشترک",
         "دسترسی به سامانه نارساخوانی",
+        "دسترسی به سامانه حساب نارسایی",
         "عدم دسترسی به سامانه انتخاب رشته",
       ],
     ],
@@ -378,6 +384,7 @@ async function setup() {
         "مدت اشتراک: ۶۰ روز",
         "۳۰۰ تحلیل مشترک",
         "دسترسی به سامانه انتخاب رشته",
+        "دسترسی به سامانه حساب نارسایی",
         "دسترسی به سامانه نارساخوانی",
       ],
     ],
@@ -699,6 +706,23 @@ async function canAccessDyslexiaSystem(userId) {
   if (sub.ends_at && new Date(sub.ends_at) <= new Date()) {
     return false;
   }
+  return true;
+}
+async function canAccessDyscalculiaSystem(userId) {
+  const sub = await currentSubscription(userId);
+
+  if (!sub || !["silver", "gold"].includes(sub.plan_id)) {
+    return false;
+  }
+
+  if (sub.status !== "active") {
+    return false;
+  }
+
+  if (sub.ends_at && new Date(sub.ends_at) <= new Date()) {
+    return false;
+  }
+
   return true;
 }
 function isFlaskAppPath(p) {
@@ -2799,6 +2823,36 @@ async function handler(req, res) {
       return proxyToFlask(req, res, p);
     }
     // ============================================
+    // PROTECTED DYSCALCULIA SYSTEM
+    // سامانه حساب نارسایی — اشتراک نقره‌ای و طلایی
+    // ============================================
+    if (req.method === "GET" && p === "/assessments/DyscalculiaV11.html") {
+      const u = await need(req, res);
+      if (!u) return;
+
+      const allowed = await canAccessDyscalculiaSystem(u.id);
+
+      if (!allowed) {
+        return json(res, 403, {
+          error:
+            "برای ورود به سامانه حساب نارسایی، اشتراک نقره‌ای یا طلایی فعال لازم است.",
+        });
+      }
+
+      const full = join(ROOT, "assessments", "DyscalculiaV11.html");
+      const info = await stat(full);
+
+      securityHeaders(res);
+
+      res.writeHead(200, {
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Length": info.size,
+        "Cache-Control": "private, no-store",
+      });
+
+      return res.end(await readFile(full));
+    }
+    // ============================================
     // PROTECTED CAREER EXCEL FILES
     // ============================================
     const careerDataFiles = {
@@ -2875,6 +2929,14 @@ async function handler(req, res) {
     ) {
       return json(res, 403, {
         error: "دسترسی مستقیم به فایل اطلاعاتی مجاز نیست.",
+      });
+    }
+    if (
+      req.method === "GET" &&
+      p.toLowerCase() === "/assessments/dyscalculiav11.html"
+    ) {
+      return json(res, 403, {
+        error: "دسترسی مستقیم به سامانه حساب نارسایی مجاز نیست.",
       });
     }
     if (req.method === "GET") {

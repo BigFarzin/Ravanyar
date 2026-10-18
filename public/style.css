@@ -6003,3 +6003,723 @@ button.career-back-button[data-page="home"]:hover {
     border-radius: 9px;
   }
 }
+/* =====================================
+   QUICK SYSTEM ACCESS - FOUR SQUARE CARDS
+===================================== */
+
+.quick-systems-section {
+  direction: rtl;
+}
+
+.quick-systems-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  width: 100%;
+}
+
+.system-square-card {
+  --system-color: #64748b;
+  --system-glow: rgba(100, 116, 139, 0.1);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  padding: clamp(14px, 1.5vw, 22px);
+  overflow: hidden;
+  text-align: right;
+  font: inherit;
+  color: #17233f;
+  background: linear-gradient(145deg, #ffffff, #f5f7ff);
+  border: 1px solid #e2e8f0;
+  border-radius: 22px;
+  box-shadow: 0 8px 25px rgba(30, 41, 90, 0.06);
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.system-square-card::before {
+  content: "";
+  position: absolute;
+  top: -55px;
+  left: -55px;
+  width: 125px;
+  height: 125px;
+  border-radius: 50%;
+  background: var(--system-glow);
+  pointer-events: none;
+}
+
+.system-square-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--system-color);
+  box-shadow: 0 16px 32px rgba(30, 41, 90, 0.12);
+}
+
+.system-square-card:focus-visible {
+  outline: 3px solid var(--system-color);
+  outline-offset: 3px;
+}
+
+.system-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.system-card-number {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.system-card-status {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.system-square-card.is-unlocked .system-card-status {
+  color: #047857;
+  background: #d1fae5;
+}
+
+.system-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: clamp(44px, 4.5vw, 62px);
+  height: clamp(44px, 4.5vw, 62px);
+  margin-top: auto;
+  margin-bottom: 12px;
+  border-radius: 17px;
+  background: var(--system-glow);
+  font-size: clamp(24px, 2.7vw, 34px);
+}
+
+.system-card-title {
+  display: block;
+  font-size: clamp(13px, 1.15vw, 17px);
+  font-weight: 900;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.system-card-description {
+  display: -webkit-box;
+  margin-top: 4px;
+  color: #64748b;
+  font-size: clamp(10px, 0.85vw, 12px);
+  line-height: 1.8;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.system-card-footer {
+  display: block;
+  margin-top: auto;
+  padding-top: 10px;
+  color: var(--system-color);
+  font-size: clamp(10px, 0.85vw, 12px);
+  font-weight: 900;
+  line-height: 1.8;
+}
+
+.system-square-card.is-locked {
+  background: linear-gradient(145deg, #ffffff, #f8fafc);
+}
+
+.system-square-card.is-locked .system-card-title {
+  color: #475569;
+}
+
+/* رنگ اختصاصی سامانه‌ها */
+
+.system-career {
+  --system-color: #7c3aed;
+  --system-glow: rgba(139, 92, 246, 0.13);
+}
+
+.system-dyslexia {
+  --system-color: #2563eb;
+  --system-glow: rgba(59, 130, 246, 0.13);
+}
+
+.system-dyscalculia {
+  --system-color: #0891b2;
+  --system-glow: rgba(6, 182, 212, 0.13);
+}
+
+.system-cognitive {
+  --system-color: #059669;
+  --system-glow: rgba(16, 185, 129, 0.13);
+}
+
+/* تبلت و نمایشگرهای کوچک‌تر */
+
+@media (max-width: 1050px) {
+  .quick-systems-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .system-square-card {
+    padding: 16px;
+  }
+
+  .system-card-title {
+    font-size: 16px;
+  }
+
+  .system-card-description,
+  .system-card-footer {
+    font-size: 12px;
+  }
+}
+
+/* موبایل */
+
+@media (max-width: 480px) {
+  .quick-systems-grid {
+    gap: 10px;
+  }
+
+  .system-square-card {
+    padding: 11px;
+    border-radius: 17px;
+  }
+
+  .system-card-status {
+    padding: 4px 6px;
+    font-size: 9px;
+  }
+
+  .system-card-icon {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+    border-radius: 12px;
+    font-size: 23px;
+  }
+
+  .system-card-title {
+    font-size: 13px;
+  }
+
+  .system-card-description {
+    font-size: 10px;
+    line-height: 1.7;
+  }
+
+  .system-card-footer {
+    padding-top: 7px;
+    font-size: 10px;
+  }
+}
+/* =====================================
+   SMART QUICK START
+===================================== */
+
+.smart-start-section {
+  direction: rtl;
+}
+
+.smart-start-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(230px, 1fr);
+  grid-template-rows: repeat(2, minmax(125px, auto));
+  gap: 16px;
+}
+
+/* پنل پیشنهاد اصلی */
+
+.smart-start-feature {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  grid-row: 1 / span 2;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-width: 0;
+  min-height: 280px;
+  padding: clamp(22px, 3vw, 36px);
+  overflow: hidden;
+  border: 1px solid rgba(129, 140, 248, 0.18);
+  border-radius: 25px;
+  background:
+    radial-gradient(
+      circle at 12% 20%,
+      rgba(129, 140, 248, 0.18),
+      transparent 35%
+    ),
+    linear-gradient(125deg, #ffffff 0%, #f5f5ff 55%, #eef2ff 100%);
+  box-shadow: 0 10px 32px rgba(49, 46, 129, 0.07);
+}
+
+.smart-start-feature::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 240px;
+  height: 240px;
+  left: -105px;
+  bottom: -140px;
+  border-radius: 50%;
+  border: 1px solid rgba(99, 102, 241, 0.13);
+  box-shadow:
+    0 0 0 22px rgba(99, 102, 241, 0.035),
+    0 0 0 44px rgba(99, 102, 241, 0.025);
+}
+
+.smart-start-feature-content {
+  position: relative;
+  z-index: 2;
+  flex: 1;
+  min-width: 0;
+}
+
+.smart-start-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 15px;
+  color: #635bdb;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.smart-start-feature-content h3 {
+  max-width: 470px;
+  margin: 0;
+  color: #182445;
+  font-size: clamp(20px, 2vw, 28px);
+  font-weight: 900;
+  line-height: 1.8;
+}
+
+.smart-start-feature-content p {
+  max-width: 470px;
+  margin: 10px 0 22px;
+  color: #64718a;
+  font-size: 13px;
+  line-height: 2;
+}
+
+.smart-start-primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  min-height: 46px;
+  padding: 0 20px;
+  border: 0;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #7167e8, #5046c9);
+  color: #ffffff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 7px 18px rgba(99, 91, 219, 0.22);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.smart-start-primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 11px 24px rgba(99, 91, 219, 0.3);
+}
+
+.smart-start-primary-btn:focus-visible,
+.smart-start-mini-card:focus-visible {
+  outline: 3px solid #818cf8;
+  outline-offset: 3px;
+}
+
+/* تصویرسازی تزئینی */
+
+.smart-start-illustration {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 clamp(110px, 15vw, 180px);
+  aspect-ratio: 1;
+}
+
+.smart-start-main-icon {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 52px;
+  box-shadow:
+    0 15px 35px rgba(79, 70, 229, 0.11),
+    inset 0 0 0 1px rgba(99, 102, 241, 0.06);
+  backdrop-filter: blur(8px);
+}
+
+.smart-start-icon-orbit {
+  position: absolute;
+  width: 135px;
+  height: 135px;
+  border: 1px solid rgba(99, 102, 241, 0.16);
+  border-radius: 50%;
+}
+
+.orbit-two {
+  width: 175px;
+  height: 175px;
+  border-style: dashed;
+  border-color: rgba(99, 102, 241, 0.12);
+}
+
+.smart-start-spark {
+  position: absolute;
+  z-index: 3;
+  color: #8b82f6;
+  font-size: 25px;
+}
+
+.spark-one {
+  top: 15%;
+  right: 13%;
+}
+
+.spark-two {
+  bottom: 13%;
+  left: 13%;
+  font-size: 32px;
+}
+
+/* کارت‌های جانبی */
+
+.smart-start-mini-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  width: 100%;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid #e8ecf4;
+  border-radius: 21px;
+  background: #ffffff;
+  text-align: right;
+  font: inherit;
+  cursor: pointer;
+  box-shadow: 0 7px 24px rgba(30, 41, 90, 0.04);
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.smart-start-mini-card:hover {
+  transform: translateY(-3px);
+  border-color: #c7d2fe;
+  box-shadow: 0 12px 28px rgba(30, 41, 90, 0.08);
+}
+
+.smart-start-mini-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 15px;
+  background: #eef2ff;
+  font-size: 25px;
+}
+
+.smart-start-plan .smart-start-mini-icon {
+  background: #f3e8ff;
+}
+
+.smart-start-mini-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  min-width: 0;
+}
+
+.smart-start-mini-content strong {
+  color: #1e293b;
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.8;
+}
+
+.smart-start-mini-content small {
+  color: #718096;
+  font-size: 11px;
+  line-height: 1.9;
+}
+
+.smart-start-mini-link {
+  margin-top: 5px;
+  color: #635bdb;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+/* تبلت */
+
+@media (max-width: 900px) {
+  .smart-start-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+  }
+
+  .smart-start-feature {
+    grid-row: auto;
+    min-height: 260px;
+  }
+
+  .smart-start-mini-card {
+    min-height: 115px;
+  }
+}
+
+/* موبایل */
+
+@media (max-width: 520px) {
+  .smart-start-feature {
+    min-height: auto;
+    padding: 22px 18px;
+    border-radius: 20px;
+  }
+
+  .smart-start-feature-content h3 {
+    font-size: 19px;
+  }
+
+  .smart-start-feature-content p {
+    font-size: 12px;
+  }
+
+  .smart-start-illustration {
+    flex-basis: 72px;
+    align-self: center;
+  }
+
+  .smart-start-main-icon {
+    width: 65px;
+    height: 65px;
+    border-radius: 21px;
+    font-size: 35px;
+  }
+
+  .smart-start-icon-orbit {
+    width: 85px;
+    height: 85px;
+  }
+
+  .orbit-two {
+    width: 105px;
+    height: 105px;
+  }
+
+  .smart-start-spark {
+    font-size: 18px;
+  }
+
+  .spark-two {
+    font-size: 22px;
+  }
+
+  .smart-start-primary-btn {
+    min-height: 42px;
+    padding: 0 13px;
+    gap: 10px;
+    font-size: 11px;
+  }
+
+  .smart-start-mini-card {
+    padding: 17px;
+    border-radius: 17px;
+  }
+}
+
+@media (max-width: 360px) {
+  .smart-start-feature {
+    gap: 8px;
+    padding: 17px 12px;
+  }
+
+  .smart-start-illustration {
+    flex-basis: 54px;
+  }
+
+  .smart-start-main-icon {
+    width: 52px;
+    height: 52px;
+    font-size: 28px;
+  }
+
+  .smart-start-icon-orbit {
+    width: 66px;
+    height: 66px;
+  }
+
+  .orbit-two {
+    width: 82px;
+    height: 82px;
+  }
+}
+/* Smart Start - Auto Slider */
+
+.smart-start-feature {
+  position: relative;
+  display: block;
+  min-height: 330px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.smart-start-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 28px 32px 55px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-18px);
+  pointer-events: none;
+  transition:
+    opacity 650ms ease,
+    transform 650ms ease,
+    visibility 650ms ease;
+}
+
+.smart-start-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.smart-start-slide .smart-start-feature-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.smart-start-slide .smart-start-illustration {
+  flex-shrink: 0;
+}
+
+.smart-start-indicators {
+  position: absolute;
+  z-index: 5;
+  right: 32px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  direction: ltr;
+}
+
+.smart-start-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: #cbd5e1;
+  cursor: pointer;
+  transition:
+    width 350ms ease,
+    background 350ms ease;
+}
+
+.smart-start-dot.is-active {
+  width: 25px;
+  background: #635bdb;
+}
+
+.smart-start-progress-track {
+  position: absolute;
+  z-index: 6;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 3px;
+  overflow: hidden;
+  background: rgba(99, 91, 219, 0.1);
+}
+
+.smart-start-progress {
+  width: 0;
+  height: 100%;
+  background: #635bdb;
+}
+
+.smart-start-progress.is-running {
+  animation: smartStartProgress 5s linear forwards;
+}
+
+@keyframes smartStartProgress {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .smart-start-feature {
+    min-height: 340px;
+  }
+
+  .smart-start-slide {
+    padding: 22px 16px 54px;
+    gap: 8px;
+  }
+
+  .smart-start-slide .smart-start-illustration {
+    flex-basis: 65px;
+  }
+
+  .smart-start-indicators {
+    right: 18px;
+    bottom: 19px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .smart-start-slide,
+  .smart-start-dot {
+    transition: none;
+  }
+
+  .smart-start-progress.is-running {
+    animation: none;
+  }
+}
