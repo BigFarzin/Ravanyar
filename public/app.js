@@ -41,416 +41,243 @@ function enterSession(d) {
   state.user = d.user;
   d.user.role === "admin" ? admin() : home();
 }
+
 function login(msg = "", mode = "login") {
   const isRegister = mode === "register";
 
   root.innerHTML = `
-    <div class="glass-auth-page">
+    <main class="auth-page" dir="rtl">
 
-      <!-- Background Glow -->
-      <div class="auth-glow auth-glow-1"></div>
-      <div class="auth-glow auth-glow-2"></div>
-      <div class="auth-glow auth-glow-3"></div>
+      <!-- RIGHT: LOGIN / REGISTER -->
+      <section class="auth-panel">
 
-      <!-- Decorative shapes -->
-      <div class="auth-orb auth-orb-1"></div>
-      <div class="auth-orb auth-orb-2"></div>
+        <div class="brand-mark">✦</div>
 
-      <div class="glass-auth-container">
+        <span class="eyebrow">RAVANYAR PLATFORM</span>
 
-        <!-- =========================
-             LEFT / BRAND SECTION
-        ========================== -->
+        <h1>${isRegister ? "به روان‌یار بپیوند" : "به روان‌یار خوش آمدی"}</h1>
 
-        <section class="glass-auth-brand">
+        <p>
+          ${
+            isRegister
+              ? "حساب خودت را بساز و مسیر شناخت را شروع کن."
+              : "برای ادامه مسیر، وارد حساب کاربری خودت شو."
+          }
+        </p>
 
-          <div class="brand-decoration decoration-1"></div>
-          <div class="brand-decoration decoration-2"></div>
+        <div class="auth-tabs">
+          <button
+            type="button"
+            id="tabLogin"
+            class="auth-tab ${isRegister ? "" : "active"}"
+          >ورود</button>
 
-          <div class="auth-brand-content">
+          <button
+            type="button"
+            id="tabRegister"
+            class="auth-tab ${isRegister ? "active" : ""}"
+          >ثبت‌نام</button>
+        </div>
 
-            <div class="auth-brand-logo">
-              <span>✦</span>
-            </div>
+        ${
+          msg
+            ? `<div class="glass-auth-alert" role="alert">${esc(msg)}</div>`
+            : ""
+        }
 
-            <div class="auth-brand-name">
-              روان‌یار
-            </div>
+        <form id="authForm" class="glass-auth-form">
 
-            <div class="auth-brand-line"></div>
-
-            <h1>
-              مسیر شناخت،
-              <br>
-              <span>از همین‌جا شروع می‌شود.</span>
-            </h1>
-
-            <p>
-              پلتفرم یکپارچه روان‌شناختی برای ارزیابی،
-              آموزش و رشد فردی.
-            </p>
-
-            <div class="auth-feature-list">
-
-              <div class="auth-feature">
-                <div class="auth-feature-icon">✦</div>
-                <div>
-                  <strong>ارزیابی هوشمند</strong>
-                  <span>شناخت بهتر ویژگی‌ها و توانمندی‌ها</span>
-                </div>
-              </div>
-
-              <div class="auth-feature">
-                <div class="auth-feature-icon">◈</div>
-                <div>
-                  <strong>مسیر رشد شخصی</strong>
-                  <span>دسترسی به ابزارها و محتوای تخصصی</span>
-                </div>
-              </div>
-
-              <div class="auth-feature">
-                <div class="auth-feature-icon">✓</div>
-                <div>
-                  <strong>فضای امن و شخصی</strong>
-                  <span>اطلاعات شما در حساب شخصی شما</span>
-                </div>
-              </div>
-
-            </div>
-
-          </div>
-
-        </section>
-
-
-        <!-- =========================
-             LOGIN / REGISTER
-        ========================== -->
-
-        <section class="glass-auth-panel">
-
-          <div class="glass-auth-card">
-
-            <div class="glass-auth-card-header">
-
-              <div class="mobile-auth-logo">
-                ✦
-              </div>
-
-              <span class="glass-auth-eyebrow">
-                ${isRegister ? "عضویت در روان‌یار" : "ورود به حساب"}
-              </span>
-
-              <h2>
-                ${isRegister ? "حساب خودت را بساز" : "خوش آمدی 👋"}
-              </h2>
-
-              <p>
-                ${
-                  isRegister
-                    ? "برای شروع مسیر خود اطلاعاتت را وارد کن."
-                    : "برای ادامه وارد حساب کاربری خود شو."
-                }
-              </p>
-
-            </div>
-
-
-            <!-- Tabs -->
-
-            <div class="glass-auth-tabs">
-
-              <button
-                type="button"
-                id="tabLogin"
-                class="${isRegister ? "" : "active"}"
-              >
-                ورود
-              </button>
-
-              <button
-                type="button"
-                id="tabRegister"
-                class="${isRegister ? "active" : ""}"
-              >
-                ثبت‌نام
-              </button>
-
-              <div
-                class="glass-tab-indicator ${isRegister ? "register" : ""}"
-              ></div>
-
-            </div>
-
-
-            ${
-              msg
-                ? `
-                  <div class="glass-auth-alert">
-                    <span>!</span>
-                    <div>${esc(msg)}</div>
+          ${
+            isRegister
+              ? `
+                <label class="glass-input-group">
+                  <span>نام</span>
+                  <div class="glass-input-wrapper">
+                    <input
+                      name="firstName"
+                      required
+                      autocomplete="given-name"
+                      placeholder="نام شما"
+                    >
                   </div>
-                `
-                : ""
-            }
+                </label>
 
-
-            <form id="authForm" class="glass-auth-form">
-
-              ${
-                isRegister
-                  ? `
-                    <div class="glass-auth-row">
-
-                      <label class="glass-input-group">
-                        <span>نام</span>
-
-                        <div class="glass-input-wrapper">
-                          <span class="glass-input-icon">◉</span>
-
-                          <input
-                            name="firstName"
-                            required
-                            autocomplete="given-name"
-                            placeholder="نام شما"
-                          >
-                        </div>
-                      </label>
-
-
-                      <label class="glass-input-group">
-                        <span>نام خانوادگی</span>
-
-                        <div class="glass-input-wrapper">
-                          <span class="glass-input-icon">◉</span>
-
-                          <input
-                            name="lastName"
-                            required
-                            autocomplete="family-name"
-                            placeholder="نام خانوادگی"
-                          >
-                        </div>
-                      </label>
-
-                    </div>
-                  `
-                  : ""
-              }
-
-
-              <label class="glass-input-group">
-
-                <span>نام کاربری</span>
-
-                <div class="glass-input-wrapper">
-
-                  <span class="glass-input-icon">
-                    @
-                  </span>
-
-                  <input
-                    name="username"
-                    required
-                    autocomplete="username"
-                    placeholder="نام کاربری خود را وارد کنید"
-                  >
-
-                </div>
-
-              </label>
-
-
-              <label class="glass-input-group">
-
-                <div class="glass-label-row">
-                  <span>گذرواژه</span>
-
-                  ${
-                    !isRegister
-                      ? `<button type="button" class="forgot-password">
-                          فراموشی گذرواژه؟
-                        </button>`
-                      : ""
-                  }
-
-                </div>
-
-
-                <div class="glass-input-wrapper">
-
-                  <span class="glass-input-icon">
-                    ◈
-                  </span>
-
-                  <input
-                    id="passwordInput"
-                    type="password"
-                    name="password"
-                    required
-                    minlength="${isRegister ? 8 : 1}"
-                    autocomplete="${
-                      isRegister ? "new-password" : "current-password"
-                    }"
-                    placeholder="گذرواژه خود را وارد کنید"
-                  >
-
-                  <button
-                    type="button"
-                    id="togglePassword"
-                    class="password-toggle"
-                  >
-                    ◉
-                  </button>
-
-                </div>
-
-              </label>
-
-
-              ${
-                isRegister
-                  ? `
-                    <div
-                      id="passwordStrength"
-                      class="password-strength"
+                <label class="glass-input-group">
+                  <span>نام خانوادگی</span>
+                  <div class="glass-input-wrapper">
+                    <input
+                      name="lastName"
+                      required
+                      autocomplete="family-name"
+                      placeholder="نام خانوادگی شما"
                     >
+                  </div>
+                </label>
+              `
+              : ""
+          }
 
-                      <div class="password-strength-bar">
-                        <span></span>
-                      </div>
+          <label class="glass-input-group">
+            <span>نام کاربری</span>
+            <div class="glass-input-wrapper">
+              <input
+                name="username"
+                required
+                autocomplete="username"
+                placeholder="نام کاربری خود را وارد کنید"
+              >
+            </div>
+          </label>
 
-                      <div class="password-strength-info">
-                        <span>قدرت گذرواژه</span>
-                        <strong>ضعیف</strong>
-                      </div>
-
-                    </div>
-
-                    <div class="password-hint">
-                      <span class="password-hint-icon">ⓘ</span>
-                      <p>
-                        <strong>توجه:</strong>
-                         گذرواژه باید حداقل ۸ کاراکتر داشته باشد و شامل حداقل
-                         یک حرف بزرگ انگلیسی (A–Z)، یک عدد (0–9) و یک علامت ویژه     
-                         مانند @ _ ( ) * & ^ % $ ! # باشد.
-                      </p>
-                      </div>
-  
-                    <label class="glass-input-group">
-
-                      <span>تکرار گذرواژه</span>
-
-                      <div class="glass-input-wrapper">
-
-                        <span class="glass-input-icon">
-                          ◈
-                        </span>
-
-                        <input
-                          id="passwordConfirm"
-                          type="password"
-                          name="password2"
-                          required
-                          minlength="8"
-                          autocomplete="new-password"
-                          placeholder="گذرواژه را دوباره وارد کنید"
-                        >
-
-                      </div>
-
-                    </label>
-                  `
-                  : ""
-              }
-
-
-              ${
-                isRegister
-                  ? `
-                    <label class="glass-checkbox">
-
-                      <input
-                        type="checkbox"
-                        required
-                      >
-
-                      <span class="checkbox-custom"></span>
-
-                      <span>
-                        قوانین استفاده از روان‌یار را می‌پذیرم.
-                      </span>
-
-                    </label>
-                  `
-                  : ""
-              }
-
-
-              <button
-                type="submit"
-                class="glass-submit-button"
+          <label class="glass-input-group">
+            <span>گذرواژه</span>
+            <div class="glass-input-wrapper">
+              <input
+                id="passwordInput"
+                type="password"
+                name="password"
+                required
+                minlength="${isRegister ? 8 : 1}"
+                autocomplete="${isRegister ? "new-password" : "current-password"}"
+                placeholder="گذرواژه خود را وارد کنید"
               >
 
-                <span>
-                  ${isRegister ? "ساخت حساب کاربری" : "ورود به روان‌یار"}
-                </span>
-
-                <strong>←</strong>
-
-              </button>
-
-            </form>
-
-
-            <div class="glass-auth-footer">
-
-              ${
-                isRegister
-                  ? `
-                    <span>قبلاً حساب ساخته‌ای؟</span>
-
-                    <button
-                      type="button"
-                      id="footerLogin"
-                    >
-                      وارد شو
-                    </button>
-                  `
-                  : `
-                    <span>هنوز حساب کاربری نداری؟</span>
-
-                    <button
-                      type="button"
-                      id="footerRegister"
-                    >
-                      ثبت‌نام کن
-                    </button>
-                  `
-              }
-
+              <button
+                type="button"
+                id="togglePassword"
+                aria-label="نمایش یا مخفی کردن گذرواژه"
+              >◉</button>
             </div>
+          </label>
 
-          </div>
+          ${
+            isRegister
+              ? `
+                <div id="passwordStrength" class="password-strength">
+                  <div class="password-strength-bar">
+                    <span></span>
+                  </div>
+                  <div class="password-strength-info">
+                    <span>قدرت گذرواژه</span>
+                    <strong>ضعیف</strong>
+                  </div>
+                </div>
 
-        </section>
+                <p class="password-hint">
+                  گذرواژه باید حداقل ۸ کاراکتر و شامل حرف بزرگ انگلیسی،
+                  عدد و علامت ویژه باشد.
+                </p>
 
-      </div>
+                <label class="glass-input-group">
+                  <span>تکرار گذرواژه</span>
+                  <div class="glass-input-wrapper">
+                    <input
+                      id="passwordConfirm"
+                      type="password"
+                      name="password2"
+                      required
+                      minlength="8"
+                      autocomplete="new-password"
+                      placeholder="گذرواژه را دوباره وارد کنید"
+                    >
+                  </div>
+                </label>
 
-    </div>
+                <label class="glass-checkbox">
+                  <input type="checkbox" name="acceptTerms" required>
+                  <span class="checkbox-custom"></span>
+                  <span>قوانین استفاده از روان‌یار را می‌پذیرم.</span>
+                </label>
+              `
+              : ""
+          }
+
+          <button type="submit" class="glass-submit-button">
+            <span>
+              ${isRegister ? "ساخت حساب کاربری" : "ورود به روان‌یار"}
+            </span>
+            <strong>←</strong>
+          </button>
+
+        </form>
+
+        <div class="glass-auth-footer">
+          ${
+            isRegister
+              ? `
+                <span>قبلاً حساب ساخته‌ای؟</span>
+                <button type="button" id="footerLogin">وارد شو</button>
+              `
+              : `
+                <span>هنوز حساب کاربری نداری؟</span>
+                <button type="button" id="footerRegister">ثبت‌نام کن</button>
+              `
+          }
+        </div>
+
+      </section>
+
+      <!-- LEFT: SYSTEM ORBIT -->
+      <section class="systems-panel">
+
+        <span class="eyebrow">RAVANYAR ECOSYSTEM</span>
+
+        <h2>
+          همه ابزارهای شناخت،
+          <br>
+          در یک مسیر
+        </h2>
+
+        <div class="orbit-stage">
+
+          <div class="orbit-ring ring-one"></div>
+          <div class="orbit-ring ring-two"></div>
+
+          <div class="orbit-core">روان‌یار</div>
+
+          <article class="system-card active" data-index="0">
+            <span class="system-icon">🧩</span>
+            <h3>تکالیف شناختی</h3>
+            <p>تمرین‌های تعاملی برای بررسی و تقویت مهارت‌های شناختی.</p>
+          </article>
+
+          <article class="system-card" data-index="1">
+            <span class="system-icon">📘</span>
+            <h3>سامانه نارساخوانی</h3>
+            <p>ابزارهای تخصصی ارزیابی و تمرین در حوزه خواندن.</p>
+          </article>
+
+          <article class="system-card" data-index="2">
+            <span class="system-icon">🎯</span>
+            <h3>سامانه انتخاب رشته</h3>
+            <p>شناخت علاقه‌ها و بررسی مسیرهای تحصیلی.</p>
+          </article>
+
+          <article class="system-card" data-index="3">
+            <span class="system-icon">🔢</span>
+            <h3>سامانه حساب نارسایی</h3>
+            <p>ابزارهای تخصصی مرتبط با ارزیابی مهارت‌های ریاضی.</p>
+          </article>
+
+        </div>
+
+        <div class="orbit-caption">
+          <span id="system-counter">01 / 04</span>
+          <div class="caption-line"></div>
+          <p id="system-description">
+            تمرین‌های تعاملی برای بررسی و تقویت مهارت‌های شناختی.
+          </p>
+        </div>
+
+      </section>
+
+    </main>
   `;
 
-  /* =========================
-     TABS
-  ========================== */
-
+  // Switching between login and register
   document.querySelector("#tabLogin").onclick = () => login("", "login");
 
   document.querySelector("#tabRegister").onclick = () => login("", "register");
-
-  /* =========================
-     FOOTER SWITCH
-  ========================== */
 
   document
     .querySelector("#footerLogin")
@@ -460,85 +287,66 @@ function login(msg = "", mode = "login") {
     .querySelector("#footerRegister")
     ?.addEventListener("click", () => login("", "register"));
 
-  /* =========================
-     PASSWORD TOGGLE
-  ========================== */
-
+  // Show / hide password
   const passwordInput = document.querySelector("#passwordInput");
-
   const togglePassword = document.querySelector("#togglePassword");
 
   togglePassword?.addEventListener("click", () => {
-    if (passwordInput.type === "password") {
-      passwordInput.type = "text";
-      togglePassword.textContent = "◉";
-    } else {
-      passwordInput.type = "password";
-      togglePassword.textContent = "◌";
-    }
+    const hidden = passwordInput.type === "password";
+    passwordInput.type = hidden ? "text" : "password";
+    togglePassword.textContent = hidden ? "◌" : "◉";
   });
 
-  /* =========================
-     PASSWORD STRENGTH
-  ========================== */
-
+  // Password strength indicator
   const strengthBox = document.querySelector("#passwordStrength");
 
   if (strengthBox) {
     passwordInput.addEventListener("input", () => {
       const password = passwordInput.value;
-
       let score = 0;
 
       if (password.length >= 8) score++;
-
       if (/[A-Z]/.test(password)) score++;
-
       if (/[a-z]/.test(password)) score++;
-
       if (/[0-9]/.test(password)) score++;
-
       if (/[^A-Za-z0-9]/.test(password)) score++;
 
       const bar = strengthBox.querySelector(".password-strength-bar span");
-
       const label = strengthBox.querySelector(".password-strength-info strong");
 
       const levels = ["ضعیف", "ضعیف", "متوسط", "خوب", "قوی", "عالی"];
-
       const widths = ["5%", "20%", "40%", "60%", "80%", "100%"];
 
       bar.style.width = widths[score];
-
       label.textContent = levels[score];
     });
   }
 
-  /* =========================
-     FORM SUBMIT
-  ========================== */
-
+  // Real login / register API
   document.querySelector("#authForm").onsubmit = async (e) => {
     e.preventDefault();
 
-    const payload = Object.fromEntries(new FormData(e.target));
+    const form = e.currentTarget;
+    const submitButton = form.querySelector('button[type="submit"]');
+    const payload = Object.fromEntries(new FormData(form));
+
+    if (isRegister && payload.password !== payload.password2) {
+      login("گذرواژه‌ها یکسان نیستند.", "register");
+      return;
+    }
+
+    const originalButtonText = submitButton.innerHTML;
+    submitButton.disabled = true;
+    submitButton.querySelector("span").textContent = "در حال بررسی...";
 
     try {
       if (isRegister) {
-        if (payload.password !== payload.password2) {
-          return login("گذرواژه‌ها یکسان نیستند.", "register");
-        }
-
         const d = await api("/api/register", {
           method: "POST",
-
           body: JSON.stringify({
             firstName: payload.firstName,
-
             lastName: payload.lastName,
-
             username: payload.username,
-
             password: payload.password,
           }),
         });
@@ -547,10 +355,8 @@ function login(msg = "", mode = "login") {
       } else {
         const d = await api("/api/login", {
           method: "POST",
-
           body: JSON.stringify({
             username: payload.username,
-
             password: payload.password,
           }),
         });
@@ -559,9 +365,18 @@ function login(msg = "", mode = "login") {
       }
     } catch (x) {
       login(x.message, mode);
+    } finally {
+      if (submitButton.isConnected) {
+        submitButton.disabled = false;
+        submitButton.innerHTML = originalButtonText;
+      }
     }
   };
+
+  // Initialize orbit after its HTML has been created
+  window.initAuthCarousel?.();
 }
+
 async function load() {
   const d = await api("/api/products");
   state.products = d.products;

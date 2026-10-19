@@ -6126,6 +6126,7 @@ button.career-back-button[data-page="home"]:hover {
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .system-card-footer {
@@ -6722,4 +6723,1045 @@ button.career-back-button[data-page="home"]:hover {
   .smart-start-progress.is-running {
     animation: none;
   }
+}
+
+.auth-page {
+  --accent: #70a7ff;
+  --muted: #9aacc9;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(340px, 0.85fr) minmax(420px, 1.15fr);
+  align-items: center;
+  gap: 56px;
+  padding: 48px clamp(20px, 6vw, 100px);
+  overflow: hidden;
+  color: #f4f7ff;
+  background:
+    radial-gradient(ellipse at 75% 30%, #203c70 0, transparent 40%),
+    radial-gradient(ellipse at 10% 90%, #272451 0, transparent 35%), #080d1b;
+  font-family: Vazirmatn, Tahoma, sans-serif;
+}
+
+.auth-panel {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 460px;
+  justify-self: end;
+  padding: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 28px;
+  background: rgba(255, 255, 255, 0.065);
+  backdrop-filter: blur(22px);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 22px;
+  border: 1px solid #70a7ff66;
+  border-radius: 18px;
+  color: #a8cbff;
+  background: #70a7ff1a;
+  font-size: 28px;
+}
+
+.auth-panel h1 {
+  margin: 0 0 12px;
+  font-size: clamp(23px, 2vw, 30px);
+}
+
+.auth-panel > p,
+.system-card p,
+.orbit-caption p {
+  color: var(--muted);
+  line-height: 2;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 28px 0;
+  padding: 5px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 12px;
+  border: 0;
+  border-radius: 10px;
+  color: #aab9d2;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+}
+
+.auth-tab.active {
+  color: #fff;
+  background: linear-gradient(120deg, #356bc4, #7555c9);
+}
+
+.systems-panel {
+  min-width: 0;
+  text-align: center;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 3px;
+}
+
+.systems-panel h2 {
+  margin: 18px 0 34px;
+  font-size: clamp(24px, 3vw, 38px);
+  line-height: 1.8;
+}
+
+.orbit-stage {
+  position: relative;
+  width: min(100%, 510px);
+  aspect-ratio: 1;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+}
+
+.orbit-ring {
+  position: absolute;
+  border: 1px solid rgba(132, 174, 255, 0.2);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.ring-one {
+  width: 68%;
+  height: 68%;
+}
+
+.ring-two {
+  width: 94%;
+  height: 94%;
+  border-style: dashed;
+  animation: orbit-spin 35s linear infinite;
+}
+
+.orbit-core {
+  position: absolute;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  border: 1px solid #8bbaff66;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 20%, #274b83, #101b35 75%);
+  box-shadow: 0 0 50px #477ce833;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.system-card {
+  position: absolute;
+  z-index: 2;
+  width: 190px;
+  min-height: 150px;
+  padding: 17px;
+  border: 1px solid rgba(155, 188, 255, 0.23);
+  border-radius: 20px;
+  opacity: 0.28;
+  filter: blur(2px);
+  transform: scale(0.78);
+  background: rgba(21, 35, 63, 0.88);
+  box-shadow: 0 14px 40px #0003;
+  transition:
+    top 0.7s ease,
+    left 0.7s ease,
+    opacity 0.7s ease,
+    filter 0.7s ease,
+    transform 0.7s ease;
+}
+
+.system-card h3 {
+  margin: 8px 0;
+  font-size: 15px;
+}
+
+.system-card p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.9;
+}
+
+.system-icon {
+  font-size: 25px;
+}
+
+.system-card.active {
+  z-index: 4;
+  top: 50%;
+  left: 50%;
+  opacity: 1;
+  filter: none;
+  transform: translate(-50%, -50%) scale(1);
+  border-color: #7fb0ff99;
+  background: linear-gradient(145deg, #203d68, #111a30);
+  box-shadow: 0 20px 70px #4b82e533;
+}
+
+.system-card.pos-0 {
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%) scale(0.82);
+}
+.system-card.pos-1 {
+  top: 50%;
+  left: 4%;
+  transform: translateY(-50%) scale(0.82);
+}
+.system-card.pos-2 {
+  top: 50%;
+  right: 4%;
+  transform: translateY(-50%) scale(0.82);
+}
+.system-card.pos-3 {
+  bottom: 4%;
+  left: 50%;
+  transform: translateX(-50%) scale(0.82);
+}
+
+.orbit-caption {
+  max-width: 430px;
+  margin: 0 auto;
+  text-align: right;
+}
+
+#system-counter {
+  color: var(--accent);
+  font-size: 12px;
+}
+
+.caption-line {
+  width: 54px;
+  height: 2px;
+  margin: 12px 0;
+  background: var(--accent);
+}
+
+.orbit-caption p {
+  min-height: 48px;
+  margin: 0;
+  font-size: 14px;
+}
+
+@keyframes orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .auth-page {
+    grid-template-columns: 1fr;
+    gap: 44px;
+    padding: 28px 18px;
+  }
+
+  .auth-panel {
+    justify-self: center;
+    max-width: 520px;
+    grid-row: 1;
+    padding: 28px 22px;
+  }
+
+  .systems-panel {
+    grid-row: 2;
+  }
+
+  .orbit-stage {
+    max-width: 440px;
+  }
+}
+
+@media (max-width: 480px) {
+  .orbit-stage {
+    width: 100%;
+  }
+
+  .system-card {
+    width: 145px;
+    min-height: 132px;
+    padding: 12px;
+  }
+
+  .system-card h3 {
+    font-size: 12px;
+  }
+
+  .system-card p {
+    font-size: 10px;
+  }
+
+  .orbit-core {
+    width: 82px;
+    height: 82px;
+    font-size: 15px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-two {
+    animation: none;
+  }
+  .system-card {
+    transition: none;
+  }
+}
+
+/* =========================================
+   Rahnayar Auth - Soft Violet & White Theme
+   ========================================= */
+
+.auth-page {
+  --accent: rgb(132 113 238 / 92%);
+  --accent-light: #a99afa;
+  --accent-dark: #7562df;
+  --muted: #77758e;
+
+  box-sizing: border-box;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  min-height: 0;
+
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 64px);
+  padding: clamp(16px, 3vh, 30px) clamp(20px, 5vw, 76px);
+
+  overflow: hidden;
+  color: #292542;
+
+  background:
+    radial-gradient(circle at 15% 20%, rgb(132 113 238 / 17%), transparent 32%),
+    radial-gradient(circle at 85% 80%, rgb(184 173 255 / 23%), transparent 34%),
+    linear-gradient(135deg, #ffffff 0%, #f8f7ff 52%, #f0edff 100%);
+}
+
+/* فرم ورود و ثبت‌نام */
+.auth-panel {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 430px;
+  max-height: calc(100svh - 32px);
+  padding: clamp(22px, 3vh, 32px);
+
+  justify-self: end;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #d5cdfc transparent;
+
+  color: #292542;
+  border: 1px solid rgb(132 113 238 / 19%);
+  border-radius: 26px;
+
+  background: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 97%),
+    rgb(250 248 255 / 91%)
+  );
+
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+
+  box-shadow:
+    0 24px 70px rgb(83 65 160 / 10%),
+    0 5px 18px rgb(132 113 238 / 7%),
+    inset 0 1px 0 rgb(255 255 255 / 95%);
+}
+
+.auth-panel h1 {
+  color: #30294f;
+  font-size: clamp(22px, 2vw, 28px);
+  line-height: 1.65;
+  margin-bottom: 8px;
+}
+
+.auth-panel > p {
+  color: #85819e;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+/* لوگو */
+.auth-panel .brand-mark {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 14px;
+  border-radius: 16px;
+
+  color: white;
+  background: linear-gradient(140deg, rgb(132 113 238 / 92%), #b4a5ff);
+
+  border: 1px solid rgb(132 113 238 / 22%);
+  box-shadow: 0 8px 22px rgb(132 113 238 / 25%);
+}
+
+/* تب‌های ورود و ثبت‌نام */
+.auth-tabs {
+  gap: 6px;
+  margin: 20px 0;
+  padding: 5px;
+  border: 1px solid #eeebfb;
+  border-radius: 14px;
+  background: #f5f3ff;
+}
+
+.auth-tab {
+  min-height: 42px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  color: #85809f;
+  transition:
+    color 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.auth-tab:hover {
+  color: var(--accent-dark);
+}
+
+.auth-tab.active {
+  color: #fff;
+  background: linear-gradient(120deg, rgb(132 113 238 / 92%), #a99afa);
+  box-shadow: 0 5px 14px rgb(132 113 238 / 24%);
+}
+
+/* فیلدهای فرم */
+.auth-panel input,
+.auth-panel select,
+.auth-panel textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 12px 14px;
+
+  color: #30294f;
+  font-family: inherit;
+  font-size: 13px;
+
+  border: 1px solid #e6e1f8;
+  border-radius: 13px;
+  outline: none;
+
+  background: linear-gradient(135deg, #ffffff 0%, #fbfaff 100%);
+
+  box-shadow: inset 0 1px 2px rgb(52 39 105 / 2%);
+
+  transition:
+    border-color 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease,
+    transform 0.22s ease;
+}
+
+.auth-panel input::placeholder,
+.auth-panel textarea::placeholder {
+  color: #aaa5c0;
+  opacity: 1;
+}
+
+.auth-panel input:hover,
+.auth-panel select:hover,
+.auth-panel textarea:hover {
+  border-color: #cfc5fa;
+}
+
+.auth-panel input:focus,
+.auth-panel select:focus,
+.auth-panel textarea:focus {
+  border-color: rgb(132 113 238 / 85%);
+  background: #fff;
+
+  box-shadow:
+    0 0 0 3px rgb(132 113 238 / 12%),
+    0 5px 16px rgb(132 113 238 / 7%);
+}
+
+/* فاصله و رنگ برچسب فیلدها */
+.auth-panel label {
+  color: #514b70;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* دکمه اصلی فرم */
+.auth-panel form button[type="submit"] {
+  width: 100%;
+  min-height: 47px;
+  margin-top: 8px;
+
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+
+  border: 0;
+  border-radius: 13px;
+  cursor: pointer;
+
+  background: linear-gradient(
+    115deg,
+    rgb(132 113 238 / 92%) 0%,
+    #a99afa 55%,
+    #8d7aea 100%
+  );
+
+  box-shadow: 0 9px 22px rgb(132 113 238 / 25%);
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.auth-panel form button[type="submit"]:hover {
+  transform: translateY(-2px);
+  filter: saturate(1.08);
+  box-shadow: 0 12px 27px rgb(132 113 238 / 32%);
+}
+
+.auth-panel form button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+/* بخش معرفی سامانه‌ها */
+.systems-panel {
+  min-width: 0;
+  color: #30294f;
+}
+
+.systems-panel .eyebrow {
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.systems-panel h2 {
+  color: #30294f;
+  margin-bottom: 18px;
+}
+
+.orbit-stage {
+  width: min(100%, 430px);
+}
+
+.orbit-ring {
+  border-color: rgb(132 113 238 / 20%);
+}
+
+.ring-two {
+  border-color: rgb(132 113 238 / 25%);
+}
+
+.orbit-core {
+  color: #fff;
+  border-color: rgb(132 113 238 / 40%);
+
+  background: radial-gradient(
+    circle at 30% 20%,
+    #c2b7ff,
+    rgb(132 113 238 / 92%) 52%,
+    #6c5acb 100%
+  );
+
+  box-shadow:
+    0 0 42px rgb(132 113 238 / 25%),
+    inset 0 1px 8px rgb(255 255 255 / 25%);
+}
+
+/* کارت‌های سامانه */
+.system-card {
+  color: #30294f;
+  border-color: rgb(132 113 238 / 18%);
+  background: rgb(255 255 255 / 84%);
+
+  box-shadow:
+    0 12px 32px rgb(83 65 160 / 9%),
+    inset 0 1px 0 rgb(255 255 255 / 90%);
+}
+
+.system-card h3 {
+  color: #393154;
+}
+
+.system-card p {
+  color: #88829f;
+}
+
+.system-card.active {
+  color: #30294f;
+  border-color: rgb(132 113 238 / 48%);
+
+  background: linear-gradient(145deg, #ffffff 0%, #f1edff 100%);
+
+  box-shadow:
+    0 20px 55px rgb(132 113 238 / 19%),
+    inset 0 1px 0 #fff;
+}
+
+.system-card.active h3 {
+  color: #5c49bd;
+}
+
+.system-card.active p {
+  color: #77718f;
+}
+
+#system-counter {
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.caption-line {
+  background: linear-gradient(
+    90deg,
+    rgb(132 113 238 / 35%),
+    rgb(132 113 238 / 92%)
+  );
+}
+
+.orbit-caption p {
+  color: #77718f;
+}
+
+/* صفحه‌های با ارتفاع کم؛ فرم جمع‌وجورتر شود */
+@media (max-height: 760px) and (min-width: 901px) {
+  .auth-page {
+    gap: 28px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .auth-panel {
+    padding: 20px 26px;
+  }
+
+  .auth-panel .brand-mark {
+    width: 40px;
+    height: 40px;
+    margin-bottom: 8px;
+    font-size: 22px;
+  }
+
+  .auth-panel h1 {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
+
+  .auth-panel > p {
+    margin-top: 4px;
+    margin-bottom: 8px;
+  }
+
+  .auth-tabs {
+    margin: 12px 0;
+  }
+
+  .auth-panel input,
+  .auth-panel select,
+  .auth-panel textarea {
+    min-height: 40px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+
+  .auth-panel form button[type="submit"] {
+    min-height: 42px;
+  }
+
+  .orbit-stage {
+    width: min(100%, 350px);
+  }
+
+  .systems-panel h2 {
+    font-size: 25px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .system-card {
+    min-height: 125px;
+    padding: 12px;
+  }
+}
+
+/* موبایل و تبلت */
+@media (max-width: 900px) {
+  .auth-page {
+    height: auto;
+    min-height: 100svh;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding: 20px 16px 28px;
+    overflow: visible;
+  }
+
+  .auth-panel {
+    grid-row: 1;
+    justify-self: center;
+    max-width: 500px;
+    max-height: none;
+    padding: 24px 20px;
+    overflow: visible;
+  }
+
+  .systems-panel {
+    grid-row: 2;
+  }
+
+  .orbit-stage {
+    width: min(100%, 370px);
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-panel {
+    padding: 21px 16px;
+    border-radius: 22px;
+  }
+
+  .auth-tabs {
+    margin: 16px 0;
+  }
+
+  .auth-panel input,
+  .auth-panel select,
+  .auth-panel textarea {
+    min-height: 44px;
+    font-size: 13px;
+  }
+
+  .orbit-stage {
+    width: 100%;
+  }
+}
+
+/* ===== Password visibility button ===== */
+
+.auth-panel .password-toggle,
+.auth-panel #togglePassword {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 34px;
+  padding: 0;
+
+  border: 1px solid #e8e2ff;
+  border-radius: 11px;
+
+  color: #8270df;
+  background: linear-gradient(145deg, #ffffff, #f0ecff);
+
+  font-size: 17px;
+  line-height: 1;
+  cursor: pointer;
+
+  box-shadow: 0 3px 10px rgb(132 113 238 / 10%);
+  transition: all 0.22s ease;
+}
+
+.auth-panel .password-toggle:hover,
+.auth-panel #togglePassword:hover {
+  color: #fff;
+  border-color: rgb(132 113 238 / 92%);
+  background: linear-gradient(135deg, #a99afa, rgb(132 113 238 / 92%));
+  box-shadow: 0 5px 14px rgb(132 113 238 / 25%);
+}
+
+.auth-panel .password-toggle:active,
+.auth-panel #togglePassword:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
+.auth-panel .password-toggle:focus-visible,
+.auth-panel #togglePassword:focus-visible {
+  outline: 3px solid rgb(132 113 238 / 25%);
+  outline-offset: 2px;
+}
+
+/* جا برای دکمه داخل فیلد رمز */
+.auth-panel #passwordInput {
+  padding-left: 56px;
+}
+
+/* ===== Terms checkbox ===== */
+
+/* جلوگیری از اعمال استایل فیلدهای معمولی روی چک‌باکس */
+.auth-panel input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+
+  display: inline-grid;
+  place-content: center;
+
+  flex: 0 0 20px;
+  width: 20px;
+  min-width: 20px;
+  height: 20px;
+  min-height: 20px;
+
+  margin: 0;
+  padding: 0;
+
+  border: 1.5px solid #c9c0f5;
+  border-radius: 6px;
+
+  background: #fff;
+  box-shadow: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-panel input[type="checkbox"]::before {
+  content: "✓";
+  color: white;
+  font-size: 13px;
+  font-weight: 800;
+  transform: scale(0);
+  transition: transform 0.16s ease;
+}
+
+.auth-panel input[type="checkbox"]:checked {
+  border-color: rgb(132 113 238 / 92%);
+  background: linear-gradient(135deg, #a99afa, rgb(132 113 238 / 92%));
+  box-shadow: 0 3px 9px rgb(132 113 238 / 22%);
+}
+
+.auth-panel input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+
+.auth-panel input[type="checkbox"]:focus-visible {
+  outline: 3px solid rgb(132 113 238 / 20%);
+  outline-offset: 3px;
+}
+
+/* پشتیبانی از ساختار label با کلاس‌های مختلف */
+.auth-panel .glass-checkbox,
+.auth-panel .terms-checkbox,
+.auth-panel .auth-terms,
+.auth-panel label:has(input[type="checkbox"]) {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  width: 100%;
+  margin: 16px 0;
+
+  color: #625b7d;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.9;
+  cursor: pointer;
+}
+
+.auth-panel .glass-checkbox span,
+.auth-panel .terms-checkbox span,
+.auth-panel .auth-terms span {
+  line-height: 1.9;
+}
+
+/* ===== Make system cards easier to see ===== */
+
+.auth-page .system-card {
+  opacity: 0.78;
+  filter: none;
+  border-color: rgb(132 113 238 / 30%);
+
+  background: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 98%),
+    rgb(243 240 255 / 96%)
+  );
+
+  box-shadow:
+    0 10px 28px rgb(83 65 160 / 13%),
+    inset 0 1px 0 #fff;
+}
+
+.auth-page .system-card h3 {
+  color: #46377e;
+  font-weight: 700;
+}
+
+.auth-page .system-card p {
+  color: #625b7d;
+}
+
+.auth-page .system-card .system-icon {
+  color: rgb(132 113 238 / 92%);
+}
+
+.auth-page .system-card.active {
+  opacity: 1;
+  filter: none;
+  border-color: rgb(132 113 238 / 70%);
+
+  background: linear-gradient(145deg, #ffffff 0%, #eeeaff 100%);
+
+  box-shadow:
+    0 18px 42px rgb(132 113 238 / 22%),
+    inset 0 1px 0 #fff;
+}
+
+/* کارت‌های غیرفعال هم خوانا بمانند */
+.auth-page .system-card:not(.active) {
+  opacity: 0.82;
+  filter: none;
+}
+
+/* =====================================
+   Fix Admin Sidebar Layout
+   ===================================== */
+
+/* سایدبار در ارتفاع صفحه محدود بماند */
+.app-shell .sidebar {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* بخش داخلی سایدبار */
+.app-shell .sidebar-inner {
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* منو فضای باقی‌مانده را بگیرد و مستقل اسکرول شود */
+.app-shell .sidebar-nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  padding-bottom: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: #c7bdf5 transparent;
+}
+
+/* بخش پایین شامل اشتراک و خروج */
+.app-shell .sidebar-bottom {
+  flex: 0 0 auto;
+  margin-top: auto;
+  padding-top: 12px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+
+  background: inherit;
+  position: relative;
+  z-index: 2;
+}
+
+/* آیتم‌های منو در فضای محدود جمع‌وجورتر باشند */
+.app-shell .sidebar-nav .nav {
+  flex-shrink: 0;
+}
+
+/* صفحه اصلی پنل اجازه اسکرول مستقل داشته باشد */
+.app-shell .main {
+  min-height: 0;
+  min-width: 0;
+}
+
+/* در نمایشگرهای کوتاه، فاصله‌های سایدبار کمتر شود */
+@media (max-height: 800px) {
+  .app-shell .sidebar-inner {
+    padding-top: 12px;
+    padding-bottom: 8px;
+  }
+
+  .app-shell .role-chip {
+    margin-bottom: 12px;
+  }
+
+  .app-shell .sidebar-label {
+    margin-top: 12px;
+    margin-bottom: 6px;
+  }
+
+  .app-shell .sidebar-nav .nav {
+    padding-top: 9px;
+    padding-bottom: 9px;
+    margin-bottom: 3px;
+  }
+
+  .app-shell .sidebar-bottom {
+    padding-top: 8px;
+  }
+
+  .app-shell .mini-plan {
+    margin-bottom: 8px;
+  }
+}
+/* Restore Ravanyar logo color in internal dashboard */
+.app-shell .brand,
+.app-shell .brand-button,
+.app-shell .brand span,
+.app-shell .brand-button span {
+  color: #8471ee !important;
+  opacity: 1 !important;
+  filter: none !important;
+  -webkit-text-fill-color: #8471ee;
+}
+
+.app-shell .brand svg,
+.app-shell .brand-button svg {
+  color: #8471ee !important;
+  fill: currentColor;
+  opacity: 1 !important;
+}
+/* Stronger purple gradient background for auth page */
+.auth-page {
+  background:
+    radial-gradient(
+      ellipse at 12% 18%,
+      rgb(132 113 238 / 34%) 0%,
+      transparent 42%
+    ),
+    radial-gradient(
+      ellipse at 88% 22%,
+      rgb(167 143 255 / 32%) 0%,
+      transparent 40%
+    ),
+    radial-gradient(
+      ellipse at 75% 90%,
+      rgb(116 91 224 / 28%) 0%,
+      transparent 45%
+    ),
+    radial-gradient(
+      ellipse at 18% 82%,
+      rgb(196 181 253 / 38%) 0%,
+      transparent 42%
+    ),
+    linear-gradient(135deg, #f0ecff 0%, #ffffff 35%, #e7e0ff 68%, #f7f4ff 100%) !important;
 }
